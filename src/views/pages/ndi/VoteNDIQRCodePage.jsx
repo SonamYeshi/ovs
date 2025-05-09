@@ -2,60 +2,61 @@ import { useEffect, useState } from 'react';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { QRCode } from 'react-qrcode-logo';
-import NDIlogobg from "../../../assets/images/ndi/QRNDIlogo.png";
+import NDIlogobg from '../../../assets/images/ndi/QRNDIlogo.png';
 import ScanButton from '../../../assets/images/ndi/ScanButton.png';
-import GooglePlay from "../../../assets/images/ndi/google.jpg";
-import AppStore from "../../../assets/images/ndi/apple.jpg";
-import AppConstant from "../ndi/AppConstant";
-import BaseButton from "../ndi/BaseButton";
-import Divider from "@mui/material/Divider";
-import BaseInlineColorText from "../ndi/BaseInlineColorText";
-// import Grid from "@mui/material/Grid";
-// import Box from '@mui/material/Box';
-// import Typography from '@mui/material/Typography';
-// import Button from "@mui/material/Button";
-import {
-    Box,
-    Grid,
-    Typography,
-    Button
-} from "@mui/material";
+import GooglePlay from '../../../assets/images/ndi/google.jpg';
+import AppStore from '../../../assets/images/ndi/apple.jpg';
+import AppConstant from '../ndi/AppConstant';
+import BaseButton from '../ndi/BaseButton';
+import Divider from '@mui/material/Divider';
+import BaseInlineColorText from '../ndi/BaseInlineColorText';
+import { Box, Grid, Typography, Button, IconButton } from '@mui/material';
 import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined';
-import {faPlayCircle} from "@fortawesome/free-solid-svg-icons";
+import { faPlayCircle } from '@fortawesome/free-solid-svg-icons';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import CrossImg from 'assets/images/corssImg.png';
+import CloseIcon from '@mui/icons-material/Close';
+import globalLib from 'utils/global-lib';
 
 import NdiService from '../../../services/ndi.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const VoteNDIQRCodePage = () => {
-    const location = useLocation(); //hook to access the state passed
+    const location = useLocation();
     const { isMobile } = location.state || {};
-    // const { url, isMobile, deepLinkUrl, progressNDI } = location.state || {};
 
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
     const [progressNDI, setProgressNDI] = useState(true);
     const [alertMessage, setAlertMessage] = useState(null);
+    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState('');
 
     const constant = AppConstant();
     const navigate = useNavigate();
 
     useEffect(() => {
-        NdiService.proofNdiRequest().then((res) => {
-            const deepLink = res.data.deepLinkURL;
-            const invite = res.data.inviteURL;
-            const threadId = res.data.threadId;
+        NdiService.proofNdiRequest()
+            .then((res) => {
+                const deepLink = res.data.deepLinkURL;
+                const invite = res.data.inviteURL;
+                const threadId = res.data.threadId;
 
-            setUrl(invite);
-            setDeepLinkUrl(deepLink);
-            setProgressNDI(false);
+                setUrl(invite);
+                setDeepLinkUrl(deepLink);
+                setProgressNDI(false);
 
-            natsListener(threadId);
-        }).catch((err) => {
-            setAlertMessage("Failed to load QR code. Please try again.");
-            setProgressNDI(false);
-        });
+                natsListener(threadId);
+            })
+            .catch((err) => {
+                setAlertMessage('Failed to load QR code. Please try again.');
+                setProgressNDI(false);
+            });
     }, []);
 
     const natsListener = (threadId) => {
@@ -63,16 +64,14 @@ const VoteNDIQRCodePage = () => {
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
-            console.log(data)
             if (data.status === 'exists') {
+                globalLib.successMsg();
                 navigate('/localElectionScanPage', {
                     state: { cid: data.userDTO.cidNumber }
                 });
             } else {
-                navigate('/dashboard/not-eligible', {
-                    state: { errorMessage: data.userDTO.message || 'Voters Eligibility Failed.' }
-                });
-                // setAlertMessage(data.userDTO.message || 'User not found.');
+                setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
+                setErrorDialogOpen(true);
             }
         });
     };
@@ -107,11 +106,11 @@ const VoteNDIQRCodePage = () => {
                     }}
                 >
                     {progressNDI ? (
-                    <Box sx={{ textAlign: 'center' }}>
-                        {/* <l-line-spinner size="40" stroke="3" speed="1" color="black" /> */}
-                        <CircularProgress size={40} thickness={4} sx={{ mb: 1 }} />
-                        <Typography sx={{ mt: 2 }}>Generating QR code...</Typography>
-                    </Box>
+                        <Box sx={{ textAlign: 'center' }}>
+                            {/* <l-line-spinner size="40" stroke="3" speed="1" color="black" /> */}
+                            <CircularProgress size={40} thickness={4} sx={{ mb: 1 }} />
+                            <Typography sx={{ mt: 2 }}>Generating QR code...</Typography>
+                        </Box>
                     ) : alertMessage ? (
                         <Typography color="error">{alertMessage}</Typography>
                     ) : (
@@ -125,22 +124,21 @@ const VoteNDIQRCodePage = () => {
                     <li>Open Bhutan NDI Wallet on your phone.</li>
                     <li>
                         Tap the Scan button located on the menu bar
-                        <img 
-                            src={ScanButton} 
-                            alt="Scan" 
-                            style={{ 
-                                width: 21, 
-                                height: 21, 
-                                margin: '0 6px', 
-                                verticalAlign: 'middle' 
-                            }} 
+                        <img
+                            src={ScanButton}
+                            alt="Scan"
+                            style={{
+                                width: 21,
+                                height: 21,
+                                margin: '0 6px',
+                                verticalAlign: 'middle'
+                            }}
                         />
                         <br />
                         and capture code.
                     </li>
                 </ol>
             </Box>
-
 
             {isMobile && (
                 <>
@@ -154,7 +152,7 @@ const VoteNDIQRCodePage = () => {
                             ix={{
                                 href: deepLinkUrl,
                                 target: '_blank',
-                                rel: 'noreferrer',
+                                rel: 'noreferrer'
                             }}
                             first="Open "
                             mid="Bhutan NDI"
@@ -199,6 +197,32 @@ const VoteNDIQRCodePage = () => {
                     </Button>
                 </Grid>
             </Grid>
+            <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
+                <IconButton
+                    aria-label="close"
+                    onClick={() => setErrorDialogOpen(false)}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8
+                    }}
+                >
+                    <CloseIcon color="error" />
+                </IconButton>
+                <Box display={'flex'} justifyContent={'center'}>
+                    <img src={CrossImg} alt="corssImg" width="30%" />
+                </Box>
+                <DialogContent>
+                    <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
+                        <Typography variant="h4" textAlign={'center'}>
+                            Error Message
+                        </Typography>
+                        <Typography variant="h5" color="error">
+                            {dialogMessage}
+                        </Typography>
+                    </Box>
+                </DialogContent>
+            </Dialog>
         </Box>
     );
 };

@@ -5,6 +5,9 @@ import Typography from '@mui/material/Typography';
 import { Box, Button } from '@mui/material';
 
 // project imports
+import NationalAssemblyImg from 'assets/images/National Assembly.png';
+import NationalCouncilImg from 'assets/images/nationa Council.png';
+import LocalGovtImg from 'assets/images/Local Oovernment.png';
 import VoteIcon from 'assets/images/VoteIcon.png';
 
 import MainCard from 'ui-component/cards/MainCard';
@@ -25,14 +28,14 @@ const Election = () => {
                     >
                         <Box
                             component={Link}
-                            href="/nationalAssemblyElectionScanPage"
+                            // href="/nationalAssemblyElectionScanPage"
                             sx={{ textDecoration: 'none' }}
                             display={'flex'}
                             flexDirection="column"
                             alignItems="center"
                             gap={2}
                         >
-                            <img src={VoteIcon} alt="VoteIcon" height="20%" width="20%" />
+                            <img src={NationalAssemblyImg} alt="NationalAssemblyImg" height="20%" width="20%" />
                             <Typography
                                 variant="body1"
                                 sx={{
@@ -66,14 +69,14 @@ const Election = () => {
                     >
                         <Box
                             component={Link}
-                            href="/nationalCouncilElectionScanPage"
+                            // href="/nationalCouncilElectionScanPage"
                             sx={{ textDecoration: 'none' }}
                             display={'flex'}
                             flexDirection="column"
                             alignItems="center"
                             gap={2}
                         >
-                            <img src={VoteIcon} alt="VoteIcon" height="20%" width="20%" />
+                            <img src={NationalCouncilImg} alt="NationalCouncilImg" height="20%" width="20%" />
                             <Typography
                                 variant="body1"
                                 sx={{
@@ -106,15 +109,14 @@ const Election = () => {
                         }}
                     >
                         <Box
-                            component={Link}
-                            href="/localElectionScanPage"
+                            component={Link}                         
                             sx={{ textDecoration: 'none' }}
                             display={'flex'}
                             flexDirection="column"
                             alignItems="center"
                             gap={2}
                         >
-                            <img src={VoteIcon} alt="VoteIcon" height="20%" width="20%" />
+                            <img src={LocalGovtImg} alt="LocalGovtImg" height="20%" width="20%" />
                             <Typography
                                 variant="body1"
                                 sx={{
@@ -148,7 +150,7 @@ const Election = () => {
                     >
                         <Box
                             component={Link}
-                            href="/byeElectionScanPage"
+                            // href="/byeElectionScanPage"
                             sx={{ textDecoration: 'none' }}
                             display={'flex'}
                             flexDirection="column"
