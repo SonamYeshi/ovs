@@ -123,7 +123,7 @@ export const JWTProvider = ({ children }) => {
                     user
                 }
             });
-            navigate('/dashboard/default');
+            navigate('/dashboard');
         } else {
             return response.error;
         }

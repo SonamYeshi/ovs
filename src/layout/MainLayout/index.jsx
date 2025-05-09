@@ -14,7 +14,7 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 import HorizontalBar from './HorizontalBar';
 import MainContentStyled from './MainContentStyled';
-import Customization from '../Customization';
+
 import Loader from 'ui-component/Loader';
 import Breadcrumbs from 'ui-component/extended/Breadcrumbs';
 
@@ -57,17 +57,20 @@ const MainLayout = () => {
             </AppBar>
 
             {/* menu / drawer */}
-            {menu}
+         {menu}
 
             {/* main content */}
             <MainContentStyled {...{ borderRadius, menuOrientation, open: drawerOpen, theme }}>
                 <Container maxWidth={container ? 'lg' : false} {...(!container && { sx: { px: { xs: 0 } } })}>
                     {/* breadcrumb */}
-                    <Breadcrumbs />
+                    <Box mt={3}>
+                        {' '}
+                        <Breadcrumbs />
+                    </Box>
+
                     <Outlet />
                 </Container>
             </MainContentStyled>
-            <Customization />
         </Box>
     );
 };

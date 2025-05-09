@@ -1,7 +1,6 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useConfig from 'hooks/useConfig';
 import LogoSection from '../LogoSection';
@@ -9,6 +8,8 @@ import ProfileSection from './ProfileSection';
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 import { MenuOrientation, ThemeMode } from 'config';
 import { IconMenu2 } from '@tabler/icons-react';
+import MenuIcon from '@mui/icons-material/Menu';
+import { IconButton, Box } from '@mui/material';
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
@@ -36,15 +37,14 @@ const Header = () => {
                             ...theme.typography.mediumAvatar,
                             overflow: 'hidden',
                             transition: 'all .2s ease-in-out',
-                            bgcolor: mode === ThemeMode.DARK ? 'dark.main' : 'secondary.light',
-                            color: mode === ThemeMode.DARK ? 'secondary.main' : 'secondary.dark',
+                            bgcolor: '#003366',
+                            color: '#ffffff',
                             '&:hover': {
-                                bgcolor: mode === ThemeMode.DARK ? 'secondary.main' : 'secondary.dark',
-                                color: mode === ThemeMode.DARK ? 'secondary.light' : 'secondary.light'
+                                bgcolor: '#356a9e'
                             }
                         }}
                         onClick={() => handlerDrawerOpen(!drawerOpen)}
-                        color="inherit"
+                        color="#fffff"
                     >
                         <IconMenu2 stroke={1.5} size="20px" />
                     </Avatar>
@@ -56,7 +56,6 @@ const Header = () => {
 
             {/* profile */}
             <ProfileSection />
-
         </>
     );
 };

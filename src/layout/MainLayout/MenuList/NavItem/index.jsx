@@ -55,7 +55,11 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
         <Icon
             stroke={1.5}
             size={drawerOpen ? '20px' : '24px'}
-            style={{ ...(isHorizontal && isParents && { fontSize: 20, stroke: '1.5' }) }}
+            style={{
+                ...(isHorizontal && isParents && { fontSize: 20, stroke: '1.5' }),
+                color: isSelected ? '#ffffff' : '#000000'
+            }}
+            // color={isSelected ? '#ffffff' : '#000000'}
         />
     ) : (
         <FiberManualRecordIcon sx={{ width: isSelected ? 8 : 6, height: isSelected ? 8 : 6 }} fontSize={level > 0 ? 'inherit' : 'medium'} />
@@ -74,7 +78,7 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
         }
     };
 
-    const iconSelectedColor = mode === ThemeMode.DARK && drawerOpen ? 'text.primary' : 'secondary.main';
+    // const iconSelectedColor = mode === ThemeMode.DARK && drawerOpen ? 'text.primary' : 'secondary.main';
 
     return (
         <>
@@ -94,14 +98,15 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                             level === 1 &&
                             mode !== ThemeMode.DARK && {
                                 '&:hover': {
-                                    bgcolor: 'secondary.light'
+                                    // bgcolor: 'secondary.light'
+                                    bgcolor: '#003366'
                                 },
                                 '&.Mui-selected': {
-                                    bgcolor: 'secondary.light',
-                                    color: iconSelectedColor,
+                                    bgcolor: '#003366',
+                                    color: '#ffffff',
                                     '&:hover': {
-                                        color: iconSelectedColor,
-                                        bgcolor: 'secondary.light'
+                                        color: '#ffffff',
+                                        bgcolor: '#003366'
                                     }
                                 }
                             }),
@@ -125,7 +130,11 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                         <ListItemIcon
                             sx={{
                                 minWidth: level === 1 ? 36 : 18,
-                                color: isSelected ? iconSelectedColor : 'text.primary',
+                                color: '#ffffff',
+                                // color: isSelected ? 'inherit' : 'inherit',
+                                // '&:hover': {
+                                //     color: '#ffffff'
+                                // },
                                 ...(!drawerOpen &&
                                     level === 1 && {
                                         borderRadius: `${borderRadius}px`,
@@ -134,14 +143,12 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         '&:hover': {
-                                            bgcolor: mode === ThemeMode.DARK ? alpha(theme.palette.secondary.main, 0.25) : 'secondary.light'
+                                            bgcolor: '#003366'
                                         },
                                         ...(isSelected && {
-                                            bgcolor:
-                                                mode === ThemeMode.DARK ? alpha(theme.palette.secondary.main, 0.25) : 'secondary.light',
+                                            bgcolor: '#003366',
                                             '&:hover': {
-                                                bgcolor:
-                                                    mode === ThemeMode.DARK ? alpha(theme.palette.secondary.main, 0.3) : 'secondary.light'
+                                                bgcolor: '#003366'
                                             }
                                         })
                                     })
@@ -152,7 +159,7 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                     </ButtonBase>
 
                     {(drawerOpen || (!drawerOpen && level !== 1)) && (
-                        <Tooltip title={item.title} disableHoverListener={!hoverStatus}>
+                        <Tooltip disableHoverListener={!hoverStatus}>
                             <ListItemText
                                 primary={
                                     <Typography
@@ -161,8 +168,13 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                                         overflow="hidden"
                                         textOverflow="ellipsis"
                                         variant={isSelected ? 'h5' : 'body1'}
-                                        color="inherit"
-                                        width={102}
+                                        sx={{
+                                            color: isSelected ? '#ffffff' : 'inherit',
+                                            '&:hover': {
+                                                color: '#ffffff'
+                                            }
+                                        }}
+                                        width={200}
                                     >
                                         {item.title}
                                     </Typography>
@@ -174,6 +186,7 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                                             sx={{ ...theme.typography.subMenuCaption }}
                                             display="block"
                                             gutterBottom
+                                            // color="#ffffff"
                                         >
                                             {item.caption}
                                         </Typography>

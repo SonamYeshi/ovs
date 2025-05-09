@@ -15,16 +15,19 @@ import MenuList from '../MenuList';
 import LogoSection from '../LogoSection';
 import MiniDrawerStyled from './MiniDrawerStyled';
 import Chip from 'ui-component/extended/Chip';
+import { useTheme } from '@mui/material/styles';
 
 import useConfig from 'hooks/useConfig';
 import { MenuOrientation } from 'config';
 import { drawerWidth } from 'store/constant';
-
+import Logo from 'assets/images/ecb-logo.gif'
+import { ThemeMode } from 'config';
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 
 // ==============================|| SIDEBAR DRAWER ||============================== //
 
 const Sidebar = () => {
+    const theme = useTheme();
     const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
     const { menuMaster } = useGetMenuMaster();
@@ -35,7 +38,8 @@ const Sidebar = () => {
     const logo = useMemo(
         () => (
             <Box sx={{ display: 'flex', p: 2 }}>
-                <LogoSection />
+                {/* <LogoSection /> */}
+                <img src={theme.palette.mode === ThemeMode.DARK ? logoDark : Logo} alt="POC" width={'40%'} height={'90%'} />
             </Box>
         ),
         []

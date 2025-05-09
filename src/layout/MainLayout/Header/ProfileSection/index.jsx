@@ -98,11 +98,10 @@ const ProfileSection = () => {
                     borderRadius: '27px',
                     transition: 'all .2s ease-in-out',
                     borderColor: mode === ThemeMode.DARK ? 'dark.main' : 'primary.light',
-                    bgcolor: mode === ThemeMode.DARK ? 'dark.main' : 'primary.light',
+                    bgcolor: mode === ThemeMode.DARK ? 'dark.main' : '#003366',
                     '&[aria-controls="menu-list-grow"], &:hover': {
-                        borderColor: 'primary.main',
-                        bgcolor: `${theme.palette.primary.main} !important`,
-                        color: 'primary.light',
+                        bgcolor: '#356a9e !important',
+                        color: '#ffffff !important',
                         '& svg': {
                             stroke: theme.palette.primary.light
                         }
@@ -126,7 +125,13 @@ const ProfileSection = () => {
                         color="inherit"
                     />
                 }
-                label={<IconSettings stroke={1.5} size="24px" />}
+                label={
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{ color: '#ffffff', mr: 1, fontWeight: 'bold', '&:hover': { color: '#ffffff' } }}>
+                            {'ADMIN'}
+                        </Typography>
+                    </Box>
+                }
                 variant="outlined"
                 ref={anchorRef}
                 aria-controls={open ? 'menu-list-grow' : undefined}
@@ -158,19 +163,6 @@ const ProfileSection = () => {
                             <Paper>
                                 {open && (
                                     <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
-                                        <Box sx={{ p: 2, pb: 0 }}>
-                                            <Stack>
-                                                <Stack direction="row" spacing={0.5} alignItems="center">
-                                                    <Typography variant="h4">Good Morning,</Typography>
-                                                    <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                                                        {user?.name}
-                                                    </Typography>
-                                                </Stack>
-                                                <Typography variant="subtitle2">Project Admin</Typography>
-                                            </Stack>
-
-                                            <Divider />
-                                        </Box>
                                         <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 250px)', overflowX: 'hidden' }}>
                                             <Box sx={{ p: 2, pt: 0 }}>
                                                 <List
