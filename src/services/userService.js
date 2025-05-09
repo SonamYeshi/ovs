@@ -1,0 +1,49 @@
+// import axios from "axios";
+import axios from "utils/axios";
+import authHeader from "./auth-header";
+
+// const BASE_URL = "http://localhost:8080/";
+const BASE_URL = "api/auth";
+
+const registerUser = (data) => {
+    return axios.post(
+        "api/auth/register",
+        data
+    );
+};
+
+const getAllUsers = () => {
+    // const token = localStorage.getItem('serviceToken');
+    // alert(BASE_URL)
+    return axios.get(
+        "api/user/getUsers",
+            {
+                headers: authHeader()
+            }
+    );
+};
+
+const saveBuyer = (data) => {
+    console.log(authHeader());
+    return axios.post(
+        "api/landUser/save",
+        data,
+        {
+            headers: authHeader()
+        }
+    )
+};
+
+const getRefreshToken = (data)=> {
+    console.log(data);
+    return axios.post('api/auth/refreshtoken',
+        data,
+    );
+};
+
+export default{
+    registerUser,
+    getAllUsers,
+    saveBuyer,
+    getRefreshToken,
+};
