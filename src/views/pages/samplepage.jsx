@@ -69,7 +69,7 @@ const SamplePage = () => {
 
     return (
         <MainCard title="Online Voting">
-            
+
             <br></br><br></br>
             <Box
                 display="flex"
@@ -103,6 +103,7 @@ const SamplePage = () => {
                 </Button>
             </Box>
         </MainCard>
+       
     );
 }
 export default SamplePage;

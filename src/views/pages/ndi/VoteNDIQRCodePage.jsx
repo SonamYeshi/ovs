@@ -65,8 +65,8 @@ const VoteNDIQRCodePage = () => {
             const data = JSON.parse(event.data);
             console.log(data)
             if (data.status === 'exists') {
-                navigate('/dashboard/candidates', {
-                    state: { cid: data.userDTO.cidNumber}
+                navigate('/localElectionScanPage', {
+                    state: { cid: data.userDTO.cidNumber }
                 });
             } else {
                 navigate('/dashboard/not-eligible', {
