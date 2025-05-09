@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { useEffect, React, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -20,27 +20,43 @@ import { TITLE, BUTTON_ADD_COLOR } from "common/color";
 import Breadcrumbs from "ui-component/extended/Breadcrumbs";
 import VoteIcon from "assets/images/VoteIcon.png";
 
-const candidates = [
-  {
-    id: 1,
-    name: "Dorji Gyeltshen",
-    image: "https://via.placeholder.com/80x100",
-  },
-  {
-    id: 2,
-    name: "Sonam Penjor",
-    image: "https://via.placeholder.com/80x100",
-  },
-  {
-    id: 3,
-    name: "Dorji Gyeltshen",
-    image: "https://via.placeholder.com/80x100",
-  },
-];
+import voteService from "services/vote.service";
+
+// const candidates = [
+//   {
+//     id: 1,
+//     name: "Dorji Gyeltshen",
+//     image: "https://via.placeholder.com/80x100",
+//   },
+//   {
+//     id: 2,
+//     name: "Sonam Penjor",
+//     image: "https://via.placeholder.com/80x100",
+//   },
+//   {
+//     id: 3,
+//     name: "Dorji Gyeltshen",
+//     image: "https://via.placeholder.com/80x100",
+//   },
+// ];
 
 const LocalElectionScanPage = () => {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [candidates, setCandidates] = useState([]);
+
+  useEffect(() => {
+    const electionTypeId = 1;
+
+    voteService.getCandidates(electionTypeId)
+      .then((response) => {
+        setCandidates(response.data); // assuming response is a list of candidate objects
+      })
+      .catch((error) => {
+        console.error("Error fetching candidates:", error);
+      });
+  }, []);
+
 
   const handleConfirmClick = () => {
     setDialogOpen(true);
@@ -93,11 +109,11 @@ const LocalElectionScanPage = () => {
                 {candidates.map((candidate, index) => (
                   <TableRow key={candidate.id}>
                     <TableCell align="center">{index + 1}</TableCell>
-                    <TableCell>{candidate.name}</TableCell>
+                    <TableCell>{candidate.candidateName}</TableCell>
                     <TableCell align="center">
                       <Avatar
                         src={candidate.image}
-                        alt={candidate.name}
+                        alt={candidate.candidateName}
                         sx={{ width: 56, height: 70 }}
                         variant="rounded"
                       />
