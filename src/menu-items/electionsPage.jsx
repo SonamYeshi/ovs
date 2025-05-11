@@ -37,14 +37,14 @@ const reports = {
     children: [
         {
             id: 'elections',
-            title: <FormattedMessage id="Elections" />,
+            title: <FormattedMessage id="elections" />,
             type: 'item',
             icon: icons.IconUserCheck,
             url: '/election'
         },
         {
             id: 'electionResult',
-            title: <FormattedMessage id=" Elections Results" />,
+            title: <FormattedMessage id="electionResult" />,
             type: 'item',
             icon: icons.IconUserCheck,
             url: '/electionResult'

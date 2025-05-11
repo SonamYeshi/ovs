@@ -14,6 +14,17 @@ const getCandidates = (electionTypeId) => {
     );
 };
 
+const saveVote = (data) => {
+    return axios.post(
+        "voter/recordVote",
+        data,
+        {
+            headers: authHeader()
+        }
+    );
+};
+
 export default{
-    getCandidates
+    getCandidates,
+    saveVote,
 };

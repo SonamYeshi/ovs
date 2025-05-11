@@ -64,10 +64,12 @@ const VoteNDIQRCodePage = () => {
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
+            console.log(data)
             if (data.status === 'exists') {
                 globalLib.successMsg();
                 navigate('/localElectionScanPage', {
-                    state: { cid: data.userDTO.cidNumber }
+                    state: { voterCid: data.userDTO.cid
+                     }
                 });
             } else {
                 setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
