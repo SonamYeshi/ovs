@@ -22,6 +22,7 @@ import DialogActions from '@mui/material/DialogActions';
 import CrossImg from 'assets/images/corssImg.png';
 import CloseIcon from '@mui/icons-material/Close';
 import globalLib from 'utils/global-lib';
+import LoadingPage from 'common/LoadingPage';
 
 import NdiService from '../../../services/ndi.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -36,6 +37,7 @@ const VoteNDIQRCodePage = () => {
     const [alertMessage, setAlertMessage] = useState(null);
     const [errorDialogOpen, setErrorDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const constant = AppConstant();
     const navigate = useNavigate();
@@ -64,13 +66,16 @@ const VoteNDIQRCodePage = () => {
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
-            console.log(data)
+            console.log(data);
+
             if (data.status === 'exists') {
-                globalLib.successMsg();
-                navigate('/localElectionScanPage', {
-                    state: { voterCid: data.userDTO.cid
-                     }
-                });
+                setLoading(true); // Show loading spinner
+                // Slight delay to allow loading spinner to appear
+                setTimeout(() => {
+                    navigate('/localElectionScanPage', {
+                        state: { voterCid: data.userDTO.cid }
+                    });
+                }, 100);
             } else {
                 setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
                 setErrorDialogOpen(true);
@@ -225,6 +230,12 @@ const VoteNDIQRCodePage = () => {
                     </Box>
                 </DialogContent>
             </Dialog>
+            {/* lodaing page */}
+            {loading && (
+                <>
+                    <LoadingPage />
+                </>
+            )}
         </Box>
     );
 };

@@ -1,342 +1,293 @@
-import { useEffect, React, useState } from "react";
-import { useLocation } from 'react-router-dom';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import {
-  Box,
-  Button,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  TableHead,
-  Paper,
-  Avatar,
-  Dialog,
-  DialogActions,
-  DialogContent
-} from "@mui/material";
+    Avatar,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
+} from '@mui/material';
+import CandidateImg from 'assets/images/candidatephoto.jpg';
+import VoteIcon from 'assets/images/VoteIcon.png';
+import { TITLE } from 'common/color';
+import globalLib from 'common/global-lib';
+import LoadingPage from 'common/LoadingPage';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import voteService from 'services/vote.service';
+import VoteNDIQRCode from '../ndi/VoteNDIQRCodePage';
 
-import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
-import { TITLE, BUTTON_ADD_COLOR } from "common/color";
-import Breadcrumbs from "ui-component/extended/Breadcrumbs";
-import VoteIcon from "assets/images/VoteIcon.png";
-
-import voteService from "services/vote.service";
-
-// const candidates = [
-//   {
-//     id: 1,
-//     name: "Dorji Gyeltshen",
-//     image: "https://via.placeholder.com/80x100",
-//   },
-//   {
-//     id: 2,
-//     name: "Sonam Penjor",
-//     image: "https://via.placeholder.com/80x100",
-//   },
-//   {
-//     id: 3,
-//     name: "Dorji Gyeltshen",
-//     image: "https://via.placeholder.com/80x100",
-//   },
-// ];
 
 const LocalElectionScanPage = () => {
-  const location = useLocation();
-  console.log('Location State:', location.state);
-
-  const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [candidates, setCandidates] = useState([]);
-  const [dialogState, setDialogState] = useState({
-    open: false,
-    type: '', // e.g., "vote", "confirm", etc.
-    title: '',
-    message: '',
-    confirmAction: null,
-  });
-
-  const { voterCid } = location.state || {};
-
-  useEffect(() => {
-    const electionTypeId = 1;
-
-    voteService.getCandidates(electionTypeId)
-      .then((response) => {
-        setCandidates(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching candidates:", error);
-        setDialogState({
-          open: true,
-          type: "result",
-          title: "Error",
-          message: "Unable to fetch candidates. Please try again later.",
-          confirmAction: null,
-        });
-      });
-  }, []);
-
-  // const submitVote = () => {
-  //   if (!selectedCandidateData) return;
-
-  //   const payload = {
-  //     voterName: "Voter Name",
-  //     voterCid: voterCid,
-  //     candidateId: selectedCandidateData.id,
-  //     electionTypeId: 1,
-  //     isVoted: true,
-  //     voteTxnHash: "vote-txn-hash",
-
-  //   };
-
-  //   voteService
-  //     .saveVote(payload)
-  //     .then((res) => {
-  //       console.log("Vote submitted successfully", res.data);
-  //       // Optional: show success
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error submitting vote", err);
-  //     })
-  //     .finally(() => {
-  //       handleDialogClose();
-  //     });
-  // };
-
-  const handleConfirmClick = () => {
-    setDialogOpen(true);
-  };
-
-  // const handleDialogClose = () => {
-  //   setDialogOpen(false);
-  // };
-
-  const selectedCandidateData = candidates.find(
-    (c) => c.id === selectedCandidate
-  );
-
-  const handleVoteClick = (candidateId) => {
-    setSelectedCandidate(candidateId);
-
-    const candidate = candidates.find(c => c.id === candidateId);
-
-    setDialogState({
-      open: true,
-      type: "confirm",
-      title: "Confirmation",
-      message: (
-        <>
-          Are you sure you want to confirm your vote for{" "}
-          <strong>{candidate.candidateName}</strong>? This process cannot be undone.
-        </>
-      ),
-      // message: `Are you sure you want to confirm your vote for <strong>${candidate.candidateName}</strong>? This process cannot be undone.`,
-      confirmAction: () => submitVote(candidate),
+    const location = useLocation();
+    const [selectedCandidate, setSelectedCandidate] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [candidates, setCandidates] = useState([]);
+    const [dialogState, setDialogState] = useState({
+        open: false,
+        type: '', // e.g., "vote", "confirm", etc.
+        title: '',
+        message: '',
+        confirmAction: null
     });
-  };
+    const [loading, setLoading] = useState(false);
+    const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
+    const { voterCid } = location.state || {};
 
-  const submitVote = (candidate) => {
-    const payload = {
-      voterName: "Voter Name",
-      voterCid: voterCid,
-      candidateId: candidate.id,
-      electionTypeId: 1,
-      isVoted: true,
-      voteTxnHash: "vote-txn-hash",
+    const handleQRLoading = () => {
+        setDialogQRCodeOpen(true); // Open dialog
     };
 
-    voteService.saveVote(payload)
-      .then((res) => {
-        console.log("Vote submitted successfully", res.data);
+    const handleCloseDialogForQRCode = () => {
+        setDialogQRCodeOpen(false);
+    };
+    useEffect(() => {
+        const electionTypeId = 1;
+        voteService
+            .getCandidates(electionTypeId)
+            .then((response) => {
+                setCandidates(response.data);
+            })
+            .catch((error) => {
+                console.error('Error fetching candidates:', error);
+                setDialogState({
+                    open: true,
+                    type: 'result',
+                    title: 'Error',
+                    message: 'No Candidates found.',
+                    confirmAction: null
+                });
+            });
+    }, []);
+
+    // const submitVote = () => {
+    //   if (!selectedCandidateData) return;
+
+    //   const payload = {
+    //     voterName: "Voter Name",
+    //     voterCid: voterCid,
+    //     candidateId: selectedCandidateData.id,
+    //     electionTypeId: 1,
+    //     isVoted: true,
+    //     voteTxnHash: "vote-txn-hash",
+
+    //   };
+
+    //   voteService
+    //     .saveVote(payload)
+    //     .then((res) => {
+    //       console.log("Vote submitted successfully", res.data);
+    //       // Optional: show success
+    //     })
+    //     .catch((err) => {
+    //       console.error("Error submitting vote", err);
+    //     })
+    //     .finally(() => {
+    //       handleDialogClose();
+    //     });
+    // };
+
+    const handleConfirmClick = () => {
+        setDialogOpen(true);
+    };
+
+    const selectedCandidateData = candidates.find((c) => c.id === selectedCandidate);
+
+    const handleVoteClick = (candidateId) => {
+        setSelectedCandidate(candidateId);
+        const candidate = candidates.find((c) => c.id === candidateId);
         setDialogState({
-          open: true,
-          type: "result",
-          title: "Success",
-          message: res.data,
-          confirmAction: null,
+            open: true,
+            type: 'confirm',
+            title: 'Confirmation',
+            message: (
+                <>
+                    Are you sure you want to confirm your vote for <strong>{candidate.candidateName}</strong>? This process cannot be
+                    undone.
+                </>
+            ),
+            // message: `Are you sure you want to confirm your vote for <strong>${candidate.candidateName}</strong>? This process cannot be undone.`,
+            confirmAction: () => submitVote(candidate)
         });
-      })
-      .catch((err) => {
-        console.error("Error submitting vote", err);
-        setDialogState({
-          open: true,
-          type: "result",
-          title: "Error",
-          message: err.response.data,
-          confirmAction: null,
-        });
-      });
-  };
+    };
 
-  const handleDialogClose = () => {
-    setDialogState(prev => ({ ...prev, open: false }));
-  };
+    const submitVote = (candidate) => {
+        const payload = {
+            voterName: 'Voter Name',
+            voterCid: voterCid,
+            candidateId: candidate.id,
+            electionTypeId: 1,
+            isVoted: true,
+            voteTxnHash: 'vote-txn-hash'
+        };
+        setLoading(true);
+        voteService
+            .saveVote(payload)
+            .then((res) => {
+                setDialogQRCodeOpen(true);
+                globalLib.successMsg(res.data).then(() => {
+                    setLoading(true); // Show loading again before reload
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 100); // Slight delay to ensure loader is visible
+                });
+            })
+            .catch((err) => {
+                console.error('Error submitting vote', err);
+                globalLib.warningMsg(err.response?.data || 'Something went wrong').then(() => {
+                    setLoading(true); // Show loading again before reload
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 100); // Delay to render loading
+                });
+            });
+    };
 
-  return (
-    <>
-      <Box mt={4}>
-        {" "}
-        <Typography
-          variant="h2"
-          align="center"
-          fontWeight="bold"
-          sx={{ color: TITLE, mb: 4 }}
-        >
-          Local Government Elections
-        </Typography>
-      </Box>
-      <Box
-        mt={1}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{ borderRadius: 4, p: 4, width: "80%", maxWidth: 900 }}
-        >
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align="center"></TableCell>
-                  <TableCell align="center"></TableCell>
-                  <TableCell align="center"></TableCell>
-                  <TableCell align="center"></TableCell>
-                  <TableCell align="center"></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {candidates.map((candidate, index) => (
-                  <TableRow key={candidate.id}>
-                    <TableCell align="center">{index + 1}</TableCell>
-                    <TableCell>{candidate.candidateName}</TableCell>
-                    <TableCell align="center">
-                      <Avatar
-                        src={"https://via.placeholder.com/80x100"}
-                        alt={candidate.candidateName}
-                        sx={{ width: 56, height: 70 }}
-                        variant="rounded"
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <ArrowCircleLeftIcon
-                        fontSize="large"
-                        sx={{
-                          color:
-                            selectedCandidate === candidate.id
-                              ? "#c0392b"
-                              : "#003366", // green if selected
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Button
-                        variant="contained"
-                        onClick={() => handleVoteClick(candidate.id)}
-                        sx={{
-                          backgroundColor:
-                            selectedCandidate === candidate.id
-                              ? "#667FA5"
-                              : "#003366", // green if selected
-                          borderRadius: "30px",
-                          px: 7,
-                          py: 2.5,
-                          minWidth: "100px",
-                          textTransform: "none",
-                          "&:hover": {
-                            backgroundColor: "#003366",
-                          },
-                        }}
-                      >
-                        Vote
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+    const handleDialogClose = () => {
+        setDialogState((prev) => ({ ...prev, open: false }));
+    };
 
-          {/* <Box textAlign="center" mt={4}>
-            <Button
-              variant="contained"
-              disabled={selectedCandidate === null}
-              onClick={handleConfirmClick}
-              sx={{
-                backgroundColor: BUTTON_ADD_COLOR,
-                "&:hover": {
-                  backgroundColor: "#003366",
-                },
-                px: 4,
-                py: 2,
-                borderRadius: 2,
-              }}
+    return (
+        <>
+            <Box mt={4}>
+                {' '}
+                <Typography variant="h2" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
+                    Local Government Elections
+                </Typography>
+            </Box>
+            <Box
+                mt={1}
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center'
+                }}
             >
-              Confirm Vote
-            </Button>
-          </Box> */}
-        </Paper>
-      </Box>
-      {/* Dialog */}
-      <Dialog open={dialogState.open} onClose={handleDialogClose}>
-        <Box display={"flex"} justifyContent={"center"}>
-          <img src={VoteIcon} alt="VoteIcon" height="25%" width="25%" />
-        </Box>
+                <Paper elevation={3} sx={{ borderRadius: 4, p: 4, width: '80%', maxWidth: 900 }}>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center"></TableCell>
+                                    <TableCell align="center"></TableCell>
+                                    <TableCell align="center"></TableCell>
+                                    <TableCell align="center"></TableCell>
+                                    <TableCell align="center"></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {candidates.map((candidate, index) => (
+                                    <TableRow key={candidate.id}>
+                                        <TableCell align="center">{index + 1}</TableCell>
+                                        <TableCell>{candidate.candidateName}</TableCell>
+                                        <TableCell align="center">
+                                            <Avatar
+                                                src={CandidateImg}
+                                                alt={candidate.candidateName}
+                                                sx={{ width: 70, height: 70 }}
+                                                variant="circular"
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <ArrowCircleLeftIcon
+                                                fontSize="large"
+                                                sx={{
+                                                    color: selectedCandidate === candidate.id ? '#c0392b' : '#003366' // green if selected
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => handleVoteClick(candidate.id)}
+                                                sx={{
+                                                    backgroundColor: selectedCandidate === candidate.id ? '#667FA5' : '#003366', // green if selected
+                                                    borderRadius: '30px',
+                                                    px: 7,
+                                                    py: 2.5,
+                                                    minWidth: '100px',
+                                                    textTransform: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: '#003366'
+                                                    }
+                                                }}
+                                            >
+                                                Vote
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            </Box>
+            {/* Dialog */}
+            <Dialog open={dialogState.open} onClose={handleDialogClose}>
+                <Box display={'flex'} justifyContent={'center'}>
+                    <img src={VoteIcon} alt="VoteIcon" height="25%" width="25%" />
+                </Box>
 
-        <DialogContent>
-          <Box
-            p={2}
-            display={"flex"}
-            justifyContent={"center"}
-            flexDirection={"column"}
-          >
-            <Typography
-              variant="caption"
-              fontSize={"14px"}
-              textAlign={"center"}
-            >
-              {dialogState.title}
-            </Typography>
-            <Typography
-              variant="caption"
-              fontSize={"13px"}
-              textAlign={"center"}
-            >
-              {dialogState.message}
-            </Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions style={{ justifyContent: "center" }}>
-          <Button
-            size="small"
-            color="error"
-            variant="outlined"
-            onClick={handleDialogClose}
-          >
-            {dialogState.type === "confirm" ? "No" : "Close"}
-          </Button>
+                <DialogContent>
+                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
+                        <Typography variant="caption" fontSize={'14px'} textAlign={'center'}>
+                            {dialogState.title}
+                        </Typography>
+                        <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
+                            {dialogState.message}
+                        </Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions style={{ justifyContent: 'center' }}>
+                    <Button size="small" color="error" variant="outlined" onClick={handleDialogClose}>
+                        {dialogState.type === 'confirm' ? 'No' : 'Close'}
+                    </Button>
 
-          {dialogState.type === "confirm" && (
-            <Button
-              size="small"
-              color="success"
-              variant="outlined"
-              onClick={() => {
-                handleDialogClose();
-                dialogState.confirmAction && dialogState.confirmAction();
-              }}
-            >
-              Confirm
-            </Button>
-          )}
-        </DialogActions>
-      </Dialog>
-    </>
-  );
+                    {dialogState.type === 'confirm' && (
+                        <Button
+                            size="small"
+                            color="success"
+                            variant="outlined"
+                            onClick={() => {
+                                handleQRLoading();
+                                // dialogState.confirmAction && dialogState.confirmAction();
+                            }}
+                        >
+                            Confirm
+                        </Button>
+                    )}
+                </DialogActions>
+            </Dialog>
+
+            {/* lodaing page */}
+            {loading && (
+                <>
+                    <LoadingPage />
+                </>
+            )}
+
+            {/* page for QR code */}
+            <Dialog open={dialogQRCodeOpen} onClose={handleCloseDialogForQRCode} fullWidth maxWidth="sm">
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognization </DialogTitle>
+                <DialogContent>
+                    <VoteNDIQRCode />
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: 'center' }}>
+                    <Button variant="contained" onClick={handleCloseDialogForQRCode} color="error">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
+    );
 };
 
 export default LocalElectionScanPage;

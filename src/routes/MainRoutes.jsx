@@ -27,10 +27,10 @@ const ByeElectionScanPage = Loadable(lazy(() => import('views/pages/election/Bye
 // election result
 const ElectionResult = Loadable(lazy(() => import('views/pages/electionResult/ElectionResult')));
 const LocalElectionResult = Loadable(lazy(() => import('views/pages/electionResult/LocalElectionResult')));
-const SamplePage = Loadable(lazy(() => import('views/pages/samplepage')));
 const VoteNDIQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoteNDIQRCodePage')));
 const NotEligible = Loadable(lazy(() => import('views/pages/ndi/NotEligible')));
 const Candidates = Loadable(lazy(() => import('views/pages/ndi/CandidateDisplayPage')));
+const Dasbboard = Loadable(lazy(() => import('views/dashboard/Dashoard')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -48,8 +48,7 @@ const MainRoutes = {
         // },
         {
             path: '/dashboard',
-            element: <SamplePage />
-            // element: <DashboardDefault />
+            element: <Dasbboard />
         },
         {
             path: '/widget/statistics',

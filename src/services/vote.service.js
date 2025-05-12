@@ -23,8 +23,14 @@ const saveVote = (data) => {
         }
     );
 };
+const getVoteResult = () => {
+    return axios.get('voter/getVoteResult', {
+        headers: authHeader()
+    });
+};
 
-export default{
+export default {
     getCandidates,
     saveVote,
+    getVoteResult
 };

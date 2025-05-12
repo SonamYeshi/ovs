@@ -53,7 +53,7 @@ const ndiScanPage = () => {
             </Box>
 
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-                <DialogTitle>Bhutan NDI Login</DialogTitle>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Login </DialogTitle>
                 <DialogContent>
                     <VoteNDIQRCode />
                 </DialogContent>
@@ -67,4 +67,4 @@ const ndiScanPage = () => {
     );
 };
 
-export default ndiScanPage
+export default ndiScanPage;

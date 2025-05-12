@@ -52,13 +52,11 @@ const successMsg = (msg) => {
 };
 
 const warningMsg = (msg) => {
-    Swal.fire({
-        title: 'Warning!',
+    return Swal.fire({
+        title: 'Error!',
         text: msg,
-        icon: 'warning',
-        // showCancelButton: true,
+        icon: 'error',
         confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
         confirmButtonText: 'OK',
         customClass: {
             container: 'sweet-alert-modal'
@@ -70,10 +68,8 @@ const warningMsg = (msg) => {
             }
         }
     });
-    // .then((result) => {
-    //     return result.isConfirmed
-    // });
 };
+;
 
 const deleteMsg = (msg) => {
     Swal.fire({

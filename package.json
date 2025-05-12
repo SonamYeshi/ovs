@@ -86,6 +86,7 @@
         "react-to-print": "^2.15.1",
         "react-window": "^1.8.10",
         "react18-input-otp": "^1.1.4",
+        "recharts": "^2.15.3",
         "redux": "^5.0.1",
         "redux-persist": "^6.0.0",
         "remark-gfm": "^4.0.0",
