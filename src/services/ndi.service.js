@@ -1,15 +1,16 @@
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const proofNdiRequest = () => {
+const proofNdiRequest = (isFacialProof) => {
     return (
         axios
-            .post(BASE_URL + "ndi/proofRequest", [])
+            .post(BASE_URL + "ndi/proofRequest", [], {
+                params: { isFacialProof }
+            })
             .then((response) => {
-                // console.log(response);
                 return response;
             })
-    );
+        );
 };
 const nats_subscribe = (threadId) => {
     return axios

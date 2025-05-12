@@ -15,13 +15,8 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const ndiScanPage = () => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
-    const [progressNDI, setProgressNDI] = useState(true);
-    const [url, setUrl] = useState('');
-    const [deepLinkUrl, setDeepLinkUrl] = useState('');
-    const [ndiScanOpen, setNdiScanOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    // Instead of navigate
     const handleQRLoading = () => {
         setDialogOpen(true); // Open dialog
     };
@@ -55,7 +50,7 @@ const ndiScanPage = () => {
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Login </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode />
+                    <VoteNDIQRCode isFacialProof={false} isMobile={isMobile}/>
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialog} color="error">
