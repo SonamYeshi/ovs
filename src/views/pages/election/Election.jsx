@@ -1,4 +1,5 @@
 // material-ui
+import React, { useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
@@ -14,173 +15,47 @@ import MainCard from 'ui-component/cards/MainCard';
 
 import NdiScanPage from '../ndiScanPage/ndiScanPage';
 
+const electionTypes = [
+    { id: 1, label: 'Local Government Election', image: LocalGovtImg },
+    { id: 2, label: 'National Assembly Election', image: NationalAssemblyImg },
+    { id: 3, label: 'National Council Election', image: NationalCouncilImg },
+    { id: 4, label: 'Bye-Election', image: VoteIcon }
+];
+
 const Election = () => {
+    const [selectedElection, setSelectedElection] = useState(null);
+
+    const handleCardClick = (election) => {
+        setSelectedElection(election.id);
+    };
+
     return (
         <>
             <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
-                <Grid item xs={12} sm={6} md={3}>
-                    <MainCard
-                        sx={{
-                            height: 200, // optional fixed height
-                            transition: 'box-shadow 0.5s',
-                            '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                        }}
-                    >
-                        <Box
-                            component={Link}
-                            // href="/nationalAssemblyElectionScanPage"
-                            sx={{ textDecoration: 'none' }}
-                            display={'flex'}
-                            flexDirection="column"
-                            alignItems="center"
-                            gap={2}
+                {electionTypes.map((election) => (
+                    <Grid item xs={12} sm={6} md={3} key={election.id}>
+                        <MainCard
+                            onClick={() => handleCardClick(election)}
+                            sx={{
+                                height: 200,
+                                transition: 'box-shadow 0.5s',
+                                cursor: 'pointer',
+                                '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
+                            }}
                         >
-                            <img src={NationalAssemblyImg} alt="NationalAssemblyImg" height="20%" width="20%" />
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    fontSize: {
-                                        xs: '13px',
-                                        sm: '10px',
-                                        md: '17px',
-                                        lg: '15px',
-                                        xl: '1rem'
-                                    },
-                                    color: '#000000'
-                                }}
-                            >
-                                National Assembly Elections
-                            </Typography>
-                        </Box>
-                        <Box mt={1}>
-                            {' '}
-                            <NdiScanPage />
-                        </Box>
-                    </MainCard>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                    <MainCard
-                        sx={{
-                            height: 200,
-                            transition: 'box-shadow 0.5s',
-                            '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                        }}
-                    >
-                        <Box
-                            component={Link}
-                            // href="/nationalCouncilElectionScanPage"
-                            sx={{ textDecoration: 'none' }}
-                            display={'flex'}
-                            flexDirection="column"
-                            alignItems="center"
-                            gap={2}
-                        >
-                            <img src={NationalCouncilImg} alt="NationalCouncilImg" height="20%" width="20%" />
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    fontSize: {
-                                        xs: '13px',
-                                        sm: '10px',
-                                        md: '17px',
-                                        lg: '15px',
-                                        xl: '1rem'
-                                    },
-                                    color: '#000000'
-                                }}
-                            >
-                                National Council Elections
-                            </Typography>
-                        </Box>
-                        <Box mt={1}>
-                            {' '}
-                            <NdiScanPage />
-                        </Box>
-                    </MainCard>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                    <MainCard
-                        sx={{
-                            height: 200,
-                            transition: 'box-shadow 0.5s',
-                            '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                        }}
-                    >
-                        <Box
-                            component={Link}                         
-                            sx={{ textDecoration: 'none' }}
-                            display={'flex'}
-                            flexDirection="column"
-                            alignItems="center"
-                            gap={2}
-                        >
-                            <img src={LocalGovtImg} alt="LocalGovtImg" height="20%" width="20%" />
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    fontSize: {
-                                        xs: '13px',
-                                        sm: '10px',
-                                        md: '17px',
-                                        lg: '15px',
-                                        xl: '1rem'
-                                    },
-                                    color: '#000000'
-                                }}
-                            >
-                                Local Government Elections
-                            </Typography>
-                        </Box>
-                        <Box mt={1}>
-                            {' '}
-                            <NdiScanPage />
-                        </Box>
-                    </MainCard>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                    <MainCard
-                        sx={{
-                            height: 200,
-                            transition: 'box-shadow 0.5s',
-                            '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                        }}
-                    >
-                        <Box
-                            component={Link}
-                            // href="/byeElectionScanPage"
-                            sx={{ textDecoration: 'none' }}
-                            display={'flex'}
-                            flexDirection="column"
-                            alignItems="center"
-                            gap={2}
-                        >
-                            <img src={VoteIcon} alt="VoteIcon" height="20%" width="20%" />
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    fontSize: {
-                                        xs: '13px',
-                                        sm: '10px',
-                                        md: '17px',
-                                        lg: '15px',
-                                        xl: '1rem'
-                                    },
-                                    color: '#000000'
-                                }}
-                            >
-                                Bye-Elections
-                            </Typography>
-                        </Box>
-                        <Box mt={1}>
-                            {' '}
-                            <NdiScanPage />
-                        </Box>
-                    </MainCard>
-                </Grid>
-            </Grid>
+                            <Box display={'flex'} flexDirection="column" alignItems="center" gap={2}>
+                                <img src={election.image} alt={election.label} height="20%" width="20%" />
+                                <Typography variant="body1" sx={{ fontSize: { md: '17px' }, color: '#000000' }}>
+                                    {election.label}
+                                </Typography>
+                            </Box>
+                            <Box mt={4}>
+                                <NdiScanPage electionTypeId={selectedElection} />
+                            </Box>
+                        </MainCard>
+                    </Grid>
+                ))}
+            </Grid>   
         </>
     );
 };

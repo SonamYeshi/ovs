@@ -13,7 +13,7 @@ import VoteNDIQRCode from '../ndi/VoteNDIQRCodePage';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const ndiScanPage = () => {
+const ndiScanPage = ({electionTypeId}) => {
     // const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -50,7 +50,7 @@ const ndiScanPage = () => {
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Login </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode isFacialProof={false} />
+                    <VoteNDIQRCode isFacialProof={false} electionTypeId={electionTypeId}/>
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialog} color="error">

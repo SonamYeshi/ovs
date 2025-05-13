@@ -41,7 +41,7 @@ const LocalElectionScanPage = () => {
     });
     const [loading, setLoading] = useState(false);
     const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
-    const { voterCid } = location.state || {};
+    const { voterCid, electionTypeId } = location.state || {};
 
     const handleQRLoading = () => {
         setDialogQRCodeOpen(true); // Open dialog
@@ -51,7 +51,7 @@ const LocalElectionScanPage = () => {
         setDialogQRCodeOpen(false);
     };
     useEffect(() => {
-        const electionTypeId = 1;
+        // const electionTypeId = 1;
         voteService
             .getCandidates(electionTypeId)
             .then((response) => {
@@ -92,6 +92,7 @@ const LocalElectionScanPage = () => {
         const payload = {
             voterName: 'Voter Name',
             voterCid: voterCid,
+            candidateCid: candidate.candidateCid,
             candidateId: candidate.id,
             electionTypeId: 1,
             isVoted: true,
@@ -101,8 +102,9 @@ const LocalElectionScanPage = () => {
         voteService
             .saveVote(payload)
             .then((res) => {
+                console.log(res)
                 setDialogQRCodeOpen(true);
-                globalLib.successMsg(res.data).then(() => {
+                globalLib.successMsg(res.data.message).then(() => {
                     setLoading(true); // Show loading again before reload
                     setTimeout(() => {
                         window.location.reload();
@@ -110,8 +112,8 @@ const LocalElectionScanPage = () => {
                 });
             })
             .catch((err) => {
-                console.error('Error submitting vote', err);
-                globalLib.warningMsg(err.response?.data || 'Something went wrong').then(() => {
+                console.error('Error submitting vote', err.response.data.error);
+                globalLib.warningMsg(err.response?.data.error || 'Something went wrong').then(() => {
                     setLoading(true); // Show loading again before reload
                     setTimeout(() => {
                         window.location.reload();
@@ -225,7 +227,8 @@ const LocalElectionScanPage = () => {
                             color="success"
                             variant="outlined"
                             onClick={() => {
-                                handleQRLoading();
+                                submitVote(selectedCandidateData);
+                                // handleQRLoading(); //this is for QR code
                             }}
                         >
                             Confirm

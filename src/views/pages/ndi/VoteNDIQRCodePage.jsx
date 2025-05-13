@@ -24,7 +24,7 @@ import LoadingPage from 'common/LoadingPage';
 import NdiService from '../../../services/ndi.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const VoteNDIQRCodePage = ({isFacialProof}) => {
+const VoteNDIQRCodePage = ({isFacialProof, electionTypeId}) => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
@@ -61,14 +61,16 @@ const VoteNDIQRCodePage = ({isFacialProof}) => {
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
-            console.log(data);
+            // console.log(data);
 
             if (data.status === 'exists') {
                 setLoading(true); // Show loading spinner
                 // Slight delay to allow loading spinner to appear
                 setTimeout(() => {
                     navigate('/localElectionScanPage', {
-                        state: { voterCid: data.userDTO.cid }
+                        state: { voterCid: data.userDTO.cid,
+                            electionTypeId: electionTypeId
+                         }
                     });
                 }, 100);
             } else {
