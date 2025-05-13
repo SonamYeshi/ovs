@@ -18,8 +18,8 @@ const dashboard = {
     type: 'group',
     children: [
         {
-            id: 'default',
-            title: <FormattedMessage id="default" />,
+            id: 'dashboard',
+            title: <FormattedMessage id="dashboard" />,
             type: 'item',
             url: '/dashboard',
             icon: icons.IconDashboard,
