@@ -158,7 +158,7 @@ const LocalElectionScanPage = () => {
                                         <TableCell>{candidate.candidateName}</TableCell>
                                         <TableCell align="center">
                                             <Avatar
-                                                src={CandidateImg}
+                                                src={candidate.proPicUrl}
                                                 alt={candidate.candidateName}
                                                 sx={{ width: 70, height: 70 }}
                                                 variant="circular"

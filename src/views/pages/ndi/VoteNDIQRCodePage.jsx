@@ -18,13 +18,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import CrossImg from 'assets/images/corssImg.png';
 import CloseIcon from '@mui/icons-material/Close';
-import LoadingPage from 'common/LoadingPage';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
+import LoadingPage from 'common/LoadingPage';
 import NdiService from '../../../services/ndi.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const VoteNDIQRCodePage = ({isFacialProof, isMobile}) => {
-    
+const VoteNDIQRCodePage = ({isFacialProof}) => {
+    const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
     const [progressNDI, setProgressNDI] = useState(true);
