@@ -69,37 +69,6 @@ const LocalElectionScanPage = () => {
             });
     }, []);
 
-    // const submitVote = () => {
-    //   if (!selectedCandidateData) return;
-
-    //   const payload = {
-    //     voterName: "Voter Name",
-    //     voterCid: voterCid,
-    //     candidateId: selectedCandidateData.id,
-    //     electionTypeId: 1,
-    //     isVoted: true,
-    //     voteTxnHash: "vote-txn-hash",
-
-    //   };
-
-    //   voteService
-    //     .saveVote(payload)
-    //     .then((res) => {
-    //       console.log("Vote submitted successfully", res.data);
-    //       // Optional: show success
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error submitting vote", err);
-    //     })
-    //     .finally(() => {
-    //       handleDialogClose();
-    //     });
-    // };
-
-    const handleConfirmClick = () => {
-        setDialogOpen(true);
-    };
-
     const selectedCandidateData = candidates.find((c) => c.id === selectedCandidate);
 
     const handleVoteClick = (candidateId) => {
@@ -115,7 +84,6 @@ const LocalElectionScanPage = () => {
                     undone.
                 </>
             ),
-            // message: `Are you sure you want to confirm your vote for <strong>${candidate.candidateName}</strong>? This process cannot be undone.`,
             confirmAction: () => submitVote(candidate)
         });
     };
@@ -190,7 +158,7 @@ const LocalElectionScanPage = () => {
                                         <TableCell>{candidate.candidateName}</TableCell>
                                         <TableCell align="center">
                                             <Avatar
-                                                src={CandidateImg}
+                                                src={candidate.proPicUrl}
                                                 alt={candidate.candidateName}
                                                 sx={{ width: 70, height: 70 }}
                                                 variant="circular"
@@ -258,7 +226,6 @@ const LocalElectionScanPage = () => {
                             variant="outlined"
                             onClick={() => {
                                 handleQRLoading();
-                                // dialogState.confirmAction && dialogState.confirmAction();
                             }}
                         >
                             Confirm
@@ -276,9 +243,9 @@ const LocalElectionScanPage = () => {
 
             {/* page for QR code */}
             <Dialog open={dialogQRCodeOpen} onClose={handleCloseDialogForQRCode} fullWidth maxWidth="sm">
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognization </DialogTitle>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognition </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode />
+                    <VoteNDIQRCode isFacialProof={true}/>
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialogForQRCode} color="error">

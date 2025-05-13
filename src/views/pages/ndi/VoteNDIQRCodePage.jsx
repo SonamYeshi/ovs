@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import { QRCode } from 'react-qrcode-logo';
 import NDIlogobg from '../../../assets/images/ndi/QRNDIlogo.png';
 import ScanButton from '../../../assets/images/ndi/ScanButton.png';
@@ -16,21 +15,17 @@ import { faPlayCircle } from '@fortawesome/free-solid-svg-icons';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import CrossImg from 'assets/images/corssImg.png';
 import CloseIcon from '@mui/icons-material/Close';
-import globalLib from 'utils/global-lib';
-import LoadingPage from 'common/LoadingPage';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
+import LoadingPage from 'common/LoadingPage';
 import NdiService from '../../../services/ndi.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const VoteNDIQRCodePage = () => {
-    const location = useLocation();
-    const { isMobile } = location.state || {};
-
+const VoteNDIQRCodePage = ({isFacialProof}) => {
+    const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
     const [progressNDI, setProgressNDI] = useState(true);
@@ -43,7 +38,7 @@ const VoteNDIQRCodePage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        NdiService.proofNdiRequest()
+        NdiService.proofNdiRequest(isFacialProof)
             .then((res) => {
                 const deepLink = res.data.deepLinkURL;
                 const invite = res.data.inviteURL;
@@ -59,7 +54,7 @@ const VoteNDIQRCodePage = () => {
                 setAlertMessage('Failed to load QR code. Please try again.');
                 setProgressNDI(false);
             });
-    }, []);
+    }, [isFacialProof]);
 
     const natsListener = (threadId) => {
         const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}`;
@@ -114,7 +109,6 @@ const VoteNDIQRCodePage = () => {
                 >
                     {progressNDI ? (
                         <Box sx={{ textAlign: 'center' }}>
-                            {/* <l-line-spinner size="40" stroke="3" speed="1" color="black" /> */}
                             <CircularProgress size={40} thickness={4} sx={{ mb: 1 }} />
                             <Typography sx={{ mt: 2 }}>Generating QR code...</Typography>
                         </Box>

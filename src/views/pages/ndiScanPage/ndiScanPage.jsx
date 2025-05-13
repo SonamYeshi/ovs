@@ -2,7 +2,7 @@ import { useState } from 'react';
 import React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import useMediaQuery from '@mui/material/useMediaQuery';
+// import useMediaQuery from '@mui/material/useMediaQuery';
 import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -14,14 +14,9 @@ import VoteNDIQRCode from '../ndi/VoteNDIQRCodePage';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const ndiScanPage = () => {
-    const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
-    const [progressNDI, setProgressNDI] = useState(true);
-    const [url, setUrl] = useState('');
-    const [deepLinkUrl, setDeepLinkUrl] = useState('');
-    const [ndiScanOpen, setNdiScanOpen] = useState(false);
+    // const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    // Instead of navigate
     const handleQRLoading = () => {
         setDialogOpen(true); // Open dialog
     };
@@ -55,7 +50,7 @@ const ndiScanPage = () => {
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Login </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode />
+                    <VoteNDIQRCode isFacialProof={false} />
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialog} color="error">
