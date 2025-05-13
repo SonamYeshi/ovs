@@ -39,22 +39,6 @@ const Dashoard = () => {
             <Grid container spacing={3} style={{ padding: '20px' }}>
                 <Grid item xs={12} sm={12}>
                     <MainCard>
-                        {/* <div style={{ width: '100%', height: 400 }}>
-                        <ResponsiveContainer>
-                            <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis allowDecimals={false} />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="voteCount" name="Vote Count">
-                                    {data.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={getColorByValue(entry.voteCount, maxVote)} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div> */}
                         <Box display={'flex'} flexDirection={'column'} gap={3}>
                             <Typography variant="h3" sx={{ color: '#003366', fontWeight: 'bold' }}>
                                 About Electronic Voting System (EVS)
@@ -129,14 +113,29 @@ const Dashoard = () => {
                                 </ListItem>
                             </List>
                         </Box>
-                        <Box display="flex" flexDirection="column" gap={3} mt={4}>
+                        {/* <Box display="flex" flexDirection="column" gap={3} mt={4}>
                             <Typography variant="h3" sx={{ color: '#003366', fontWeight: 'bold' }}>
                                 System Architecture for EVS
                             </Typography>
                             <Box display="flex" justifyContent={'center'}>
-                                <img src={VotingArcImg} alt="VoteIcon" height="50%" width="50%" />
+                                <div style={{ width: '100%', height: 400 }}>
+                                    <ResponsiveContainer>
+                                        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="name" />
+                                            <YAxis allowDecimals={false} />
+                                            <Tooltip />
+                                            <Legend />
+                                            <Bar dataKey="voteCount" name="Vote Count">
+                                                {data.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={getColorByValue(entry.voteCount, maxVote)} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </Box>
-                        </Box>
+                        </Box> */}
                     </MainCard>
                 </Grid>
             </Grid>

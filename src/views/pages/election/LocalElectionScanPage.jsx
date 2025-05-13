@@ -16,7 +16,6 @@ import {
     TableRow,
     Typography
 } from '@mui/material';
-import CandidateImg from 'assets/images/candidatephoto.jpg';
 import VoteIcon from 'assets/images/VoteIcon.png';
 import { TITLE } from 'common/color';
 import globalLib from 'common/global-lib';
@@ -25,7 +24,6 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import voteService from 'services/vote.service';
 import VoteNDIQRCode from '../ndi/VoteNDIQRCodePage';
-
 
 const LocalElectionScanPage = () => {
     const location = useLocation();
@@ -80,6 +78,13 @@ const LocalElectionScanPage = () => {
             title: 'Confirmation',
             message: (
                 <>
+                    <Box display={'flex'} justifyContent={'center'} mb={2}>
+                        <Avatar src={candidate.proPicUrl} alt={candidate.candidateName} sx={{ width: 90, height: 90 }} variant="circular" />
+                    </Box>
+                    <Typography variant="h5" textAlign={'center'}>
+                        Confirmation
+                    </Typography>{' '}
+                    <br />
                     Are you sure you want to confirm your vote for <strong>{candidate.candidateName}</strong>? This process cannot be
                     undone.
                 </>
@@ -200,15 +205,8 @@ const LocalElectionScanPage = () => {
             </Box>
             {/* Dialog */}
             <Dialog open={dialogState.open} onClose={handleDialogClose}>
-                <Box display={'flex'} justifyContent={'center'}>
-                    <img src={VoteIcon} alt="VoteIcon" height="25%" width="25%" />
-                </Box>
-
                 <DialogContent>
-                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-                        <Typography variant="caption" fontSize={'14px'} textAlign={'center'}>
-                            {dialogState.title}
-                        </Typography>
+                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>     
                         <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
                             {dialogState.message}
                         </Typography>
@@ -245,7 +243,7 @@ const LocalElectionScanPage = () => {
             <Dialog open={dialogQRCodeOpen} onClose={handleCloseDialogForQRCode} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognition </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode isFacialProof={true}/>
+                    <VoteNDIQRCode isFacialProof={true} />
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialogForQRCode} color="error">

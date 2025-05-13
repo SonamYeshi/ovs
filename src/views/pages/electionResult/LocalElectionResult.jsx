@@ -1,17 +1,16 @@
-import { React, useEffect, useState } from 'react';
 import { Box, Chip } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
 import TableHead from '@mui/material/TableHead';
-import Paper from '@mui/material/Paper';
-import Avatar from '@mui/material/Avatar';
-import voteService from 'services/vote.service';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
 import { TITLE } from 'common/color';
-import CandidateImg from 'assets/images/candidatephoto.jpg'
+import { useEffect, useState } from 'react';
+import voteService from 'services/vote.service';
 
 const LocalElectionResult = () => {
     const [candidates, setCandidates] = useState([]);
@@ -65,9 +64,12 @@ const LocalElectionResult = () => {
                                         <TableCell align="center">{index + 1}</TableCell>
                                         <TableCell>{item.candidateName}</TableCell>
                                         <TableCell align="center">
-                                            {/* {console.log(item.proPicUrl)} */}
-                                            {/* {item.proPicUrl} */}
-                                            <Avatar src={CandidateImg} alt={item.name} sx={{ width: 70, height: 70 }} variant="circular" />
+                                            <Avatar
+                                                src={item.proPicUrl}
+                                                alt={item.candidateName}
+                                                sx={{ width: 70, height: 70 }}
+                                                variant="circular"
+                                            />
                                         </TableCell>
                                         <TableCell align="center">
                                             <Chip
