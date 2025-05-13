@@ -86,7 +86,7 @@ const Customization = () => {
     return (
         <>
             {/* toggle button */}
-            <Tooltip title="Live Customize">
+            <Tooltip title="Live Customizes">
                 <Fab
                     component="div"
                     onClick={handleToggle}
