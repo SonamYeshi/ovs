@@ -72,7 +72,7 @@ const LoadingPage = () => {
               />
           </Box>
           <Typography variant="h6" sx={{ mt: 3, color: 'text.primary' }}>
-              Validating...
+              Recording your vote. Please wait...
           </Typography>
       </Box>
   );

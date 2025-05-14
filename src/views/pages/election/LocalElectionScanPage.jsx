@@ -89,43 +89,44 @@ const LocalElectionScanPage = () => {
                     undone.
                 </>
             ),
-            confirmAction: () => submitVote(candidate)
+            confirmAction: null
         });
     };
 
-    const submitVote = (candidate) => {
-        const payload = {
-            voterName: 'Voter Name',
-            voterCid: voterCid,
-            candidateCid: candidate.candidateCid,
-            candidateId: candidate.id,
-            electionTypeId: 1,
-            isVoted: true,
-            voteTxnHash: 'vote-txn-hash'
-        };
-        setLoading(true);
-        voteService
-            .saveVote(payload)
-            .then((res) => {
-                console.log(res)
-                setDialogQRCodeOpen(true);
-                globalLib.successMsg(res.data.message).then(() => {
-                    setLoading(true); // Show loading again before reload
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 100); // Slight delay to ensure loader is visible
-                });
-            })
-            .catch((err) => {
-                console.error('Error submitting vote', err.response.data.error);
-                globalLib.warningMsg(err.response?.data.error || 'Something went wrong').then(() => {
-                    setLoading(true); // Show loading again before reload
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 100); // Delay to render loading
-                });
-            });
-    };
+    // const submitVote = (candidate) => {
+    //     console.log("i am being called");
+    //     const payload = {
+    //         voterName: 'Voter Name',
+    //         voterCid: voterCid,
+    //         candidateCid: candidate.candidateCid,
+    //         candidateId: candidate.id,
+    //         electionTypeId: 1,
+    //         isVoted: true,
+    //         voteTxnHash: 'vote-txn-hash'
+    //     };
+    //     setLoading(true);
+    //     voteService
+    //         .saveVote(payload)
+    //         .then((res) => {
+    //             console.log(res)
+    //             setDialogQRCodeOpen(true);
+    //             globalLib.successMsg(res.data.message).then(() => {
+    //                 setLoading(true); // Show loading again before reload
+    //                 setTimeout(() => {
+    //                     window.location.reload();
+    //                 }, 100); // Slight delay to ensure loader is visible
+    //             });
+    //         })
+    //         .catch((err) => {
+    //             console.error('Error submitting vote', err.response.data.error);
+    //             globalLib.warningMsg(err.response?.data.error || 'Something went wrong').then(() => {
+    //                 setLoading(true); // Show loading again before reload
+    //                 setTimeout(() => {
+    //                     window.location.reload();
+    //                 }, 100); // Delay to render loading
+    //             });
+    //         });
+    // };
 
     const handleDialogClose = () => {
         setDialogState((prev) => ({ ...prev, open: false }));
@@ -225,8 +226,8 @@ const LocalElectionScanPage = () => {
                             color="success"
                             variant="outlined"
                             onClick={() => {
-                                submitVote(selectedCandidateData);
-                                // handleQRLoading(); //this is for QR code
+                                // submitVote(selectedCandidateData);
+                                handleQRLoading(); //this is for QR code
                             }}
                         >
                             Confirm
@@ -246,7 +247,7 @@ const LocalElectionScanPage = () => {
             <Dialog open={dialogQRCodeOpen} onClose={handleCloseDialogForQRCode} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognition </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode isFacialProof={true} />
+                    <VoteNDIQRCode isFacialProof={true} electionTypeId={electionTypeId} candidate={selectedCandidateData} />
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialogForQRCode} color="error">

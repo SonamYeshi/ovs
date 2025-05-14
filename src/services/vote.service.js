@@ -23,11 +23,17 @@ const saveVote = (data) => {
         }
     );
 };
-const getVoteResult = () => {
-    return axios.get('voter/getVoteResult', {
+const getVoteResult = (electionId) => {
+    return axios.get('voter/getVoteResultFromBlockchain/'+electionId, {
         headers: authHeader()
     });
 };
+
+// const getVoteResult = () => {
+//     return axios.get('voter/getVoteResult', {
+//         headers: authHeader()
+//     });
+// };
 
 export default {
     getCandidates,

@@ -17,7 +17,7 @@ const LocalElectionResult = () => {
 
     const getVoteResult = async () => {
         try {
-            const response = await voteService.getVoteResult();
+            const response = await voteService.getVoteResult(1);
             if (response.data !== '') {
                 setCandidates(response.data);
             }
