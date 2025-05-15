@@ -35,6 +35,21 @@ const reports = {
     icon: icons.IconApps,
     type: 'group',
     children: [
+      {
+        id: 'electionType',
+        title: <FormattedMessage id="electionType" />,
+        type: 'item',
+        icon: icons.IconUserCheck,
+        url: '/electionType'
+    },
+        {
+          id: 'electionEligibilitySetup',
+          title: <FormattedMessage id="electionEligibilitySetup" />,
+          type: 'item',
+          icon: icons.IconUserCheck,
+          url: '/electionEligibilitySetup'
+      },
+    
         {
             id: 'elections',
             title: <FormattedMessage id="elections" />,

@@ -1,5 +1,5 @@
 // material-ui
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
@@ -15,15 +15,33 @@ import MainCard from 'ui-component/cards/MainCard';
 
 import NdiScanPage from '../ndiScanPage/ndiScanPage';
 
-const electionTypes = [
-    { id: 1, label: 'Local Government Election', image: LocalGovtImg },
-    { id: 2, label: 'National Assembly Election', image: NationalAssemblyImg },
-    { id: 3, label: 'National Council Election', image: NationalCouncilImg },
-    { id: 4, label: 'Bye-Election', image: VoteIcon }
-];
+import voteService from 'services/vote.service';
+
+// const electionTypes = [
+//     { id: 1, label: 'Local Government Election', image: LocalGovtImg },
+//     { id: 2, label: 'National Assembly Election', image: NationalAssemblyImg },
+//     { id: 3, label: 'National Council Election', image: NationalCouncilImg },
+//     { id: 4, label: 'Bye-Election', image: VoteIcon }
+// ];
 
 const Election = () => {
+    const [electionTypes, setElectionTypes] = useState([]);
     const [selectedElection, setSelectedElection] = useState(null);
+
+    useEffect(() => {
+        const fetchElectionTypes = async () => {
+            try {
+                const response = await voteService.getElectionType(); // Make sure this method exists
+                if (response.status === 200) {
+                    setElectionTypes(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch election types:', error);
+            }
+        };
+
+        fetchElectionTypes();
+    }, []);
 
     const handleCardClick = (election) => {
         setSelectedElection(election.id);
@@ -44,9 +62,9 @@ const Election = () => {
                             }}
                         >
                             <Box display={'flex'} flexDirection="column" alignItems="center" gap={2}>
-                                <img src={election.image} alt={election.label} height="20%" width="20%" />
+                                <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
                                 <Typography variant="body1" sx={{ fontSize: { md: '17px' }, color: '#000000' }}>
-                                    {election.label}
+                                    {election.electionName}
                                 </Typography>
                             </Box>
                             <Box mt={4}>

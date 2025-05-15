@@ -31,7 +31,8 @@ const VoteNDIQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoteNDIQRC
 const NotEligible = Loadable(lazy(() => import('views/pages/ndi/NotEligible')));
 const Candidates = Loadable(lazy(() => import('views/pages/ndi/CandidateDisplayPage')));
 const Dasbboard = Loadable(lazy(() => import('views/dashboard/Dashoard')));
-
+const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/electionEligibilitySetup')));
+const ElectionType = Loadable(lazy(() => import('views/pages/election/electionType')));
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -104,6 +105,14 @@ const MainRoutes = {
         {
             path: '/dashboard/not-eligible',
             element: <NotEligible />
+        },
+        {
+            path: "electionEligibilitySetup",
+            element: <ElectionEligibilitySetup/>
+        },
+        {
+            path: "electionType",
+            element: <ElectionType/>
         }
     ]
 };
