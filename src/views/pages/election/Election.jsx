@@ -31,17 +31,7 @@ const Election = () => {
     const [selectedElection, setSelectedElection] = useState(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 500); // Simulate 500ms loading time
 
-        return () => clearTimeout(timer);
-    }, []);
-
-    if (loading) {
-        return <NormalLoadingPage />;
-    }
     useEffect(() => {
         const fetchElectionTypes = async () => {
             try {
@@ -62,7 +52,19 @@ const Election = () => {
             state: { electionId: election.id }
         });
     };
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 500); // Simulate 500ms loading time
 
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <NormalLoadingPage />;
+    }
+    
     
 
     return (

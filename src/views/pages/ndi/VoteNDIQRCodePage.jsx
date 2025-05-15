@@ -75,17 +75,15 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
 
             if (data.status === 'exists') {
                 setLoading(true); // Show loading spinner
-                // Slight delay to allow loading spinner to appear
-
                 setTimeout(async () => {
                     try {
-                        const isAllowed = await performExtraCheck(data.userDTO.cid, electionTypeId);
+                        const isAllowed = await performExtraCheck(data.userDTO.cid, electionId);
 
                         if (!isAllowed) {
                             navigate('/localElectionScanPage', {
                                 state: {
                                     voterCid: data.userDTO.cid,
-                                    electionTypeId: electionTypeId
+                                    electionTypeId: electionId
                                 }
                             });
                         } else {
@@ -191,9 +189,9 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
     };
     return (
         <MainCard>
-            <Typography variant="h3" textAlign={'center'}>
+            {/* <Typography variant="h3" textAlign={'center'}>
                 {electionTitles[electionId] || 'Mock Election'}
-            </Typography>
+            </Typography> */}
             <Box
                 sx={{
                     maxWidth: 500,
@@ -333,7 +331,7 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
                             <Typography variant="h4" textAlign={'center'}>
                                 Error Message
                             </Typography>
-                            <Typography variant="h5" color="error">
+                            <Typography variant="h5" color="error" textAlign={'center'}>
                                 {dialogMessage}
                             </Typography>
                         </Box>
