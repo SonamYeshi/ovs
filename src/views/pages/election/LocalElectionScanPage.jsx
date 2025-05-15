@@ -24,6 +24,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import voteService from 'services/vote.service';
 import VoteNDIQRCode from '../ndi/VoteNDIQRCodePage';
+import NDIBiometricQRCodePage from '../ndi/NDIBiometricQRCodePage';
 
 const LocalElectionScanPage = () => {
     const location = useLocation();
@@ -251,7 +252,7 @@ const LocalElectionScanPage = () => {
             <Dialog open={dialogQRCodeOpen} onClose={handleCloseDialogForQRCode} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognition </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode isFacialProof={true} electionTypeId={electionTypeId} candidate={selectedCandidateData} />
+                    <NDIBiometricQRCodePage electionTypeId={electionTypeId} candidate={selectedCandidateData} />
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialogForQRCode} color="error">

@@ -24,7 +24,7 @@ const Dashoard = () => {
     };
 
     useEffect(() => {
-        getVoteResult();
+        // getVoteResult();
     }, []);
     const getColorByValue = (value, maxValue) => {
         const intensity = Math.round((value / maxValue) * 255);

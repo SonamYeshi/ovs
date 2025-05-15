@@ -10,14 +10,16 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { TITLE } from 'common/color';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import voteService from 'services/vote.service';
 
 const LocalElectionResult = () => {
     const [candidates, setCandidates] = useState([]);
-
+    const location = useLocation();
+    const electionId = location.state?.id;
     const getVoteResult = async () => {
         try {
-            const response = await voteService.getVoteResult(1);
+            const response = await voteService.getVoteResult(electionId);
             if (response.data !== '') {
                 setCandidates(response.data);
             }
@@ -29,11 +31,12 @@ const LocalElectionResult = () => {
     useEffect(() => {
         getVoteResult();
     }, []);
+
     return (
         <>
             <Box mt={4}>
                 <Typography variant="h2" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 2 }}>
-                    Local Government Election Result
+                   Election Result
                 </Typography>
             </Box>
             <Box
@@ -60,7 +63,7 @@ const LocalElectionResult = () => {
                             </TableHead>
                             <TableBody>
                                 {candidates.map((item, index) => (
-                                    <TableRow key={item.id}>
+                                    <TableRow key={item.candidateId}>
                                         <TableCell align="center">{index + 1}</TableCell>
                                         <TableCell>{item.candidateName}</TableCell>
                                         <TableCell align="center">

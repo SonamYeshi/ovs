@@ -22,19 +22,7 @@ const nats_subscribe = (threadId) => {
         });
 };
 
-// const proofNdiRequestSignUp = () => {
-//     return (
-//         axios
-//             .post(BASE_URL + "api/user/profile/signup/proofRequest", [])
-//             .then((response) => {
-//                 // console.log(response);
-//                 return response;
-//             })
-//     );
-// };
-
 export default {
     proofNdiRequest,
     nats_subscribe,
-    // proofNdiRequestSignUp
 };
