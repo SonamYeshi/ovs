@@ -26,7 +26,7 @@ import NdiService from '../../../services/ndi.service';
 import voteService from 'services/vote.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const NDIBiometricQRCodePage = ({electionTypeId, candidate}) => {
+const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
@@ -50,15 +50,12 @@ const NDIBiometricQRCodePage = ({electionTypeId, candidate}) => {
                 setUrl(invite);
                 setDeepLinkUrl(deepLink);
                 setProgressNDI(false);
-
-
                 natsListenerForBiometric(threadId);
                 // if(!isFacialProof){
                 //     natsListener(threadId);
                 // }else{
                 //     natsListenerForBiometric(threadId);
                 // }
-                
             })
             .catch((err) => {
                 setAlertMessage('Failed to load QR code. Please try again.');
@@ -94,17 +91,12 @@ const NDIBiometricQRCodePage = ({electionTypeId, candidate}) => {
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
-            console.log("NATS Biometric:",data, electionTypeId);
+            console.log('NATS Biometric:', data, electionTypeId);
 
             if (data.status === 'exists') {
                 const voterCid = data.userDTO.cid;
                 setVoterCid(voterCid);
                 submitVote(candidate, voterCid);
-                setLoading(true); // Show loading spinner
-                // Slight delay to allow loading spinner to appear
-                // setTimeout(() => {
-                //     navigate('/election');
-                // }, 100);
             } else {
                 setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
                 setErrorDialogOpen(true);
@@ -127,22 +119,19 @@ const NDIBiometricQRCodePage = ({electionTypeId, candidate}) => {
             .saveVote(payload)
             .then((res) => {
                 if (!res.data || !res.data.message) {
-                    throw new Error("Response is missing data.message");
+                    throw new Error('Response is missing data.message');
                 }
 
+                // Show success message
                 return globalLib.successMsg(res.data.message);
             })
             .then(() => {
-                setLoading(true);
-                setTimeout(() => {
-                    window.location.reload();
-                }, 100);
+                navigate('/election');
             })
             .catch((err) => {
                 console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
-                globalLib.warningMsg(
-                    err?.response?.data?.error || err.message || 'Something went wrong'
-                ).then(() => {
+
+                globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
                     setLoading(true);
                     setTimeout(() => {
                         window.location.reload();

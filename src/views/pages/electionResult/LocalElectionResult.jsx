@@ -12,10 +12,13 @@ import { TITLE } from 'common/color';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import voteService from 'services/vote.service';
+import NormalLoadingPage from 'common/NormalLoadingPage';
 
 const LocalElectionResult = () => {
     const [candidates, setCandidates] = useState([]);
     const location = useLocation();
+    const [loading, setLoading] = useState(true);
+
     const electionId = location.state?.id;
     const getVoteResult = async () => {
         try {
@@ -31,12 +34,23 @@ const LocalElectionResult = () => {
     useEffect(() => {
         getVoteResult();
     }, []);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 500); // Simulate 500ms loading time
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <NormalLoadingPage />;
+    }
 
     return (
         <>
             <Box mt={4}>
                 <Typography variant="h2" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 2 }}>
-                   Election Result
+                    Election Result
                 </Typography>
             </Box>
             <Box

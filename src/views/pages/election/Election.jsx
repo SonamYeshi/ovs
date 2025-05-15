@@ -1,9 +1,10 @@
 // material-ui
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { Box, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 // project imports
 import NationalAssemblyImg from 'assets/images/National Assembly.png';
@@ -14,6 +15,7 @@ import VoteIcon from 'assets/images/VoteIcon.png';
 import MainCard from 'ui-component/cards/MainCard';
 
 import NdiScanPage from '../ndiScanPage/ndiScanPage';
+import NormalLoadingPage from 'common/NormalLoadingPage';
 
 const electionTypes = [
     { id: 1, label: 'Local Government Election', image: LocalGovtImg },
@@ -24,10 +26,26 @@ const electionTypes = [
 
 const Election = () => {
     const [selectedElection, setSelectedElection] = useState(null);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 500); // Simulate 500ms loading time
 
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <NormalLoadingPage />;
+    }
     const handleCardClick = (election) => {
-        setSelectedElection(election.id);
+        navigate('/vote-ndi-qr', {
+            state: { electionId: election.id }
+        });
     };
+
+    
 
     return (
         <>
@@ -37,7 +55,7 @@ const Election = () => {
                         <MainCard
                             onClick={() => handleCardClick(election)}
                             sx={{
-                                height: 200,
+                                height: 150,
                                 transition: 'box-shadow 0.5s',
                                 cursor: 'pointer',
                                 '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
@@ -49,13 +67,10 @@ const Election = () => {
                                     {election.label}
                                 </Typography>
                             </Box>
-                            <Box mt={2}>
-                                <NdiScanPage electionTypeId={selectedElection} />
-                            </Box>
                         </MainCard>
                     </Grid>
                 ))}
-            </Grid>   
+            </Grid>
         </>
     );
 };

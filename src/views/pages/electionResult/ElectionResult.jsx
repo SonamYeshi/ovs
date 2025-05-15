@@ -1,53 +1,68 @@
-// material-ui
-import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
+
+import { useEffect, useState } from 'react';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router-dom';
 
 // project imports
-import VoteIcon from "assets/images/VoteIcon.png";
+import VoteIcon from 'assets/images/VoteIcon.png';
 import NationalAssemblyImg from 'assets/images/National Assembly.png';
 import NationalCouncilImg from 'assets/images/nationa Council.png';
 import LocalGovtImg from 'assets/images/Local Oovernment.png';
-
-import MainCard from "ui-component/cards/MainCard";
+import NormalLoadingPage from 'common/NormalLoadingPage';
+import MainCard from 'ui-component/cards/MainCard';
 
 const electionCards = [
     {
         id: 1,
-        title: "Local Government Elections",
-        img: NationalAssemblyImg,
-        link: "/localElectionResult"
+        title: 'Local Government Elections',
+        img: LocalGovtImg,
+        link: '/localElectionResult'
     },
     {
         id: 2,
-        title: "National Assembly Elections",
+        title: 'National Assembly Elections',
         img: NationalCouncilImg,
-        link: "/localElectionResult"
+        link: '/localElectionResult'
     },
     {
         id: 3,
-        title: "National Council Elections",
-        img: LocalGovtImg,
-        link: "/localElectionResult"
+        title: 'National Council Elections',
+        img: NationalAssemblyImg,
+        link: '/localElectionResult'
     },
     {
         id: 4,
-        title: "Bye-Elections",
+        title: 'Bye-Elections',
         img: VoteIcon,
-        link: "/localElectionResult"
+        link: '/localElectionResult'
     }
 ];
-    
+
 const ElectionResult = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Simulate loading time (e.g., 500ms), or do actual data fetching here
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 500); // adjust as needed
+
+        return () => clearTimeout(timer);
+    }, []);
+
     const handleCardClick = (id, link) => {
-        navigate(link, 
-            { state: { id } 
-        });
+        navigate(link, { state: { id } });
     };
 
+    // Show loading screen
+    if (loading) {
+        return <NormalLoadingPage />;
+    }
+
+    // Show content after loading
     return (
         <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
             {electionCards.map((card) => (
@@ -55,19 +70,13 @@ const ElectionResult = () => {
                     <MainCard
                         onClick={() => handleCardClick(card.id, card.link)}
                         sx={{
-                            height: 200,
+                            height: 150,
                             cursor: 'pointer',
                             transition: 'box-shadow 0.5s',
                             '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
                         }}
                     >
-                        <Box
-                            sx={{ textDecoration: 'none' }}
-                            display={'flex'}
-                            flexDirection="column"
-                            alignItems="center"
-                            gap={2}
-                        >
+                        <Box sx={{ textDecoration: 'none' }} display={'flex'} flexDirection="column" alignItems="center" gap={2}>
                             <img src={card.img} alt={card.title} height="20%" width="20%" />
                             <Typography
                                 variant="body1"
@@ -91,6 +100,11 @@ const ElectionResult = () => {
         </Grid>
     );
 };
+
+export default ElectionResult;
+
+
+
 // const ElectionResult = () => {
 //   return (
 //       <>
@@ -247,4 +261,4 @@ const ElectionResult = () => {
 //   );
 // };
 
-export default ElectionResult;
+

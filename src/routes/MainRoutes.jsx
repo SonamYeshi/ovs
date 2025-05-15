@@ -94,7 +94,7 @@ const MainRoutes = {
         },
 
         {
-            path: '/dashboard/vote-ndi-qr',
+            path: '/vote-ndi-qr',
             element: <VoteNDIQRCodePage />
         },
         {
