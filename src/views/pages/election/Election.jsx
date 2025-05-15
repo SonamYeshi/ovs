@@ -13,18 +13,8 @@ import LocalGovtImg from 'assets/images/Local Oovernment.png';
 import VoteIcon from 'assets/images/VoteIcon.png';
 
 import MainCard from 'ui-component/cards/MainCard';
-
-import NdiScanPage from '../ndiScanPage/ndiScanPage';
 import NormalLoadingPage from 'common/NormalLoadingPage';
-
 import voteService from 'services/vote.service';
-
-// const electionTypes = [
-//     { id: 1, label: 'Local Government Election', image: LocalGovtImg },
-//     { id: 2, label: 'National Assembly Election', image: NationalAssemblyImg },
-//     { id: 3, label: 'National Council Election', image: NationalCouncilImg },
-//     { id: 4, label: 'Bye-Election', image: VoteIcon }
-// ];
 
 const Election = () => {
     const [electionTypes, setElectionTypes] = useState([]);
@@ -52,7 +42,7 @@ const Election = () => {
             state: { electionId: election.id }
         });
     };
-    
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
@@ -65,8 +55,6 @@ const Election = () => {
         return <NormalLoadingPage />;
     }
     
-    
-
     return (
         <>
             <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>

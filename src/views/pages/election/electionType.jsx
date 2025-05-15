@@ -2,31 +2,16 @@ import { useState } from 'react';
 import { useDispatch } from 'store';
 import React from 'react';
 
-// material-ui
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
-import InputLabel2 from 'ui-component/extended/Form/InputLabel';
-
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Slide from '@mui/material/Slide';
 import Typography from '@mui/material/Typography';
-
-
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import SecondaryAction from 'ui-component/cards/CardSecondaryAction';
@@ -36,7 +21,6 @@ import { gridSpacing } from 'store/constant';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-// assets
 import LinkIcon from '@mui/icons-material/Link';
 import userService from 'services/userService';
 
@@ -46,8 +30,6 @@ const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={r
 const validationSchema = yup.object({
     electionName: yup.string().required('Election Name is required.'),
 });
-
-
 
 // ==============================|| FORM VALIDATION - LOGIN FORMIK ||============================== //
 
@@ -68,10 +50,6 @@ const ElectionTypeSetup = () => {
         validationSchema,
         onSubmit: async (values, { resetForm }) => {
             try {
-                // const payload = {
-                //     ...values,
-                //     isbuyer: true
-                // };
                 const response = await userService.saveElectionType(values);
                 if (response.status === 200) {
                     setDialogTitle('Success');
@@ -113,17 +91,15 @@ const ElectionTypeSetup = () => {
                         />
                     </Grid>
 
-
-
-                        <Grid item xs={12}>
-                            <Stack direction="row" justifyContent="flex-end">
-                                <AnimateButton>
-                                    <Button variant="contained" type="submit">
-                                        Save
-                                    </Button>
-                                </AnimateButton>
-                            </Stack>
-                        </Grid>
+                    <Grid item xs={12}>
+                        <Stack direction="row" justifyContent="flex-end">
+                            <AnimateButton>
+                                <Button variant="contained" type="submit">
+                                    Save
+                                </Button>
+                            </AnimateButton>
+                        </Stack>
+                    </Grid>
                     </Grid>
                 </form>
             </MainCard>

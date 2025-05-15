@@ -20,10 +20,8 @@ import CrossImg from 'assets/images/corssImg.png';
 import CloseIcon from '@mui/icons-material/Close';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from 'axios';
-import globalLib from 'common/global-lib';
 import LoadingPage from 'common/LoadingPage';
 import NdiService from '../../../services/ndi.service';
-import voteService from 'services/vote.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -55,11 +53,6 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
                 setProgressNDI(false);
 
                 natsListener(threadId);
-                // if(!isFacialProof){
-                //     natsListener(threadId);
-                // }else{
-                //     natsListenerForBiometric(threadId);
-                // }
             })
             .catch((err) => {
                 setAlertMessage('Failed to load QR code. Please try again.');
@@ -98,13 +91,6 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
                         console.error('Extra check error:', err);
                     }
                 }, 100);
-                // setTimeout(() => {
-                //     navigate('/localElectionScanPage', {
-                //         state: { voterCid: data.userDTO.cid,
-                //             electionTypeId: electionTypeId
-                //          }
-                //     });
-                // }, 100);
             } else {
                 setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
                 setErrorDialogOpen(true);
@@ -119,68 +105,6 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
 
         return response.data; // adjust based on your actual API response
     };
-
-    // const natsListenerForBiometric = (threadId) => {
-    //     const endPoint = `${BASE_URL}ndi/nats-subscribe-biometric?threadId=${threadId}`;
-    //     const eventSource = new EventSource(endPoint);
-    //     eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
-    //         const data = JSON.parse(event.data);
-    //         console.log("NATS Biometric:",data, electionTypeId);
-
-    //         if (data.status === 'exists') {
-    //             const voterCid = data.userDTO.cid;
-    //             setVoterCid(voterCid);
-    //             submitVote(candidate, voterCid);
-    //             setLoading(true); // Show loading spinner
-    //             // Slight delay to allow loading spinner to appear
-    //             // setTimeout(() => {
-    //             //     navigate('/election');
-    //             // }, 100);
-    //         } else {
-    //             setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
-    //             setErrorDialogOpen(true);
-    //         }
-    //     });
-    // };
-
-    // const submitVote = (candidate, voterCid) => {
-    //     const payload = {
-    //         voterName: 'Voter Name',
-    //         voterCid: voterCid,
-    //         candidateCid: candidate.candidateCid,
-    //         candidateId: candidate.id,
-    //         electionTypeId: electionTypeId,
-    //         isVoted: true,
-    //         voteTxnHash: 'vote-txn-hash'
-    //     };
-    //     setLoading(true);
-    //     voteService
-    //         .saveVote(payload)
-    //         .then((res) => {
-    //             if (!res.data || !res.data.message) {
-    //                 throw new Error("Response is missing data.message");
-    //             }
-
-    //             return globalLib.successMsg(res.data.message);
-    //         })
-    //         .then(() => {
-    //             setLoading(true);
-    //             setTimeout(() => {
-    //                 window.location.reload();
-    //             }, 100);
-    //         })
-    //         .catch((err) => {
-    //             console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
-    //             globalLib.warningMsg(
-    //                 err?.response?.data?.error || err.message || 'Something went wrong'
-    //             ).then(() => {
-    //                 setLoading(true);
-    //                 setTimeout(() => {
-    //                     window.location.reload();
-    //                 }, 100);
-    //             });
-    //         });
-    // };
 
     const electionTitles = {
         1: 'Local Government',

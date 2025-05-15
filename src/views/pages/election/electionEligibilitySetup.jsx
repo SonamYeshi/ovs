@@ -12,21 +12,13 @@ import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import InputLabel2 from 'ui-component/extended/Form/InputLabel';
-
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Slide from '@mui/material/Slide';
 import Typography from '@mui/material/Typography';
-
-
-// project imports
 import MainCard from 'ui-component/cards/MainCard';
 import AnimateButton from 'ui-component/extended/AnimateButton';
 import SecondaryAction from 'ui-component/cards/CardSecondaryAction';
@@ -36,10 +28,8 @@ import { gridSpacing } from 'store/constant';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-// assets
 import LinkIcon from '@mui/icons-material/Link';
 import userService from 'services/userService';
-
 import voteService from 'services/vote.service';
 
 // animation
@@ -65,8 +55,6 @@ const validationSchema = yup.object({
     minAge: yup.string().required('Minimum age requirement is required.'),
 });
 
-
-
 // ==============================|| FORM VALIDATION - LOGIN FORMIK ||============================== //
 
 const ElectionEligibilitySetup = () => {
@@ -83,7 +71,7 @@ const ElectionEligibilitySetup = () => {
         const fetchElectionTypes = async () => {
             try {
                 const response = await voteService.getElectionType();
-                setElectionTypes(response.data); // assuming response.data is an array
+                setElectionTypes(response.data);
             } catch (error) {
                 console.error('Failed to fetch election types', error);
             }
@@ -131,8 +119,8 @@ const ElectionEligibilitySetup = () => {
     const electionType = formik.values.electionTypeId.toString();
 
     const showDzongkhag = electionType !== '';
-    const showGewog = electionType === '1' || electionType === '3' || electionType === '4'; // National Assembly or LG
-    const showVillage = electionType === '3' || electionType === '4'; // LG only
+    const showGewog = electionType === '1' || electionType === '3' || electionType === '4'; // NA,NC
+    const showVillage = electionType === '3' || electionType === '4'; // NC,LG etc..
     
     return (
         <>
@@ -146,19 +134,6 @@ const ElectionEligibilitySetup = () => {
                             <InputLabel2>Election Type</InputLabel2>
                             <FormControl fullWidth>
                                 <InputLabel id="election">Election</InputLabel>
-                                {/* <Select
-                                    labelId="electionTypeId"
-                                    id="electionTypeId"
-                                    name="electionTypeId"
-                                    value={formik.values.electionTypeId}
-                                    onChange={formik.handleChange}
-                                    label="Election Type"
-                                >
-                                    <MenuItem value=""><em>Select</em></MenuItem>
-                                    <MenuItem value='1'>National Assembly Election</MenuItem>
-                                    <MenuItem value='2'>National Council Election</MenuItem>
-                                    <MenuItem value='3'>Local Government Election</MenuItem>
-                                </Select> */}
                                 <Select
                                     labelId="electionTypeId"
                                     id="electionTypeId"

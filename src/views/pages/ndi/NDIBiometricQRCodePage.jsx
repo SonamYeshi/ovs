@@ -51,40 +51,12 @@ const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
                 setDeepLinkUrl(deepLink);
                 setProgressNDI(false);
                 natsListenerForBiometric(threadId);
-                // if(!isFacialProof){
-                //     natsListener(threadId);
-                // }else{
-                //     natsListenerForBiometric(threadId);
-                // }
             })
             .catch((err) => {
                 setAlertMessage('Failed to load QR code. Please try again.');
                 setProgressNDI(false);
             });
     }, []);
-
-    // const natsListener = (threadId) => {
-    //     const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}`;
-    //     const eventSource = new EventSource(endPoint);
-    //     eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
-    //         const data = JSON.parse(event.data);
-
-    //         if (data.status === 'exists') {
-    //             setLoading(true); // Show loading spinner
-    //             // Slight delay to allow loading spinner to appear
-    //             setTimeout(() => {
-    //                 navigate('/localElectionScanPage', {
-    //                     state: { voterCid: data.userDTO.cid,
-    //                         electionTypeId: electionTypeId
-    //                      }
-    //                 });
-    //             }, 100);
-    //         } else {
-    //             setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
-    //             setErrorDialogOpen(true);
-    //         }
-    //     });
-    // };
 
     const natsListenerForBiometric = (threadId) => {
         const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=true`;
