@@ -45,11 +45,11 @@ const Election = () => {
                         >
                             <Box display={'flex'} flexDirection="column" alignItems="center" gap={2}>
                                 <img src={election.image} alt={election.label} height="20%" width="20%" />
-                                <Typography variant="body1" sx={{ fontSize: { md: '17px' }, color: '#000000' }}>
+                                <Typography variant="body1" sx={{ fontSize: { md: '15px' }, color: '#000000' }}>
                                     {election.label}
                                 </Typography>
                             </Box>
-                            <Box mt={4}>
+                            <Box mt={2}>
                                 <NdiScanPage electionTypeId={selectedElection} />
                             </Box>
                         </MainCard>

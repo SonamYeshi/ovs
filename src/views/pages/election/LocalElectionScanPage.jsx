@@ -130,6 +130,10 @@ const LocalElectionScanPage = () => {
 
     const handleDialogClose = () => {
         setDialogState((prev) => ({ ...prev, open: false }));
+        setLoading(true);
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
     };
 
     return (
@@ -209,7 +213,7 @@ const LocalElectionScanPage = () => {
             {/* Dialog */}
             <Dialog open={dialogState.open} onClose={handleDialogClose}>
                 <DialogContent>
-                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>     
+                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
                         <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
                             {dialogState.message}
                         </Typography>
