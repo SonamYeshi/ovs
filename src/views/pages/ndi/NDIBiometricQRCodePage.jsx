@@ -26,7 +26,7 @@ import NdiService from '../../../services/ndi.service';
 import voteService from 'services/vote.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const VoteNDIQRCodePage = ({electionTypeId}) => {
+const NDIBiometricQRCodePage = ({electionTypeId, candidate}) => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
@@ -41,7 +41,7 @@ const VoteNDIQRCodePage = ({electionTypeId}) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        NdiService.proofNdiRequest(false)
+        NdiService.proofNdiRequest(true)
             .then((res) => {
                 const deepLink = res.data.deepLinkURL;
                 const invite = res.data.inviteURL;
@@ -51,7 +51,8 @@ const VoteNDIQRCodePage = ({electionTypeId}) => {
                 setDeepLinkUrl(deepLink);
                 setProgressNDI(false);
 
-                natsListener(threadId);
+
+                natsListenerForBiometric(threadId);
                 // if(!isFacialProof){
                 //     natsListener(threadId);
                 // }else{
@@ -65,90 +66,90 @@ const VoteNDIQRCodePage = ({electionTypeId}) => {
             });
     }, []);
 
-    const natsListener = (threadId) => {
-        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false`;
-        const eventSource = new EventSource(endPoint);
-        eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
-            const data = JSON.parse(event.data);
-
-            if (data.status === 'exists') {
-                setLoading(true); // Show loading spinner
-                // Slight delay to allow loading spinner to appear
-                setTimeout(() => {
-                    navigate('/localElectionScanPage', {
-                        state: { voterCid: data.userDTO.cid,
-                            electionTypeId: electionTypeId
-                         }
-                    });
-                }, 100);
-            } else {
-                setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
-                setErrorDialogOpen(true);
-            }
-        });
-    };
-
-    // const natsListenerForBiometric = (threadId) => {
-    //     const endPoint = `${BASE_URL}ndi/nats-subscribe-biometric?threadId=${threadId}`;
+    // const natsListener = (threadId) => {
+    //     const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}`;
     //     const eventSource = new EventSource(endPoint);
     //     eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
     //         const data = JSON.parse(event.data);
-    //         console.log("NATS Biometric:",data, electionTypeId);
 
     //         if (data.status === 'exists') {
-    //             const voterCid = data.userDTO.cid;
-    //             setVoterCid(voterCid);
-    //             submitVote(candidate, voterCid);
     //             setLoading(true); // Show loading spinner
     //             // Slight delay to allow loading spinner to appear
-    //             // setTimeout(() => {
-    //             //     navigate('/election');
-    //             // }, 100);
+    //             setTimeout(() => {
+    //                 navigate('/localElectionScanPage', {
+    //                     state: { voterCid: data.userDTO.cid,
+    //                         electionTypeId: electionTypeId
+    //                      }
+    //                 });
+    //             }, 100);
     //         } else {
-    //             setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
+    //             setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
     //             setErrorDialogOpen(true);
     //         }
     //     });
     // };
 
-    // const submitVote = (candidate, voterCid) => {
-    //     const payload = {
-    //         voterName: 'Voter Name',
-    //         voterCid: voterCid,
-    //         candidateCid: candidate.candidateCid,
-    //         candidateId: candidate.id,
-    //         electionTypeId: electionTypeId,
-    //         isVoted: true,
-    //         voteTxnHash: 'vote-txn-hash'
-    //     };
-    //     setLoading(true);
-    //     voteService
-    //         .saveVote(payload)
-    //         .then((res) => {
-    //             if (!res.data || !res.data.message) {
-    //                 throw new Error("Response is missing data.message");
-    //             }
+    const natsListenerForBiometric = (threadId) => {
+        const endPoint = `${BASE_URL}ndi/nats-subscribe-biometric?threadId=${threadId}&isBiometric=true`;
+        const eventSource = new EventSource(endPoint);
+        eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
+            const data = JSON.parse(event.data);
+            console.log("NATS Biometric:",data, electionTypeId);
 
-    //             return globalLib.successMsg(res.data.message);
-    //         })
-    //         .then(() => {
-    //             setLoading(true);
-    //             setTimeout(() => {
-    //                 window.location.reload();
-    //             }, 100);
-    //         })
-    //         .catch((err) => {
-    //             console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
-    //             globalLib.warningMsg(
-    //                 err?.response?.data?.error || err.message || 'Something went wrong'
-    //             ).then(() => {
-    //                 setLoading(true);
-    //                 setTimeout(() => {
-    //                     window.location.reload();
-    //                 }, 100);
-    //             });
-    //         });
-    // };
+            if (data.status === 'exists') {
+                const voterCid = data.userDTO.cid;
+                setVoterCid(voterCid);
+                submitVote(candidate, voterCid);
+                setLoading(true); // Show loading spinner
+                // Slight delay to allow loading spinner to appear
+                // setTimeout(() => {
+                //     navigate('/election');
+                // }, 100);
+            } else {
+                setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
+                setErrorDialogOpen(true);
+            }
+        });
+    };
+
+    const submitVote = (candidate, voterCid) => {
+        const payload = {
+            voterName: 'Voter Name',
+            voterCid: voterCid,
+            candidateCid: candidate.candidateCid,
+            candidateId: candidate.id,
+            electionTypeId: electionTypeId,
+            isVoted: true,
+            voteTxnHash: 'vote-txn-hash'
+        };
+        setLoading(true);
+        voteService
+            .saveVote(payload)
+            .then((res) => {
+                if (!res.data || !res.data.message) {
+                    throw new Error("Response is missing data.message");
+                }
+
+                return globalLib.successMsg(res.data.message);
+            })
+            .then(() => {
+                setLoading(true);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 100);
+            })
+            .catch((err) => {
+                console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
+                globalLib.warningMsg(
+                    err?.response?.data?.error || err.message || 'Something went wrong'
+                ).then(() => {
+                    setLoading(true);
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 100);
+                });
+            });
+    };
 
     return (
         <Box
@@ -306,4 +307,4 @@ const VoteNDIQRCodePage = ({electionTypeId}) => {
     );
 };
 
-export default VoteNDIQRCodePage;
+export default NDIBiometricQRCodePage;

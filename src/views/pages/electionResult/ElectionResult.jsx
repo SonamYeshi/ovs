@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import { useNavigate } from 'react-router-dom';
 
 // project imports
 import VoteIcon from "assets/images/VoteIcon.png";
@@ -12,160 +13,238 @@ import LocalGovtImg from 'assets/images/Local Oovernment.png';
 
 import MainCard from "ui-component/cards/MainCard";
 
+const electionCards = [
+    {
+        id: 1,
+        title: "Local Government Elections",
+        img: NationalAssemblyImg,
+        link: "/localElectionResult"
+    },
+    {
+        id: 2,
+        title: "National Assembly Elections",
+        img: NationalCouncilImg,
+        link: "/localElectionResult"
+    },
+    {
+        id: 3,
+        title: "National Council Elections",
+        img: LocalGovtImg,
+        link: "/localElectionResult"
+    },
+    {
+        id: 4,
+        title: "Bye-Elections",
+        img: VoteIcon,
+        link: "/localElectionResult"
+    }
+];
+    
 const ElectionResult = () => {
-  return (
-      <>
-          <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
-              <Grid item xs={12} sm={6} md={3}>
-                  <MainCard
-                      sx={{
-                          height: 200, // optional fixed height
-                          transition: 'box-shadow 0.5s',
-                          '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                      }}
-                  >
-                      <Box
-                          component={Link}
-                          href="/nationalAssemblyElectionScanPage"
-                          sx={{ textDecoration: 'none' }}
-                          display={'flex'}
-                          flexDirection="column"
-                          alignItems="center"
-                          gap={2}
-                      >
-                          <img src={NationalAssemblyImg} alt="NationalAssemblyImg" height="20%" width="20%" />
-                          <Typography
-                              variant="body1"
-                              sx={{
-                                  fontSize: {
-                                      xs: '13px',
-                                      sm: '10px',
-                                      md: '17px',
-                                      lg: '15px',
-                                      xl: '1rem'
-                                  },
-                                  color: '#000000'
-                              }}
-                          >
-                              National Assembly Elections
-                          </Typography>
-                      </Box>
-                  </MainCard>
-              </Grid>
+    const navigate = useNavigate();
+    const handleCardClick = (id, link) => {
+        navigate(link, 
+            { state: { id } 
+        });
+    };
 
-              <Grid item xs={12} sm={6} md={3}>
-                  <MainCard
-                      sx={{
-                          height: 200,
-                          transition: 'box-shadow 0.5s',
-                          '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                      }}
-                  >
-                      <Box
-                          component={Link}
-                          href="/nationalCouncilElectionScanPage"
-                          sx={{ textDecoration: 'none' }}
-                          display={'flex'}
-                          flexDirection="column"
-                          alignItems="center"
-                          gap={2}
-                      >
-                          <img src={NationalCouncilImg} alt="NationalCouncilImg" height="20%" width="20%" />
-                          <Typography
-                              variant="body1"
-                              sx={{
-                                  fontSize: {
-                                      xs: '13px',
-                                      sm: '10px',
-                                      md: '17px',
-                                      lg: '15px',
-                                      xl: '1rem'
-                                  },
-                                  color: '#000000'
-                              }}
-                          >
-                              National Council Elections
-                          </Typography>
-                      </Box>
-                  </MainCard>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                  <MainCard
-                      sx={{
-                          height: 200,
-                          transition: 'box-shadow 0.5s',
-                          '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                      }}
-                  >
-                      <Box
-                          component={Link}
-                          href="/localElectionResult"
-                          sx={{ textDecoration: 'none' }}
-                          display={'flex'}
-                          flexDirection="column"
-                          alignItems="center"
-                          gap={2}
-                      >
-                          <img src={LocalGovtImg} alt="LocalGovtImg" height="20%" width="20%" />
-                          <Typography
-                              variant="body1"
-                              sx={{
-                                  fontSize: {
-                                      xs: '13px',
-                                      sm: '10px',
-                                      md: '17px',
-                                      lg: '15px',
-                                      xl: '1rem'
-                                  },
-                                  color: '#000000'
-                              }}
-                          >
-                              Local Government Elections
-                          </Typography>
-                      </Box>
-                  </MainCard>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                  <MainCard
-                      sx={{
-                          height: 200,
-                          transition: 'box-shadow 0.5s',
-                          '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                      }}
-                  >
-                      <Box
-                          component={Link}
-                          href="/byeElectionScanPage"
-                          sx={{ textDecoration: 'none' }}
-                          display={'flex'}
-                          flexDirection="column"
-                          alignItems="center"
-                          gap={2}
-                      >
-                          <img src={VoteIcon} alt="VoteIcon" height="20%" width="20%" />
-                          <Typography
-                              variant="body1"
-                              sx={{
-                                  fontSize: {
-                                      xs: '13px',
-                                      sm: '10px',
-                                      md: '17px',
-                                      lg: '15px',
-                                      xl: '1rem'
-                                  },
-                                  color: '#000000'
-                              }}
-                          >
-                              Bye-Elections
-                          </Typography>
-                      </Box>
-                  </MainCard>
-              </Grid>
-          </Grid>
-      </>
-  );
+    return (
+        <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
+            {electionCards.map((card) => (
+                <Grid key={card.id} item xs={12} sm={6} md={3}>
+                    <MainCard
+                        onClick={() => handleCardClick(card.id, card.link)}
+                        sx={{
+                            height: 200,
+                            cursor: 'pointer',
+                            transition: 'box-shadow 0.5s',
+                            '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
+                        }}
+                    >
+                        <Box
+                            sx={{ textDecoration: 'none' }}
+                            display={'flex'}
+                            flexDirection="column"
+                            alignItems="center"
+                            gap={2}
+                        >
+                            <img src={card.img} alt={card.title} height="20%" width="20%" />
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    fontSize: {
+                                        xs: '13px',
+                                        sm: '10px',
+                                        md: '17px',
+                                        lg: '15px',
+                                        xl: '1rem'
+                                    },
+                                    color: '#000000'
+                                }}
+                            >
+                                {card.title}
+                            </Typography>
+                        </Box>
+                    </MainCard>
+                </Grid>
+            ))}
+        </Grid>
+    );
 };
+// const ElectionResult = () => {
+//   return (
+//       <>
+//           <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
+//               <Grid item xs={12} sm={6} md={3}>
+//                   <MainCard
+//                       sx={{
+//                           height: 200, // optional fixed height
+//                           transition: 'box-shadow 0.5s',
+//                           '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
+//                       }}
+//                   >
+//                       <Box
+//                           component={Link}
+//                           href="/nationalAssemblyElectionScanPage"
+//                           sx={{ textDecoration: 'none' }}
+//                           display={'flex'}
+//                           flexDirection="column"
+//                           alignItems="center"
+//                           gap={2}
+//                       >
+//                           <img src={NationalAssemblyImg} alt="NationalAssemblyImg" height="20%" width="20%" />
+//                           <Typography
+//                               variant="body1"
+//                               sx={{
+//                                   fontSize: {
+//                                       xs: '13px',
+//                                       sm: '10px',
+//                                       md: '17px',
+//                                       lg: '15px',
+//                                       xl: '1rem'
+//                                   },
+//                                   color: '#000000'
+//                               }}
+//                           >
+//                               National Assembly Elections
+//                           </Typography>
+//                       </Box>
+//                   </MainCard>
+//               </Grid>
+
+//               <Grid item xs={12} sm={6} md={3}>
+//                   <MainCard
+//                       sx={{
+//                           height: 200,
+//                           transition: 'box-shadow 0.5s',
+//                           '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
+//                       }}
+//                   >
+//                       <Box
+//                           component={Link}
+//                           href="/nationalCouncilElectionScanPage"
+//                           sx={{ textDecoration: 'none' }}
+//                           display={'flex'}
+//                           flexDirection="column"
+//                           alignItems="center"
+//                           gap={2}
+//                       >
+//                           <img src={NationalCouncilImg} alt="NationalCouncilImg" height="20%" width="20%" />
+//                           <Typography
+//                               variant="body1"
+//                               sx={{
+//                                   fontSize: {
+//                                       xs: '13px',
+//                                       sm: '10px',
+//                                       md: '17px',
+//                                       lg: '15px',
+//                                       xl: '1rem'
+//                                   },
+//                                   color: '#000000'
+//                               }}
+//                           >
+//                               National Council Elections
+//                           </Typography>
+//                       </Box>
+//                   </MainCard>
+//               </Grid>
+
+//               <Grid item xs={12} sm={6} md={3}>
+//                   <MainCard
+//                       sx={{
+//                           height: 200,
+//                           transition: 'box-shadow 0.5s',
+//                           '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
+//                       }}
+//                   >
+//                       <Box
+//                           component={Link}
+//                           href="/localElectionResult"
+//                           sx={{ textDecoration: 'none' }}
+//                           display={'flex'}
+//                           flexDirection="column"
+//                           alignItems="center"
+//                           gap={2}
+//                       >
+//                           <img src={LocalGovtImg} alt="LocalGovtImg" height="20%" width="20%" />
+//                           <Typography
+//                               variant="body1"
+//                               sx={{
+//                                   fontSize: {
+//                                       xs: '13px',
+//                                       sm: '10px',
+//                                       md: '17px',
+//                                       lg: '15px',
+//                                       xl: '1rem'
+//                                   },
+//                                   color: '#000000'
+//                               }}
+//                           >
+//                               Local Government Elections
+//                           </Typography>
+//                       </Box>
+//                   </MainCard>
+//               </Grid>
+
+//               <Grid item xs={12} sm={6} md={3}>
+//                   <MainCard
+//                       sx={{
+//                           height: 200,
+//                           transition: 'box-shadow 0.5s',
+//                           '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
+//                       }}
+//                   >
+//                       <Box
+//                           component={Link}
+//                           href="/byeElectionScanPage"
+//                           sx={{ textDecoration: 'none' }}
+//                           display={'flex'}
+//                           flexDirection="column"
+//                           alignItems="center"
+//                           gap={2}
+//                       >
+//                           <img src={VoteIcon} alt="VoteIcon" height="20%" width="20%" />
+//                           <Typography
+//                               variant="body1"
+//                               sx={{
+//                                   fontSize: {
+//                                       xs: '13px',
+//                                       sm: '10px',
+//                                       md: '17px',
+//                                       lg: '15px',
+//                                       xl: '1rem'
+//                                   },
+//                                   color: '#000000'
+//                               }}
+//                           >
+//                               Bye-Elections
+//                           </Typography>
+//                       </Box>
+//                   </MainCard>
+//               </Grid>
+//           </Grid>
+//       </>
+//   );
+// };
 
 export default ElectionResult;

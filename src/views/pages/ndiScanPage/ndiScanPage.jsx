@@ -50,7 +50,7 @@ const ndiScanPage = ({electionTypeId}) => {
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Login </DialogTitle>
                 <DialogContent>
-                    <VoteNDIQRCode isFacialProof={false} electionTypeId={electionTypeId}/>
+                    <VoteNDIQRCode electionTypeId={electionTypeId}/>
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialog} color="error">
