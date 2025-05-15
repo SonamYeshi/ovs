@@ -29,14 +29,15 @@ const getVoteResult = (electionId) => {
     });
 };
 
-// const getVoteResult = () => {
-//     return axios.get('voter/getVoteResult', {
-//         headers: authHeader()
-//     });
-// };
+const getElectionType = () => {
+    return axios.get('voter/getElectionType', {
+        // headers: authHeader()
+    });
+};
 
 export default {
     getCandidates,
     saveVote,
-    getVoteResult
+    getVoteResult,
+    getElectionType,
 };

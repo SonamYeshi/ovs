@@ -23,10 +23,21 @@ const getAllUsers = () => {
     );
 };
 
-const saveBuyer = (data) => {
-    console.log(authHeader());
+const saveElectionEligibility = (data) => {
+    // console.log(authHeader());
     return axios.post(
-        "api/landUser/save",
+        "voter/saveEligibility",
+        data,
+        {
+            headers: authHeader()
+        }
+    )
+};
+
+const saveElectionType = (data) => {
+    // console.log(authHeader());
+    return axios.post(
+        "voter/saveElection",
         data,
         {
             headers: authHeader()
@@ -44,6 +55,7 @@ const getRefreshToken = (data)=> {
 export default{
     registerUser,
     getAllUsers,
-    saveBuyer,
+    saveElectionEligibility,
     getRefreshToken,
+    saveElectionType,
 };

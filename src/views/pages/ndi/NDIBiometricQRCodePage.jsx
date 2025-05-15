@@ -87,7 +87,7 @@ const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
     // };
 
     const natsListenerForBiometric = (threadId) => {
-        const endPoint = `${BASE_URL}ndi/nats-subscribe-biometric?threadId=${threadId}&isBiometric=true`;
+        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=true`;
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);

@@ -17,14 +17,17 @@ import MainCard from 'ui-component/cards/MainCard';
 import NdiScanPage from '../ndiScanPage/ndiScanPage';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 
-const electionTypes = [
-    { id: 1, label: 'Local Government Election', image: LocalGovtImg },
-    { id: 2, label: 'National Assembly Election', image: NationalAssemblyImg },
-    { id: 3, label: 'National Council Election', image: NationalCouncilImg },
-    { id: 4, label: 'Bye-Election', image: VoteIcon }
-];
+import voteService from 'services/vote.service';
+
+// const electionTypes = [
+//     { id: 1, label: 'Local Government Election', image: LocalGovtImg },
+//     { id: 2, label: 'National Assembly Election', image: NationalAssemblyImg },
+//     { id: 3, label: 'National Council Election', image: NationalCouncilImg },
+//     { id: 4, label: 'Bye-Election', image: VoteIcon }
+// ];
 
 const Election = () => {
+    const [electionTypes, setElectionTypes] = useState([]);
     const [selectedElection, setSelectedElection] = useState(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -39,6 +42,21 @@ const Election = () => {
     if (loading) {
         return <NormalLoadingPage />;
     }
+    useEffect(() => {
+        const fetchElectionTypes = async () => {
+            try {
+                const response = await voteService.getElectionType(); // Make sure this method exists
+                if (response.status === 200) {
+                    setElectionTypes(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch election types:', error);
+            }
+        };
+
+        fetchElectionTypes();
+    }, []);
+
     const handleCardClick = (election) => {
         navigate('/vote-ndi-qr', {
             state: { electionId: election.id }
@@ -65,6 +83,10 @@ const Election = () => {
                                 <img src={election.image} alt={election.label} height="20%" width="20%" />
                                 <Typography variant="body1" sx={{ fontSize: { md: '15px' }, color: '#000000' }}>
                                     {election.label}
+                                    </Typography>
+                                <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
+                                <Typography variant="body1" sx={{ fontSize: { md: '17px' }, color: '#000000' }}>
+                                    {election.electionName}
                                 </Typography>
                             </Box>
                         </MainCard>

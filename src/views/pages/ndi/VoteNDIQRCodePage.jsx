@@ -19,6 +19,7 @@ import DialogContent from '@mui/material/DialogContent';
 import CrossImg from 'assets/images/corssImg.png';
 import CloseIcon from '@mui/icons-material/Close';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import axios from 'axios';
 import globalLib from 'common/global-lib';
 import LoadingPage from 'common/LoadingPage';
 import NdiService from '../../../services/ndi.service';
@@ -26,7 +27,7 @@ import voteService from 'services/vote.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 import MainCard from 'ui-component/cards/MainCard';
 
-const VoteNDIQRCodePage = ({electionTypeId}) => {
+const VoteNDIQRCodePage = ({ electionTypeId }) => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
@@ -59,7 +60,6 @@ const VoteNDIQRCodePage = ({electionTypeId}) => {
                 // }else{
                 //     natsListenerForBiometric(threadId);
                 // }
-                
             })
             .catch((err) => {
                 setAlertMessage('Failed to load QR code. Please try again.');
@@ -76,16 +76,50 @@ const VoteNDIQRCodePage = ({electionTypeId}) => {
             if (data.status === 'exists') {
                 setLoading(true); // Show loading spinner
                 // Slight delay to allow loading spinner to appear
-                setTimeout(() => {
-                    navigate('/localElectionScanPage', {
-                        state: { voterCid: data.userDTO.cid, electionTypeId: electionId }
-                    });
+
+                setTimeout(async () => {
+                    try {
+                        const isAllowed = await performExtraCheck(data.userDTO.cid, electionTypeId);
+
+                        if (!isAllowed) {
+                            navigate('/localElectionScanPage', {
+                                state: {
+                                    voterCid: data.userDTO.cid,
+                                    electionTypeId: electionTypeId
+                                }
+                            });
+                        } else {
+                            setLoading(false);
+                            setDialogMessage('You have already voted for this election.');
+                            setErrorDialogOpen(true);
+                        }
+                    } catch (err) {
+                        setLoading(false);
+                        setDialogMessage('Failed to verify voter eligibility.');
+                        setErrorDialogOpen(true);
+                        console.error('Extra check error:', err);
+                    }
                 }, 100);
+                // setTimeout(() => {
+                //     navigate('/localElectionScanPage', {
+                //         state: { voterCid: data.userDTO.cid,
+                //             electionTypeId: electionTypeId
+                //          }
+                //     });
+                // }, 100);
             } else {
                 setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
                 setErrorDialogOpen(true);
             }
         });
+    };
+
+    const performExtraCheck = async (cid, electionTypeId) => {
+        const response = await axios.get(`${BASE_URL}voter/checkIfVoted`, {
+            params: { voterCid: cid, electionTypeId: electionTypeId }
+        });
+
+        return response.data; // adjust based on your actual API response
     };
 
     // const natsListenerForBiometric = (threadId) => {
@@ -157,7 +191,9 @@ const VoteNDIQRCodePage = ({electionTypeId}) => {
     };
     return (
         <MainCard>
-            <Typography variant="h3" textAlign={'center'}>{electionTitles[electionId] || 'Mock Election'}</Typography>
+            <Typography variant="h3" textAlign={'center'}>
+                {electionTitles[electionId] || 'Mock Election'}
+            </Typography>
             <Box
                 sx={{
                     maxWidth: 500,

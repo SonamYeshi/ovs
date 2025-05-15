@@ -40,5 +40,7 @@
 
     "more-items": "More Items",
     "elections": "Elections",
-    "electionResult": "Election Results"
+    "electionResult": "Election Results",
+    "electionEligibilitySetup": "Election Eligibility Setup",
+    "electionType": "Election Type"
 }
