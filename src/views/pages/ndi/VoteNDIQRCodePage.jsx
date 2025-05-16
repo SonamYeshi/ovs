@@ -25,7 +25,7 @@ import NdiService from '../../../services/ndi.service';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 import MainCard from 'ui-component/cards/MainCard';
 
-const VoteNDIQRCodePage = ({ electionTypeId }) => {
+const VoteNDIQRCodePage = () => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
@@ -42,23 +42,28 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
     const electionId = location.state?.electionId;
 
     useEffect(() => {
+        generateQRCode();
+    }, []);
+
+    const generateQRCode = () => {
+        setProgressNDI(true);
         NdiService.proofNdiRequest(false)
             .then((res) => {
                 const deepLink = res.data.deepLinkURL;
                 const invite = res.data.inviteURL;
                 const threadId = res.data.threadId;
-
+    
                 setUrl(invite);
                 setDeepLinkUrl(deepLink);
                 setProgressNDI(false);
-
+    
                 natsListener(threadId);
             })
             .catch((err) => {
                 setAlertMessage('Failed to load QR code. Please try again.');
                 setProgressNDI(false);
             });
-    }, []);
+    };
 
     const natsListener = (threadId) => {
         const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false`;
@@ -105,6 +110,12 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
 
         return response.data; // adjust based on your actual API response
     };
+
+    const handleDialogClose = () => {
+        setErrorDialogOpen(false);
+        generateQRCode(); 
+    };
+    
 
     const electionTitles = {
         1: 'Local Government',
@@ -235,10 +246,10 @@ const VoteNDIQRCodePage = ({ electionTypeId }) => {
                         </Button>
                     </Grid>
                 </Grid>
-                <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
+                <Dialog open={errorDialogOpen} onClose={handleDialogClose}>
                     <IconButton
                         aria-label="close"
-                        onClick={() => setErrorDialogOpen(false)}
+                        onClick={handleDialogClose}
                         sx={{
                             position: 'absolute',
                             right: 8,

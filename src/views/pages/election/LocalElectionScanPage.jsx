@@ -16,24 +16,21 @@ import {
     TableRow,
     Typography
 } from '@mui/material';
-import VoteIcon from 'assets/images/VoteIcon.png';
 import { TITLE } from 'common/color';
-import globalLib from 'common/global-lib';
 import LoadingPage from 'common/LoadingPage';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import voteService from 'services/vote.service';
-import VoteNDIQRCode from '../ndi/VoteNDIQRCodePage';
 import NDIBiometricQRCodePage from '../ndi/NDIBiometricQRCodePage';
 
 const LocalElectionScanPage = () => {
+    const navigate = useNavigate();
     const location = useLocation();
-    const [selectedCandidate, setSelectedCandidate] = useState(null);
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [selectedCandidateId, setSelectedCandidateId] = useState(null);
     const [candidates, setCandidates] = useState([]);
     const [dialogState, setDialogState] = useState({
         open: false,
-        type: '', // e.g., "vote", "confirm", etc.
+        type: '',
         title: '',
         message: '',
         confirmAction: null
@@ -42,37 +39,39 @@ const LocalElectionScanPage = () => {
     const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
     const { voterCid, electionTypeId } = location.state || {};
 
-    const handleQRLoading = () => {
-        setDialogQRCodeOpen(true); // Open dialog
-    };
-
-    const handleCloseDialogForQRCode = () => {
-        setDialogQRCodeOpen(false);
-    };
     useEffect(() => {
-        // const electionTypeId = 1;
         voteService
             .getCandidates(electionTypeId)
             .then((response) => {
                 setCandidates(response.data);
             })
             .catch((error) => {
-                console.error('Error fetching candidates:', error);
+                // console.error('Error fetching candidates:', error);
                 setDialogState({
                     open: true,
                     type: 'result',
                     title: 'Error',
-                    message: 'No Candidates found.',
+                    message: 'No Candidates found for this election.',
                     confirmAction: null
                 });
             });
     }, []);
 
-    const selectedCandidateData = candidates.find((c) => c.id === selectedCandidate);
+    const handleQRLoading = () => {
+        setDialogQRCodeOpen(true); // Open dialog
+    };
+
+    const handleCloseDialogForQRCode = () => {
+        setDialogQRCodeOpen(false);
+        setDialogState((prev) => ({ ...prev, open: false }));
+        setSelectedCandidateId(null);
+    };
+
+    const getCandidateById = (id) => candidates.find((c) => c.id === id);
 
     const handleVoteClick = (candidateId) => {
-        setSelectedCandidate(candidateId);
-        const candidate = candidates.find((c) => c.id === candidateId);
+        setSelectedCandidateId(candidateId);
+        const candidate = getCandidateById(candidateId);
         setDialogState({
             open: true,
             type: 'confirm',
@@ -94,47 +93,27 @@ const LocalElectionScanPage = () => {
         });
     };
 
-    // const submitVote = (candidate) => {
-    //     console.log("i am being called");
-    //     const payload = {
-    //         voterName: 'Voter Name',
-    //         voterCid: voterCid,
-    //         candidateCid: candidate.candidateCid,
-    //         candidateId: candidate.id,
-    //         electionTypeId: 1,
-    //         isVoted: true,
-    //         voteTxnHash: 'vote-txn-hash'
-    //     };
-    //     setLoading(true);
-    //     voteService
-    //         .saveVote(payload)
-    //         .then((res) => {
-    //             console.log(res)
-    //             setDialogQRCodeOpen(true);
-    //             globalLib.successMsg(res.data.message).then(() => {
-    //                 setLoading(true); // Show loading again before reload
-    //                 setTimeout(() => {
-    //                     window.location.reload();
-    //                 }, 100); // Slight delay to ensure loader is visible
-    //             });
-    //         })
-    //         .catch((err) => {
-    //             console.error('Error submitting vote', err.response.data.error);
-    //             globalLib.warningMsg(err.response?.data.error || 'Something went wrong').then(() => {
-    //                 setLoading(true); // Show loading again before reload
-    //                 setTimeout(() => {
-    //                     window.location.reload();
-    //                 }, 100); // Delay to render loading
-    //             });
-    //         });
-    // };
+    const getArrowIconColor = (candidateId) => {
+        return selectedCandidateId === candidateId ? '#2bc039' : '#003366';
+    };
+    
+    const getVoteButtonColor = (candidateId) => {
+        return selectedCandidateId === candidateId ? '#667FA5' : '#003366';
+    };
 
     const handleDialogClose = () => {
         setDialogState((prev) => ({ ...prev, open: false }));
-        setLoading(true);
-        setTimeout(() => {
-            window.location.reload();
-        }, 100);
+        if(candidates.length === 0){
+            navigate('/vote-ndi-qr', {
+                state: { electionId: electionTypeId }
+            });
+            return;
+        }
+        setSelectedCandidateId(null);
+        setLoading(false);
+        // setTimeout(() => {
+        //     window.location.reload();
+        // }, 100);
     };
 
     return (
@@ -181,7 +160,7 @@ const LocalElectionScanPage = () => {
                                             <ArrowCircleLeftIcon
                                                 fontSize="large"
                                                 sx={{
-                                                    color: selectedCandidate === candidate.id ? '#c0392b' : '#003366' // green if selected
+                                                    color: getArrowIconColor(candidate.id)
                                                 }}
                                             />
                                         </TableCell>
@@ -190,7 +169,7 @@ const LocalElectionScanPage = () => {
                                                 variant="contained"
                                                 onClick={() => handleVoteClick(candidate.id)}
                                                 sx={{
-                                                    backgroundColor: selectedCandidate === candidate.id ? '#667FA5' : '#003366', // green if selected
+                                                    backgroundColor: getVoteButtonColor(candidate.id),
                                                     borderRadius: '30px',
                                                     px: 7,
                                                     py: 2.5,
@@ -212,7 +191,12 @@ const LocalElectionScanPage = () => {
                 </Paper>
             </Box>
             {/* Dialog */}
-            <Dialog open={dialogState.open} onClose={handleDialogClose}>
+            <Dialog open={dialogState.open} onClose={(event, reason) =>{
+                if(reason !== "backdropClick"){
+                    handleDialogClose();
+                }
+            }}
+            >
                 <DialogContent>
                     <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
                         <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
@@ -231,8 +215,7 @@ const LocalElectionScanPage = () => {
                             color="success"
                             variant="outlined"
                             onClick={() => {
-                                // submitVote(selectedCandidateData);
-                                handleQRLoading(); //this is for QR code
+                                handleQRLoading();
                             }}
                         >
                             Confirm
@@ -249,10 +232,18 @@ const LocalElectionScanPage = () => {
             )}
 
             {/* page for QR code */}
-            <Dialog open={dialogQRCodeOpen} onClose={handleCloseDialogForQRCode} fullWidth maxWidth="sm">
+            <Dialog open={dialogQRCodeOpen} onClose={(event, reason) =>{
+                //not to allow closing the dialog on click outside the dialog
+                if (reason !== 'backdropClick') {
+                    handleCloseDialogForQRCode();
+                  }
+            }} 
+            fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognition </DialogTitle>
                 <DialogContent>
-                    <NDIBiometricQRCodePage electionTypeId={electionTypeId} candidate={selectedCandidateData} />
+                    <NDIBiometricQRCodePage 
+                    electionTypeId={electionTypeId} 
+                    candidate={getCandidateById(selectedCandidateId)} />
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center' }}>
                     <Button variant="contained" onClick={handleCloseDialogForQRCode} color="error">

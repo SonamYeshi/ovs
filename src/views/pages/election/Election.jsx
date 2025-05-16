@@ -1,9 +1,8 @@
 // material-ui
 import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 // project imports
@@ -25,7 +24,7 @@ const Election = () => {
     useEffect(() => {
         const fetchElectionTypes = async () => {
             try {
-                const response = await voteService.getElectionType(); // Make sure this method exists
+                const response = await voteService.getElectionType();
                 if (response.status === 200) {
                     setElectionTypes(response.data);
                 }

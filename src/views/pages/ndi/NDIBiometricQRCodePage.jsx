@@ -98,16 +98,23 @@ const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
                 return globalLib.successMsg(res.data.message);
             })
             .then(() => {
-                navigate('/election');
+                navigate('/vote-ndi-qr', {
+                    state: { electionId: electionTypeId }
+                });
+                return;
             })
             .catch((err) => {
                 console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
 
                 globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
-                    setLoading(true);
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 100);
+                    setLoading(false);
+                    navigate('/vote-ndi-qr', {
+                        state: { electionId: electionTypeId }
+                    });
+                    return;
+                    // setTimeout(() => {
+                    //     window.location.reload();
+                    // }, 100);
                 });
             });
     };
