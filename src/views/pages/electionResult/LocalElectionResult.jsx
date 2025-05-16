@@ -1,4 +1,7 @@
-import { Box, Chip } from '@mui/material';
+import { Box, Chip, Dialog,
+    DialogActions,
+    DialogContent,
+    Button, } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -10,42 +13,66 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { TITLE } from 'common/color';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import voteService from 'services/vote.service';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 
 const LocalElectionResult = () => {
+    const navigate = useNavigate();
     const [candidates, setCandidates] = useState([]);
     const location = useLocation();
     const [loading, setLoading] = useState(true);
+    const [dialogState, setDialogState] = useState({
+        open: false,
+        type: '',
+        title: '',
+        message: '',
+        confirmAction: null
+    });
 
     const electionId = location.state?.id;
-    const getVoteResult = async () => {
-        try {
-            const response = await voteService.getVoteResult(electionId);
-            if (response.data !== '') {
-                setCandidates(response.data);
-            }
-        } catch (error) {
-            console.error('Failed to fetch vote result:', error);
-        }
-    };
 
     useEffect(() => {
         getVoteResult();
     }, []);
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 500); // Simulate 500ms loading time
 
-        return () => clearTimeout(timer);
-    }, []);
+    const getVoteResult = async () => {
+        try {
+            const response = await voteService.getVoteResult(electionId);
+            if (response.data.length !== 0) {
+                setCandidates(response.data);
+            }else{
+                setDialogState({
+                    open: true,
+                    type: 'Close',
+                    title: 'Error',
+                    message: 'No Voting result for this election.',
+                    confirmAction: null
+                });
+            }
+        } catch (error) {
+            console.error('Failed to fetch vote result:', error);
+            setDialogState({
+                open: true,
+                type: 'Close',
+                title: 'Error',
+                message: 'An error occurred while fetching vote results.',
+                confirmAction: null
+            });
+        } finally{
+            setLoading(false);
+        }
+    };
+
+    const handleDialogClose = () => {
+        setDialogState((prev) => ({ ...prev, open: false }));
+        navigate('/electionResult');
+        return;
+    };
 
     if (loading) {
         return <NormalLoadingPage />;
     }
-
     return (
         <>
             <Box mt={4}>
@@ -102,6 +129,30 @@ const LocalElectionResult = () => {
                     </TableContainer>
                 </Paper>
             </Box>
+
+            {/* Dialog */}
+            <Dialog open={dialogState.open} onClose={(event, reason) =>{
+                if(reason !== "backdropClick"){
+                    handleDialogClose();
+                }
+            }}
+            >
+                <DialogContent>
+                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
+                        <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
+                            {dialogState.message}
+                        </Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions style={{ justifyContent: 'center' }}>
+                    <Button size="small" color="error" variant="outlined" onClick={()=>{
+                        handleDialogClose();
+                    }}
+                    >
+                        {dialogState.type}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };
