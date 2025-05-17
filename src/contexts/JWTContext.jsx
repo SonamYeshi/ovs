@@ -14,8 +14,8 @@ import Loader from 'ui-component/Loader';
 import axios from 'utils/axios';
 
 import { clearAuthTokens, setAuthTokens } from '../utils/auth-storage';
+import { clearBlockchainToken } from '../utils/bc-token-stogare';
 
-// import { clearUserData, setUserData } from '../store/slices/UserContext';
 import { useDispatch as useReduxDispatch } from '../store';
 
 import userService from 'services/userService';
@@ -48,6 +48,7 @@ const setSession = async (serviceToken, refreshToken, user) => {
         axios.defaults.headers.common.Authorization = `Bearer ${serviceToken}`;
     } else {
         await clearAuthTokens();
+        await clearBlockchainToken();
         delete axios.defaults.headers.common.Authorization;
     }
 };
@@ -60,24 +61,24 @@ export const JWTProvider = ({ children }) => {
     const [state, dispatch] = useReducer(accountReducer, initialState);
 
     // Refresh access token
-    const getRefreshToken = async () => {
-        try {
-            const refreshTokenStored = localStorage.getItem('refreshToken');
-            const data = {
-                refreshToken: refreshTokenStored
-            };
+    // const getRefreshToken = async () => {
+    //     try {
+    //         const refreshTokenStored = localStorage.getItem('refreshToken');
+    //         const data = {
+    //             refreshToken: refreshTokenStored
+    //         };
 
-            const response = await userService.getRefreshToken(data);
-            // const response = await axios.post('http://localhost:8080/api/auth/refreshtoken', {refreshToken});
-            const { accessToken, refreshToken, user } = response.data;
-            setSession(accessToken, refreshToken, user);
-            return accessToken;
-        } catch (err) {
-            console.error('Refresh token failed', err);
-            logout();
-            return null;
-        }
-    };
+    //         const response = await userService.getRefreshToken(data);
+    //         // const response = await axios.post('http://localhost:8080/api/auth/refreshtoken', {refreshToken});
+    //         const { accessToken, refreshToken, user } = response.data;
+    //         setSession(accessToken, refreshToken, user);
+    //         return accessToken;
+    //     } catch (err) {
+    //         console.error('Refresh token failed', err);
+    //         logout();
+    //         return null;
+    //     }
+    // };
 
     const init = async () => {
         try {
@@ -110,7 +111,7 @@ export const JWTProvider = ({ children }) => {
 
     const login = async (username, password, navigate) => {
         const response = await authServices.login(username, password);
-        console.log(response);
+        // console.log(response);
         if (response.success) {
             const { serviceToken, refreshToken, user } = response.response.data;
 

@@ -23,7 +23,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import globalLib from 'common/global-lib';
 import LoadingPage from 'common/LoadingPage';
 import NdiService from '../../../services/ndi.service';
-import voteService from 'services/vote.service';
+import blockchainAuthService from 'services/blockchainAuth.service';
+import blockchainService from 'services/blockchain.service';
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
@@ -63,7 +65,6 @@ const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
-            console.log('NATS Biometric:', data, electionTypeId);
 
             if (data.status === 'exists') {
                 const voterCid = data.userDTO.cid;
@@ -76,7 +77,12 @@ const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
         });
     };
 
-    const submitVote = (candidate, voterCid) => {
+    const submitVote = async (candidate, voterCid) => {
+        const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
+        if (!bc_token) {
+            return globalLib.warningMsg("Could not load access token for blockchain.");
+        }
+
         const payload = {
             voterName: 'Voter Name',
             voterCid: voterCid,
@@ -84,10 +90,11 @@ const NDIBiometricQRCodePage = ({ electionTypeId, candidate }) => {
             candidateId: candidate.id,
             electionTypeId: electionTypeId,
             isVoted: true,
-            voteTxnHash: 'vote-txn-hash'
+            voteTxnHash: 'vote-txn-hash',
+            bcAccessToken: bc_token
         };
         setLoading(true);
-        voteService
+        blockchainService
             .saveVote(payload)
             .then((res) => {
                 if (!res.data || !res.data.message) {

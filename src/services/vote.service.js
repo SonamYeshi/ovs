@@ -14,20 +14,24 @@ const getCandidates = (electionTypeId) => {
     );
 };
 
-const saveVote = (data) => {
-    return axios.post(
-        "voter/recordVote",
-        data,
-        {
-            headers: authHeader()
-        }
-    );
-};
-const getVoteResult = (electionId) => {
-    return axios.get('voter/getVoteResultFromBlockchain/'+electionId, {
-        headers: authHeader()
-    });
-};
+// const saveVote = (data) => {
+//     return axios.post(
+//         "voter/recordVote",
+//         data,
+//         {
+//             headers: authHeader()
+//         }
+//     );
+// };
+// const getElectionResult = (electionId, bc_token) => {
+//     alert(bc_token)
+//     return axios.get('blockchain/getElectionResult/'+electionId, {
+//         // headers: authHeader()
+//         headers: {
+//             Authorization: `Bearer ${bc_token}`
+//         }
+//     });
+// };
 
 const getElectionType = () => {
     return axios.get('voter/getElectionType', {
@@ -37,7 +41,7 @@ const getElectionType = () => {
 
 export default {
     getCandidates,
-    saveVote,
-    getVoteResult,
+    // saveVote,
+    // getElectionResult,
     getElectionType,
 };

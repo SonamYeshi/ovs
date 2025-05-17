@@ -18,12 +18,15 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import CrossImg from 'assets/images/corssImg.png';
 import CloseIcon from '@mui/icons-material/Close';
+import MainCard from 'ui-component/cards/MainCard';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from 'axios';
-import LoadingPage from 'common/LoadingPage';
+import NormalLoadingPage from 'common/NormalLoadingPage';
+
 import NdiService from '../../../services/ndi.service';
+import blockchainAuthService from 'services/blockchainAuth.service';
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-import MainCard from 'ui-component/cards/MainCard';
 
 const VoteNDIQRCodePage = () => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
@@ -68,15 +71,16 @@ const VoteNDIQRCodePage = () => {
     const natsListener = (threadId) => {
         const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false`;
         const eventSource = new EventSource(endPoint);
-        eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
+        eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
             const data = JSON.parse(event.data);
 
             if (data.status === 'exists') {
                 setLoading(true); // Show loading spinner
+
                 setTimeout(async () => {
                     try {
                         const isAllowed = await performExtraCheck(data.userDTO.cid, electionId);
-
+                
                         if (!isAllowed) {
                             navigate('/localElectionScanPage', {
                                 state: {
@@ -104,11 +108,23 @@ const VoteNDIQRCodePage = () => {
     };
 
     const performExtraCheck = async (cid, electionTypeId) => {
-        const response = await axios.get(`${BASE_URL}voter/checkIfVoted`, {
-            params: { voterCid: cid, electionTypeId: electionTypeId }
+        const token = await blockchainAuthService.fetchBlockchainAccessToken();
+
+        if (!token) {
+            setLoading(false);
+            setDialogMessage('Could not authenticate with the blockchain.');
+            setErrorDialogOpen(true);
+            return;
+        }
+
+        const response = await axios.get(`${BASE_URL}blockchain/checkIfVoted`, {
+            params: { voterCid: cid, 
+                electionTypeId: electionTypeId,
+                bcToken: token
+            },
         });
 
-        return response.data; // adjust based on your actual API response
+        return response.data;
     };
 
     const handleDialogClose = () => {
@@ -275,7 +291,7 @@ const VoteNDIQRCodePage = () => {
                 {/* lodaing page */}
                 {loading && (
                     <>
-                        <LoadingPage />
+                        <NormalLoadingPage />
                     </>
                 )}
             </Box>

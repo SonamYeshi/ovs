@@ -14,8 +14,9 @@ import Typography from '@mui/material/Typography';
 import { TITLE } from 'common/color';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import voteService from 'services/vote.service';
 import NormalLoadingPage from 'common/NormalLoadingPage';
+import blockchainAuthService from 'services/blockchainAuth.service';
+import blockchainService from 'services/blockchain.service';
 
 const LocalElectionResult = () => {
     const navigate = useNavigate();
@@ -38,7 +39,20 @@ const LocalElectionResult = () => {
 
     const getVoteResult = async () => {
         try {
-            const response = await voteService.getVoteResult(electionId);
+            const token = await blockchainAuthService.fetchBlockchainAccessToken();
+            
+            if (!token) {
+                setDialogState({
+                    open: true,
+                    type: 'Close',
+                    title: 'Error',
+                    message: 'Could not authenticate with the blockchain.',
+                    confirmAction: null
+                });
+                return;
+            }
+
+            const response = await blockchainService.getElectionResult(electionId, token);
             if (response.data.length !== 0) {
                 setCandidates(response.data);
             }else{
