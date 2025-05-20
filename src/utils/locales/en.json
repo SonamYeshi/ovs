@@ -42,5 +42,8 @@
     "elections": "Elections",
     "electionResult": "Election Results",
     "electionEligibilitySetup": "Election Eligibility Setup",
-    "electionType": "Election Type"
+    "electionType": "Election Type",
+    "candidate": "Candidate",
+    "masterSetup": "Master Setup",
+    "subElectionType": "Sub Election Type"
 }

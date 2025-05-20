@@ -31,8 +31,16 @@ const VoteNDIQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoteNDIQRC
 const NotEligible = Loadable(lazy(() => import('views/pages/ndi/NotEligible')));
 const Candidates = Loadable(lazy(() => import('views/pages/ndi/CandidateDisplayPage')));
 const Dasbboard = Loadable(lazy(() => import('views/dashboard/Dashoard')));
-const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/electionEligibilitySetup')));
-const ElectionType = Loadable(lazy(() => import('views/pages/election/electionType')));
+const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/ElectionEligibilitySetup')));
+const ElectionType = Loadable(lazy(() => import('views/pages/election/ElectionType')));
+const SubElectionType = Loadable(lazy(() => import('views/pages/election/SubElectionType')));
+const EcbQRCodePage = Loadable(lazy(() => import('views/pages/ndi/EcbQRCodePage')));
+
+
+
+// Add Candidate
+const AddCandidate = Loadable(lazy(() => import('views/pages/candidate/AddCandidate')));
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -99,6 +107,10 @@ const MainRoutes = {
             element: <VoteNDIQRCodePage />
         },
         {
+            path: '/ecbQrCode',
+            element: <EcbQRCodePage />
+        },
+        {
             path: '/dashboard/candidates',
             element: <Candidates />
         },
@@ -107,12 +119,22 @@ const MainRoutes = {
             element: <NotEligible />
         },
         {
-            path: "electionEligibilitySetup",
-            element: <ElectionEligibilitySetup/>
+            path: 'electionEligibilitySetup',
+            element: <ElectionEligibilitySetup />
         },
         {
-            path: "electionType",
-            element: <ElectionType/>
+            path: 'electionType',
+            element: <ElectionType />
+        },
+        {
+            path: 'subElectionType',
+            element: <SubElectionType />
+        },
+
+        // add Candidate
+        {
+            path: 'addCandidate',
+            element: <AddCandidate />
         }
     ]
 };

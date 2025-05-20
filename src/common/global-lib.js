@@ -69,8 +69,6 @@ const warningMsg = (msg) => {
         }
     });
 };
-;
-
 const deleteMsg = (msg) => {
     Swal.fire({
         title: 'Are you sure?',
@@ -136,11 +134,26 @@ export const theme = createTheme({
     }
 });
 
-// export const DECLEAR_RESUTL = 'Publish Shortlisting Candidates';
+const getUserDetail = () => {
+    try {
+        const userData = localStorage.getItem('user'); // or sessionStorage.getItem()
+        if (!userData) return null;
+
+        // If it's already an object (some libraries like Redux persist may store it that way)
+        if (typeof userData === 'object') return userData;
+
+        // If it's a string, parse it
+        return JSON.parse(userData);
+    } catch (error) {
+        console.error('Error parsing user data:', error);
+        return null;
+    }
+};
 
 export default {
     Roles,
     successMsg,
     deleteMsg,
-    warningMsg
+    warningMsg,
+    getUserDetail
 };

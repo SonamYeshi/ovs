@@ -41,7 +41,7 @@ const Dashoard = () => {
                     <MainCard>
                         <Box display={'flex'} flexDirection={'column'} gap={3}>
                             <Typography variant="h3" sx={{ color: '#003366', fontWeight: 'bold' }}>
-                                About Electronic Voting System (EVS)
+                                About Online Voting System (OVS)
                             </Typography>
                             <Typography variant="h7" textAlign={'justify'}>
                                 It aims to revolutionize the electoral process by enhancing user experience through a simplified voting
@@ -57,7 +57,7 @@ const Dashoard = () => {
                         </Box>
                         <Box display="flex" flexDirection="column" gap={3} mt={4}>
                             <Typography variant="h3" sx={{ color: '#003366', fontWeight: 'bold' }}>
-                                Core Components of EVS
+                                Core Components of OVS
                             </Typography>
                             <List
                                 component="ol"
@@ -85,9 +85,9 @@ const Dashoard = () => {
                                     <Typography variant="body1">
                                         <strong>Voter Verification Process:</strong> The verification process begins when voters scan a
                                         secure QR code provided on the Election Portal. They are then required to provide key personal
-                                        details for identity verification from their wallet. The EVS verifies the voter's eligibility by
+                                        details for identity verification from their wallet. The OVS verifies the voter's eligibility by
                                         matching their permanent address details against the list of ongoing elections provided by ECB. The
-                                        EVS also checks whether a vote has already been cast. If a vote has been cast but no Voter
+                                        OVS also checks whether a vote has already been cast. If a vote has been cast but no Voter
                                         Credential (VC) has been issued, as confirmed by checking the ECB Agent Issue database, the voting
                                         details are reissued to the user. If no vote has been cast, the system generates an election ballot
                                         and displays it on the touch screen based on the voter's permanent address location.
@@ -115,7 +115,7 @@ const Dashoard = () => {
                         </Box>
                         {/* <Box display="flex" flexDirection="column" gap={3} mt={4}>
                             <Typography variant="h3" sx={{ color: '#003366', fontWeight: 'bold' }}>
-                                System Architecture for EVS
+                                System Architecture for OVS
                             </Typography>
                             <Box display="flex" justifyContent={'center'}>
                                 <div style={{ width: '100%', height: 400 }}>

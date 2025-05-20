@@ -1,17 +1,14 @@
 // import axios from "axios";
-import axios from "utils/axios";
-import authHeader from "./auth-header";
+import axios from 'utils/axios';
+import authHeader from './auth-header';
 
 // const BASE_URL = "http://localhost:8080/";
 // const BASE_URL = "api/auth";
 
 const getCandidates = (electionTypeId) => {
-    return axios.get(
-        "candidate/getCandidates/"+electionTypeId,
-            {
-                headers: authHeader()
-            }
-    );
+    return axios.get('candidate/getCandidates/' + electionTypeId, {
+        headers: authHeader()
+    });
 };
 
 // const saveVote = (data) => {
@@ -39,9 +36,43 @@ const getElectionType = () => {
     });
 };
 
+const deleteElection = (id) => {
+    return axios.delete('voter/deleteElection/' + id);
+};
+
+const getAllEligibilityCriteria = () => {
+    return axios.get('voter/getAllEligibilityCriteria');
+};
+
+const deleteEligibilityCriteria = (id) => {
+    return axios.delete('voter/deleteEligibilityCriteria/' + id);
+};
+
+// sub election type
+
+const saveSubElectionType = (data) => {
+    return axios.post('voter/saveSubElectionType', data, {
+        headers: authHeader()
+    });
+};
+
+const getAllSubElectionType = () => {
+    return axios.get('voter/getAllSubElectionType');
+};
+
+const deleteSubElection = (id) => {
+    return axios.delete('voter/deleteSubElection/' + id);
+};
+
 export default {
     getCandidates,
     // saveVote,
     // getElectionResult,
     getElectionType,
+    deleteElection,
+    getAllEligibilityCriteria,
+    deleteEligibilityCriteria,
+    saveSubElectionType,
+    getAllSubElectionType,
+    deleteSubElection
 };
