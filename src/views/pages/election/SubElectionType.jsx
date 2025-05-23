@@ -33,6 +33,7 @@ import candidateService from 'services/candidate.service';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteIcon from '@mui/icons-material/Delete';
 import voteService from 'services/vote.service';
+import electionSetupService from 'services/electionSetup.service';
 
 const dzongkhags = ['Thimphu', 'Paro', 'Punakha', 'Samdrupjongkhar']; // Example values
 const gewogs = ['Gewog 1', 'Gewog 2', 'Martshala'];
@@ -50,11 +51,11 @@ const SubElectionType = () => {
     const { values, handleSubmit, setFieldValue, touched, errors, resetForm } = useFormik({
         initialValues: {
             id: '',
-            subElectionName: '',
+            electionName: '',
             electionTypeId: ''
         },
         validationSchema: Yup.object({
-            subElectionName: Yup.string().required(AppConstant().REQUIRED_FIELD),
+            electionName: Yup.string().required(AppConstant().REQUIRED_FIELD),
             electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD)
         }),
         onSubmit: (values) => {
@@ -62,14 +63,12 @@ const SubElectionType = () => {
         }
     });
 
-
-
     const saveSubElectionType = (values) => {
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
             formData.append(key, value);
         });
-        candidateService
+        electionSetupService
             .saveSubElectionType(formData)
             .then((response) => {
                 globalLib.successMsg(response.data);
@@ -78,7 +77,7 @@ const SubElectionType = () => {
                 setOpen(false);
             })
             .catch((error) => {
-                globalLib.warningMsg(error?.response?.data?.message || 'Failed to save candidate');
+                globalLib.warningMsg(error?.response?.data?.message || 'Failed to save Election Name');
             });
     };
 
@@ -95,8 +94,9 @@ const SubElectionType = () => {
 
     const getAllSubElectionType = async () => {
         try {
-            const response = await candidateService.getAllSubElectionType();
+            const response = await electionSetupService.getAllSubElectionType();
             if (response.status === 200) {
+                console.log(response.data);
                 setSubElectionList(response.data);
             }
         } catch (error) {
@@ -111,8 +111,8 @@ const SubElectionType = () => {
     const handleEditClick = (row) => {
         resetForm();
         setFieldValue('id', row.id);
-        setFieldValue('subElectionName', row.subElectionName);
-        setFieldValue('electionTypeId', row.electionType?.id || '');
+        setFieldValue('electionName', row.electionName);
+        setFieldValue('electionTypeName', row.electionTypeName);
         setOpen(true);
     };
 
@@ -123,7 +123,7 @@ const SubElectionType = () => {
     const confirmDeleteSubElection = async () => {
         if (!subElectionToDelete) return;
         try {
-            const response = await candidateService.deleteSubElection(subElectionToDelete.id);
+            const response = await electionSetupService.deleteSubElection(subElectionToDelete.id);
             if (response.status === 200) {
                 globalLib.successMsg(response.data);
                 getAllSubElectionType();
@@ -153,7 +153,7 @@ const SubElectionType = () => {
                         handleClickOpen();
                     }}
                 >
-                    Add Sub Election Type
+                    Add Election Name
                 </Button>
             </Box>
             <MaterialReactTable
@@ -164,13 +164,14 @@ const SubElectionType = () => {
                         size: 20,
                         Cell: ({ row }) => row.index + 1
                     },
-                    { accessorKey: 'subElectionName', header: 'Sub Election Type', size: 10 },
-
                     {
-                        accessorKey: 'electionType.electionName',
+                        accessorKey: 'electionTypeName',
                         header: 'Election Type',
                         size: 100
-                    }
+                    },
+                    { accessorKey: 'electionName', header: 'Election name', size: 10 }
+
+                   
                 ]}
                 data={subElectionList ?? []}
                 // data={subElectionList}
@@ -245,14 +246,14 @@ const SubElectionType = () => {
                             </TextField>
                         </Grid>
                         <Grid item sm={12} xs={12} md={12} lg={12} xl={12}>
-                            <InputLabel>Sub Election Type</InputLabel>
+                            <InputLabel>Election Name</InputLabel>
                             <TextField
                                 fullWidth
                                 size="small"
-                                value={values.subElectionName}
-                                onChange={(e) => setFieldValue('subElectionName', e.target.value)}
-                                error={touched.subElectionName && Boolean(errors.subElectionName)}
-                                helperText={touched.subElectionName && errors.subElectionName}
+                                value={values.electionName}
+                                onChange={(e) => setFieldValue('electionName', e.target.value)}
+                                error={touched.electionName && Boolean(errors.electionName)}
+                                helperText={touched.electionName && errors.electionName}
                             />
                         </Grid>
                     </Grid>

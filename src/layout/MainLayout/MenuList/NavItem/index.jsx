@@ -57,7 +57,7 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
             size={drawerOpen ? '20px' : '24px'}
             style={{
                 ...(isHorizontal && isParents && { fontSize: 20, stroke: '1.5' }),
-                color: isSelected ? '#ffffff' : '#000000'
+                color: isSelected ? '#ffffff' : '#34495e'
             }}
             // color={isSelected ? '#ffffff' : '#000000'}
         />
@@ -98,7 +98,6 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                             level === 1 &&
                             mode !== ThemeMode.DARK && {
                                 '&:hover': {
-                                    // bgcolor: 'secondary.light'
                                     bgcolor: '#003366'
                                 },
                                 '&.Mui-selected': {
@@ -169,7 +168,7 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                                         textOverflow="ellipsis"
                                         variant={isSelected ? 'h5' : 'body1'}
                                         sx={{
-                                            color: isSelected ? '#ffffff' : 'inherit',
+                                            color: isSelected ? '#ffffff' : '#1c2833',
                                             '&:hover': {
                                                 color: '#ffffff'
                                             }

@@ -3,6 +3,8 @@ import { FormattedMessage } from 'react-intl';
 
 // assets
 import { IconDashboard, IconDeviceAnalytics } from '@tabler/icons-react';
+import candidateImg from 'assets/images/Candidate.svg';
+
 
 const icons = {
     IconDashboard: IconDashboard,
@@ -22,7 +24,17 @@ const candidate = {
             title: <FormattedMessage id="candidate" />,
             type: 'item',
             url: '/addCandidate',
-            icon: icons.IconDashboard,
+            icon: () => (
+                <img
+                    src={candidateImg}
+                    alt="candidateImg"
+                    style={{
+                        width: 24,
+                        height: 24,
+                        filter: 'invert(48%) sepia(100%) saturate(2000%) hue-rotate(10deg)'
+                    }}
+                />
+            ),
             breadcrumbs: false
         }
     ]

@@ -34,6 +34,8 @@ const Dasbboard = Loadable(lazy(() => import('views/dashboard/Dashoard')));
 const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/ElectionEligibilitySetup')));
 const ElectionType = Loadable(lazy(() => import('views/pages/election/ElectionType')));
 const SubElectionType = Loadable(lazy(() => import('views/pages/election/SubElectionType')));
+const ElectionRule = Loadable(lazy(() => import('views/pages/election/ElectionRule')));
+const ElectionParameter = Loadable(lazy(() => import('views/pages/election/ElectionParameterSetup')));
 const EcbQRCodePage = Loadable(lazy(() => import('views/pages/ndi/EcbQRCodePage')));
 
 
@@ -129,6 +131,14 @@ const MainRoutes = {
         {
             path: 'subElectionType',
             element: <SubElectionType />
+        },
+        {
+            path: 'electionRule',
+            element: <ElectionRule />
+        },
+        {
+            path: 'electionParameterSetup',
+            element: <ElectionParameter />
         },
 
         // add Candidate

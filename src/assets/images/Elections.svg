@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-miterlimit: 10;
+        stroke-width: .75px;
+      }
+
+      .cls-2 {
+        fill: #231f20;
+        font-family: Bahnschrift, Bahnschrift;
+        font-size: 5.57px;
+        font-variation-settings: 'wght' 400, 'wdth' 100;
+      }
+
+      .cls-3 {
+        letter-spacing: 0em;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="1.67" y="12.01" width="26.83" height="3.83" rx=".26" ry=".26"/>
+  <path class="cls-1" d="M3.58,16.3v12.02c0,.21.17.38.38.38h21.95c.21,0,.38-.17.38-.38v-12.02"/>
+  <path class="cls-1" d="M17.65,7.55h7.9c.07,0,.13.03.16.09l2.66,4.42"/>
+  <path class="cls-1" d="M1.67,12.01l2.38-4.36c.03-.06.1-.1.17-.1h8.1"/>
+  <path class="cls-1" d="M17.08.81l3.39,3.5s.02.06,0,.09l-5.48,5.76s-.07.03-.09,0l-3.56-3.62s-.02-.07,0-.09L16.98.81s.07-.03.09,0Z"/>
+  <line class="cls-1" x1="11.29" y1="10.18" x2="18.48" y2="10.18"/>
+  <text class="cls-2" transform="translate(8.59 24.56)"><tspan class="cls-3" x="0" y="0">V</tspan><tspan x="3.21" y="0">OTE</tspan></text>
+</svg>

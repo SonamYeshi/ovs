@@ -22,7 +22,6 @@ import React, { useEffect, useState } from 'react';
 import electionRuleService from 'services/electionRule.service';
 import electionSetupService from 'services/electionSetup.service';
 import voteService from 'services/vote.service';
-import userService from 'services/userService';
 
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
@@ -33,15 +32,15 @@ const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={r
 
 // ==============================|| FORM VALIDATION - LOGIN FORMIK ||============================== //
 
-const ElectionEligibilitySetup = () => {
+const ElectionRule = () => {
     const [electionTypes, setElectionTypes] = useState([]);
-    const [parameterList, setParameterList] = useState([]);
+    const [electionNames, setElectionNames] = useState([]);
+    const [selectedElections, setSelectedElections] = useState({});
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [eligibilitySetup, setEligibilitySetup] = useState([]);
-    const [deleteDialogOpenForEligibilitySetup, setDeleteDialogOpenForEligibilitySetup] = useState(false);
-    const [eligibilitySetupToDelete, setEligibilitySetupToDelete] = useState(null);
+    const [electionRuleSetup, setElectionRuleSetup] = useState([]);
+    const [deleteDialogOpenForElectionRuleSetup, setDeleteDialogOpenForElectionRuleSetup] = useState(false);
+    const [electionRuleSetupToDelete, setElectionRuleSetupToDelete] = useState(null);
     const [electionNameList, setElectionNameList] = useState([]);
-
     const handleClickOpen = () => setDialogOpen(true);
 
     useEffect(() => {
@@ -61,38 +60,32 @@ const ElectionEligibilitySetup = () => {
         initialValues: {
             id: '',
             electionTypeId: '',
+            minAge: '18',
             electionId: '',
             dzongkhag: '',
             gewog: '',
-            village: '',
-            status: ''
+            village: ''
         },
-        validationSchema: (context) =>
-            Yup.object().shape({
-                electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
-                electionId: Yup.string().required(AppConstant().REQUIRED_FIELD),
-                dzongkhag: Yup.string().when([], {
-                    is: () => context?.parameterList?.dzongkhags,
-                    then: Yup.string().required('Dzongkhag is required')
-                }),
-                gewog: Yup.string().when([], {
-                    is: () => context?.parameterList?.gewogs,
-                    then: Yup.string().required('Gewog is required')
-                }),
-                village: Yup.string().when([], {
-                    is: () => context?.parameterList?.villages,
-                    then: Yup.string().required('Village is required')
-                })
-            }),
-        validateOnChange: true,
-        enableReinitialize: true,
-
+        validationSchema: Yup.object({
+            electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
+            electionId: Yup.string().required(AppConstant().REQUIRED_FIELD)
+        }),
         onSubmit: async (values) => {
+            const mappedSelections = {
+                dzongkhag: selectedElections['Dzongkhag'] || false,
+                gewog: selectedElections['Gewog'] || false,
+                village: selectedElections['Village'] || false
+            };
+
             try {
-                const response = await userService.saveElectionEligibility(values);
+                const payload = {
+                    ...values,
+                    ...mappedSelections
+                };
+                const response = await electionRuleService.saveElectionRule(payload);
                 if (response.status === 200) {
                     globalLib.successMsg(response.data);
-                    getAllEligibilityCriteria();
+                    getAllElectionRule();
                     resetForm();
                     setDialogOpen(false);
                 }
@@ -104,12 +97,11 @@ const ElectionEligibilitySetup = () => {
         }
     });
 
-    const getAllEligibilityCriteria = async () => {
+    const getAllElectionRule = async () => {
         try {
-            const response = await userService.getAllEligibilityCriteria();
+            const response = await electionRuleService.getAllElectionRule();
             if (response.status === 200) {
-                setEligibilitySetup(response.data);
-                console.log(response.data);
+                setElectionRuleSetup(response.data);
             }
         } catch (error) {
             console.error('Failed to fetch election types:', error);
@@ -117,10 +109,12 @@ const ElectionEligibilitySetup = () => {
     };
 
     const handleEditClick = async (row) => {
-        console.log(row);
         resetForm();
+
+        // 1. Fetch election name list based on the type so dropdown options are available
         await getElectionByElectionType(row.electionTypeId);
 
+        // 2. Set form field values
         setFieldValue('id', row.id);
         setFieldValue('electionTypeId', row.electionTypeId);
         setFieldValue('electionId', row.electionId);
@@ -128,51 +122,59 @@ const ElectionEligibilitySetup = () => {
         setFieldValue('gewog', row.gewog);
         setFieldValue('village', row.village);
 
-        // Important: Fetch parameters to enable conditional fields
-        await getElectionRuleByElection(row.electionTypeId, row.electionId);
+        // 3. Set checkboxes
+        const updatedSelections = {
+            Dzongkhag: !!row.dzongkhag,
+            Gewog: !!row.gewog,
+            Village: !!row.village
+        };
+        setSelectedElections(updatedSelections);
 
         setDialogOpen(true);
     };
 
-    const handleDeleteClick = (electionId) => {
-        setEligibilitySetupToDelete(electionId);
-        setDeleteDialogOpenForEligibilitySetup(true);
+    const handleDeleteClick = (election) => {
+        setElectionRuleSetupToDelete(election);
+        setDeleteDialogOpenForElectionRuleSetup(true);
     };
-    const confirmDeleteEligibilitySetup = async () => {
-        if (!eligibilitySetupToDelete) return;
+    const confirmDeleteElectionRule = async () => {
+        if (!electionRuleSetupToDelete) return;
         try {
-            const response = await userService.deleteEligibilityCriteria(eligibilitySetupToDelete.id);
+            const response = await electionRuleService.deleteElectionRule(electionRuleSetupToDelete.id);
             if (response.status === 200) {
                 globalLib.successMsg(response.data);
-                getAllEligibilityCriteria();
+                getAllElectionRule();
             }
         } catch (error) {
             globalLib.warningMsg('Failed to delete Rule.');
         } finally {
-            setDeleteDialogOpenForEligibilitySetup(false);
-            setEligibilitySetupToDelete(null);
+            setDeleteDialogOpenForElectionRuleSetup(false);
+            setElectionRuleSetupToDelete(null);
+        }
+    };
+
+    const getAllElectionParameter = async () => {
+        try {
+            const response = await electionSetupService.getAllElectionParameter();
+            if (response.status === 200) {
+                const elections = response.data;
+                setElectionNames(elections);
+                const initialSelections = {};
+                elections.forEach((item) => {
+                    initialSelections[item.parameterName] = false;
+                });
+                setSelectedElections(initialSelections);
+            }
+        } catch (error) {
+            console.error('Failed to fetch election types:', error);
         }
     };
 
     const getElectionByElectionType = async (electionTypeId) => {
         try {
             const response = await electionSetupService.getElectionByElectionType(electionTypeId);
-            if (Array.isArray(response.data)) {
-                setElectionNameList(response.data);
-            } else {
-                setElectionNameList([]);
-            }
-        } catch (error) {
-            setElectionNameList([]);
-        }
-    };
-
-    const getElectionRuleByElection = async (electionTypeId, electionId) => {
-        try {
-            const response = await electionRuleService.getElectionRuleByElection(electionTypeId, electionId);
-
             if (response.data) {
-                setParameterList(response.data);
+                setElectionNameList(response.data);
             }
         } catch (error) {
             console.error('Error fetching candidate list:', error);
@@ -180,9 +182,9 @@ const ElectionEligibilitySetup = () => {
     };
 
     useEffect(() => {
-        getAllEligibilityCriteria();
+        getAllElectionRule();
+        getAllElectionParameter();
         getElectionByElectionType();
-        getElectionRuleByElection();
     }, []);
 
     return (
@@ -200,12 +202,18 @@ const ElectionEligibilitySetup = () => {
                             variant="contained"
                             startIcon={<AddIcon />}
                             onClick={() => {
-                                resetForm();
-                                setParameterList([]);
+                                resetForm(); // reset form fields
+                                // reset checkboxes to unchecked
+                                const initialSelections = {};
+                                electionNames.forEach((item) => {
+                                    initialSelections[item.parameterName] = false;
+                                });
+                                setSelectedElections(initialSelections);
+
                                 handleClickOpen();
                             }}
                         >
-                            Add Election Eligibility Setup
+                            Add Election Rule
                         </Button>
                     </Box>
                     <MaterialReactTable
@@ -218,25 +226,29 @@ const ElectionEligibilitySetup = () => {
                             },
                             { accessorKey: 'electionTypeName', header: 'Election Type', size: 10 },
                             { accessorKey: 'electionName', header: 'Election Name', size: 10 },
+                            { accessorKey: 'minAge', header: 'Mininum Age', size: 10 },
 
                             {
                                 accessorKey: 'dzongkhag',
                                 header: 'Dzongkhag',
-                                size: 10
+                                size: 10,
+                                Cell: ({ cell }) => (cell.getValue() ? '✅ Yes' : '❌ No')
                             },
                             {
                                 accessorKey: 'gewog',
                                 header: 'Gewog',
-                                size: 10
+                                size: 10,
+                                Cell: ({ cell }) => (cell.getValue() ? '✅ Yes' : '❌ No')
                             },
                             {
                                 accessorKey: 'village',
                                 header: 'Village',
-                                size: 10
+                                size: 10,
+                                Cell: ({ cell }) => (cell.getValue() ? '✅ Yes' : '❌ No')
                             }
                         ]}
-                        data={eligibilitySetup ?? []}
-                        // data={eligibilitySetup}
+                        data={electionRuleSetup ?? []}
+                        // data={electionRuleSetup}
                         enableColumnFilter
                         enableRowActions
                         positionActionsColumn="last"
@@ -260,7 +272,7 @@ const ElectionEligibilitySetup = () => {
                                     <EditTwoToneIcon fontSize="small" />
                                 </IconButton>
 
-                                {/* <IconButton
+                                <IconButton
                                     sx={{
                                         color: BUTTON_CANCEL_COLOR,
                                         '&:hover': {
@@ -274,7 +286,7 @@ const ElectionEligibilitySetup = () => {
                                     onClick={() => handleDeleteClick(row.original)}
                                 >
                                     <DeleteIcon fontSize="small" />
-                                </IconButton> */}
+                                </IconButton>
                             </Box>
                         )}
                     />
@@ -290,19 +302,20 @@ const ElectionEligibilitySetup = () => {
 
                                         <TextField
                                             size="small"
-                                            fullWidth
-                                            select
                                             value={values.electionTypeId}
+                                            select
+                                            fullWidth
                                             onChange={async (e) => {
                                                 const selectedId = e.target.value;
                                                 setFieldValue('electionTypeId', selectedId);
-                                                setFieldValue('electionId', '');
-                                                setFieldValue('dzongkhag', '');
-                                                setFieldValue('gewog', '');
-                                                setFieldValue('village', '');
-                                                setElectionNameList([]);
-                                                setParameterList([]);
+                                                setFieldValue('electionId', ''); // Reset election name
+                                                setElectionNameList([]); // Clear previous names
                                                 await getElectionByElectionType(selectedId);
+                                            }}
+                                            onOpen={async () => {
+                                                if (values.electionTypeId) {
+                                                    await getElectionByElectionType(values.electionTypeId); // Refresh on open
+                                                }
                                             }}
                                             error={touched.electionTypeId && Boolean(errors.electionTypeId)}
                                             helperText={touched.electionTypeId && errors.electionTypeId}
@@ -317,96 +330,59 @@ const ElectionEligibilitySetup = () => {
 
                                     <Grid item sm={12} xs={12} md={12}>
                                         <InputLabel id="electionName">Election Name</InputLabel>
-                                        
-                                            <TextField
-                                                size="small"
-                                                select
-                                                fullWidth
-                                                value={values.electionId}
-                                                onChange={async (e) => {
-                                                    const selectedElectionId = e.target.value;
-                                                    const selectedElectionTypeId = values.electionTypeId; // still current value
 
-                                                    setFieldValue('electionId', selectedElectionId);
-
-                                                    if (selectedElectionTypeId && selectedElectionId) {
-                                                        await getElectionRuleByElection(selectedElectionTypeId, selectedElectionId);
-                                                    }
-                                                }}
-                                                error={touched.electionId && Boolean(errors.electionId)}
-                                                helperText={touched.electionId && errors.electionId}
-                                            >
-                                                {Array.isArray(electionNameList) &&
-                                                    electionNameList.map((type) => (
-                                                        <MenuItem key={type.id} value={type.id}>
-                                                            {type.electionName}
-                                                        </MenuItem>
-                                                    ))}
-                                            </TextField>
-                                    
-                                    </Grid>
-                                    <Box p={2}>
-                                        <Typography variant="h4">Permanent Address</Typography>
-                                    </Box>
-                                    <Grid item xs={12}>
-                                        {parameterList.dzongkhags && (
-                                            <Box>
-                                                <TextField
-                                                    select
-                                                    fullWidth
-                                                    size="small"
-                                                    label="Dzongkhag"
-                                                    value={values.dzongkhag}
-                                                    onChange={(e) => setFieldValue('dzongkhag', e.target.value)}
-                                                    error={touched.dzongkhag && Boolean(errors.dzongkhag)}
-                                                    helperText={touched.dzongkhag && errors.dzongkhag}
-                                                >
-                                                    <MenuItem value="">
-                                                        <em>Select</em>
-                                                    </MenuItem>
-                                                    <MenuItem value="Thimphu">Thimphu</MenuItem>
-                                                    <MenuItem value="Pemagatshel">Pemagatshel</MenuItem>
-                                                    <MenuItem value="Trashigang">Trashigang</MenuItem>
-                                                    <MenuItem value="Mongar">Mongar</MenuItem>
-                                                    <MenuItem value="Samdrupjongkhar">Samdrupjongkhar</MenuItem>
-                                                </TextField>
-                                            </Box>
-                                        )}
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        {parameterList.gewogs && (
-                                            <TextField
-                                                select
-                                                fullWidth
-                                                size="small"
-                                                label="Gewog"
-                                                value={values.gewog}
-                                                onChange={(e) => setFieldValue('gewog', e.target.value)}
-                                                error={touched.gewog && Boolean(errors.gewog)}
-                                                helperText={touched.gewog && errors.gewog}
-                                            >
-                                                <MenuItem value="">
-                                                    <em>Select</em>
+                                        <TextField
+                                            select
+                                            size="small"
+                                            fullWidth
+                                            value={values.electionId}
+                                            onChange={(e) => setFieldValue('electionId', e.target.value)}
+                                            error={touched.electionId && Boolean(errors.electionId)}
+                                            helperText={touched.electionId && errors.electionId}
+                                        >
+                                            {electionNameList.map((type) => (
+                                                <MenuItem key={type.id} value={type.id}>
+                                                    {type.electionName}
                                                 </MenuItem>
-                                                <MenuItem value="Nanong">Nanong</MenuItem>
-                                                <MenuItem value="Chang">Chang</MenuItem>
-                                                <MenuItem value="Lingmithang">Lingmithang</MenuItem>
-                                                <MenuItem value="Martshala">Martshala</MenuItem>
-                                            </TextField>
-                                        )}
+                                            ))}
+                                        </TextField>
+                                    </Grid>
+
+                                    {/* -- Age Field -- */}
+                                    <Grid item sm={12} xs={12} md={12}>
+                                        <InputLabel>Minimum Age</InputLabel>
+                                        <TextField
+                                            fullWidth
+                                            id="minAge"
+                                            name="minAge"
+                                            size="small"
+                                            value={values.minAge}
+                                            onChange={(e) => setFieldValue('minAge', e.target.value)}
+                                            error={touched.minAge && Boolean(errors.minAge)}
+                                            helperText={touched.minAge && errors.minAge}
+                                            disabled
+                                        />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        {parameterList.villages && (
-                                            <TextField
-                                                fullWidth
-                                                label="Village"
-                                                size="small"
-                                                value={values.village}
-                                                onChange={(e) => setFieldValue('village', e.target.value)}
-                                                error={touched.village && Boolean(errors.village)}
-                                                helperText={touched.village && errors.village}
-                                            />
-                                        )}
+                                        <FormGroup row>
+                                            {electionNames.map((item) => (
+                                                <FormControlLabel
+                                                    key={item.id || item.name}
+                                                    control={
+                                                        <Checkbox
+                                                            checked={selectedElections[item.parameterName] || false}
+                                                            onChange={(e) =>
+                                                                setSelectedElections({
+                                                                    ...selectedElections,
+                                                                    [item.parameterName]: e.target.checked
+                                                                })
+                                                            }
+                                                        />
+                                                    }
+                                                    label={item.parameterName}
+                                                />
+                                            ))}
+                                        </FormGroup>
                                     </Grid>
                                 </Grid>
                             </form>
@@ -417,7 +393,6 @@ const ElectionEligibilitySetup = () => {
                                 form="election-setup-form"
                                 variant="contained"
                                 sx={{ background: BUTTON_ADD_COLOR, '&:hover': { backgroundColor: BUTTON_ADD_COLOR } }}
-                                onClick={handleSubmit}
                             >
                                 Save
                             </Button>
@@ -434,23 +409,23 @@ const ElectionEligibilitySetup = () => {
                         </DialogActions>
                     </Dialog>
                     <Dialog
-                        open={deleteDialogOpenForEligibilitySetup}
-                        onClose={() => setDeleteDialogOpenForEligibilitySetup(false)}
+                        open={deleteDialogOpenForElectionRuleSetup}
+                        onClose={() => setDeleteDialogOpenForElectionRuleSetup(false)}
                         keepMounted
                     >
                         <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Confirm Delete</DialogTitle>
                         <DialogContent>
-                            <Typography textAlign={'center'}>Are you sure you want to delete this Eligibility Setup?</Typography>
+                            <Typography textAlign={'center'}>Are you sure you want to delete this Election Rule?</Typography>
                         </DialogContent>
                         <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Button
-                                onClick={() => setDeleteDialogOpenForEligibilitySetup(false)}
+                                onClick={() => setDeleteDialogOpenForElectionRuleSetup(false)}
                                 sx={{ color: '#002B69' }}
                                 variant="outlined"
                             >
                                 Cancel
                             </Button>
-                            <Button onClick={() => confirmDeleteEligibilitySetup()} color="error" variant="outlined">
+                            <Button onClick={() => confirmDeleteElectionRule()} color="error" variant="outlined">
                                 Delete
                             </Button>
                         </DialogActions>
@@ -461,4 +436,4 @@ const ElectionEligibilitySetup = () => {
     );
 };
 
-export default ElectionEligibilitySetup;
+export default ElectionRule;

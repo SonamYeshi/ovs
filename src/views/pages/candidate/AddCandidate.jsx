@@ -33,6 +33,7 @@ import candidateService from 'services/candidate.service';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteIcon from '@mui/icons-material/Delete';
 import voteService from 'services/vote.service';
+import electionSetupService from 'services/electionSetup.service';
 
 const dzongkhags = ['Thimphu', 'Paro', 'Punakha', 'Samdrupjongkhar']; // Example values
 const gewogs = ['Gewog 1', 'Gewog 2', 'Martshala'];
@@ -48,6 +49,7 @@ const AddCandidate = () => {
     const [electionTypes, setElectionTypes] = useState([]);
     const [deleteDialogOpenForCandidate, setDeleteDialogOpenForCandidate] = useState(false);
     const [candidateToDelete, setCandidateToDelete] = useState(null);
+    const [electionNameList, setElectionNameList] = useState([]);
 
     const { values, handleSubmit, setFieldValue, touched, errors, resetForm } = useFormik({
         initialValues: {
@@ -58,6 +60,7 @@ const AddCandidate = () => {
             gewog: '',
             village: '',
             electionTypeId: '',
+            electionId: '',
             profilePic: null
         },
         validationSchema: Yup.object({
@@ -66,7 +69,8 @@ const AddCandidate = () => {
             dzongkhag: Yup.string().required(AppConstant().REQUIRED_FIELD),
             gewog: Yup.string().required(AppConstant().REQUIRED_FIELD),
             village: Yup.string().required(AppConstant().REQUIRED_FIELD),
-            electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD)
+            electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
+            electionId: Yup.string().required(AppConstant().REQUIRED_FIELD)
             // profilePic: Yup.mixed()
             //     .required(AppConstant().REQUIRED_FIELD)
             //     .test('fileSize', 'File size too large (max 2MB)', (value) => value && value.size <= 2000000)
@@ -120,57 +124,31 @@ const AddCandidate = () => {
             });
     };
 
-    // const getCandidates = async (electionTypeId) => {
-    //     try {
-    //         const response = await candidateService.getCandidates(electionTypeId);
-    //         if (response.data) {
-    //             setCandidateList(response.data);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching candidate list:', error);
-    //     }
-    // };
-    const fetchElectionTypes = async () => {
-        try {
-            const response = await voteService.getElectionType();
-            if (response.status === 200) {
-                setElectionTypes(response.data);
-            }
-        } catch (error) {
-            console.error('Failed to fetch election types:', error);
-        }
-    };
+ 
 
     const getAllCandidates = async () => {
         try {
             const response = await candidateService.getAllCandidates();
             if (response.status === 200) {
                 setCandidateList(response.data);
+                console.log(response.data)
             }
         } catch (error) {
             console.error('Failed to fetch election types:', error);
         }
     };
-    useEffect(() => {
-        fetchElectionTypes();
-        getAllCandidates();
-    }, []);
 
-    // useEffect(() => {
-    //     if (values.electionTypeId) {
-    //         getCandidates(values.electionTypeId);
-    //     }
-    // }, [values.electionTypeId]);
-
-    const handleEditClick = (row) => {
+    const handleEditClick = async (row) => {
         resetForm();
+        await getElectionByElectionType(row.electionTypeId);
         setFieldValue('id', row.id);
         setFieldValue('candidateName', row.candidateName);
         setFieldValue('candidateCid', row.candidateCid);
         setFieldValue('dzongkhag', row.dzongkhag);
         setFieldValue('gewog', row.gewog);
         setFieldValue('village', row.village);
-        setFieldValue('electionTypeId', row.electionType?.id || '');
+        setFieldValue('electionTypeId', row.electionTypeId);
+        setFieldValue('electionId', row.electionId);
         setOpen(true);
     };
 
@@ -193,6 +171,31 @@ const AddCandidate = () => {
             setCandidateToDelete(null);
         }
     };
+
+    const fetchElectionTypes = async () => {
+        try {
+            const response = await voteService.getElectionType();
+            setElectionTypes(response.data);
+        } catch (error) {
+            console.error('Failed to fetch election types', error);
+        }
+    };
+
+    const getElectionByElectionType = async (electionTypeId) => {
+        try {
+            const response = await electionSetupService.getElectionByElectionType(electionTypeId);
+            if (response.data) {
+                setElectionNameList(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching candidate list:', error);
+        }
+    };
+    useEffect(() => {
+        fetchElectionTypes();
+        getAllCandidates();
+        getElectionByElectionType();
+    }, []);
 
     return (
         <MainCard>
@@ -228,10 +231,15 @@ const AddCandidate = () => {
                     { accessorKey: 'gewog', header: 'Gewog', size: 10 },
                     { accessorKey: 'village', header: 'Village', size: 10 },
                     {
-                        accessorKey: 'electionType.electionName',
+                        accessorKey: 'electionTypeName',
                         header: 'Election Type',
                         size: 100
-                    }
+                    },
+                    {
+                        accessorKey: 'electionName',
+                        header: 'Election Name',
+                        size: 100
+                    },
                 ]}
                 data={candidateList ?? []}
                 // data={candidateList}
@@ -364,23 +372,49 @@ const AddCandidate = () => {
                         </Grid>
                         <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
                             <InputLabel>Election Type</InputLabel>
+
                             <TextField
-                                id="electionTypeId"
-                                name="electionTypeId"
                                 size="small"
-                                fullWidth
-                                select
                                 value={values.electionTypeId}
-                                onChange={(e) => {
-                                    const selected = e.target.value;
-                                    setFieldValue('electionTypeId', selected);
+                                select
+                                fullWidth
+                                onChange={async (e) => {
+                                    const selectedId = e.target.value;
+                                    setFieldValue('electionTypeId', selectedId);
+                                    setFieldValue('electionId', ''); // Reset election name
+                                    setElectionNameList([]); // Clear previous names
+                                    await getElectionByElectionType(selectedId);
+                                }}
+                                onOpen={async () => {
+                                    if (values.electionTypeId) {
+                                        await getElectionByElectionType(values.electionTypeId); // Refresh on open
+                                    }
                                 }}
                                 error={touched.electionTypeId && Boolean(errors.electionTypeId)}
                                 helperText={touched.electionTypeId && errors.electionTypeId}
                             >
-                                {electionTypes.map((e, i) => (
-                                    <MenuItem key={i} value={e.id}>
-                                        {e.electionName.replace(/"/g, '')} {/* Optional: cleanup if API sends quotes */}
+                                {electionTypes.map((type) => (
+                                    <MenuItem key={type.id} value={type.id}>
+                                        {type.electionName}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
+                            <InputLabel id="electionName">Election Name</InputLabel>
+
+                            <TextField
+                                select
+                                size="small"
+                                fullWidth
+                                value={values.electionId}
+                                onChange={(e) => setFieldValue('electionId', e.target.value)}
+                                error={touched.electionId && Boolean(errors.electionId)}
+                                helperText={touched.electionId && errors.electionId}
+                            >
+                                {electionNameList.map((type) => (
+                                    <MenuItem key={type.id} value={type.id}>
+                                        {type.electionName}
                                     </MenuItem>
                                 ))}
                             </TextField>

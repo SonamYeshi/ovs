@@ -52,10 +52,20 @@ const getRefreshToken = (data)=> {
     );
 };
 
-export default{
+const deleteEligibilityCriteria = (id) => {
+    return axios.delete( 'voter/deleteEligibilityCriteria/' + id);
+};
+
+const getAllEligibilityCriteria = () => {
+    return axios.get('voter/getAllEligibilityCriteria');
+};
+
+export default {
     registerUser,
     getAllUsers,
     saveElectionEligibility,
     getRefreshToken,
     saveElectionType,
+    deleteEligibilityCriteria,
+    getAllEligibilityCriteria
 };
