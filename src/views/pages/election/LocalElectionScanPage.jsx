@@ -14,20 +14,31 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Typography
+    Typography,
+    IconButton,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import CrossImg from 'assets/images/corssImg.png';
 import { TITLE } from 'common/color';
 import LoadingPage from 'common/LoadingPage';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import voteService from 'services/vote.service';
 import NDIBiometricQRCodePage from '../ndi/NDIBiometricQRCodePage';
+import globalLib from 'common/global-lib';
+
+import NdiService from '../../../services/ndi.service';
+import blockchainAuthService from 'services/blockchainAuth.service';
+import blockchainService from 'services/blockchain.service';
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const LocalElectionScanPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedCandidateId, setSelectedCandidateId] = useState(null);
     const [candidates, setCandidates] = useState([]);
+    const [selectedCandidate, setSelectedCandidate] = useState(null);
     const [dialogState, setDialogState] = useState({
         open: false,
         type: '',
@@ -35,11 +46,20 @@ const LocalElectionScanPage = () => {
         message: '',
         confirmAction: null
     });
+    const [progressNDI, setProgressNDI] = useState(true);
     const [loading, setLoading] = useState(false);
     const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
     const { voterCid, electionTypeId } = location.state || {};
 
+    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState('');
+
+    const [relationshipDID, setRelationshipDID] = useState(null);
+    const [walletCheckDialogOpen, setWalletCheckDialogOpen] = useState(false);
+
     useEffect(() => {
+        setRelationshipDID(window.localStorage.getItem('relationship_did'));
+
         voteService
             .getCandidates(electionTypeId)
             .then((response) => {
@@ -57,21 +77,99 @@ const LocalElectionScanPage = () => {
             });
     }, []);
 
-    const handleQRLoading = () => {
-        setDialogQRCodeOpen(true); // Open dialog
-    };
-
-    const handleCloseDialogForQRCode = () => {
-        setDialogQRCodeOpen(false);
-        setDialogState((prev) => ({ ...prev, open: false }));
-        setSelectedCandidateId(null);
-    };
-
     const getCandidateById = (id) => candidates.find((c) => c.id === id);
 
+    const handleNDINotificationRequest = async () => {
+        setWalletCheckDialogOpen(true);
+
+        NdiService.proofNdiRequest(true, relationshipDID)
+            .then((res) => {
+                const threadId = res.data.threadId;
+                setProgressNDI(false);
+
+                natsListenerForNotification(threadId);
+            })
+            .catch((err) => {
+                console.log(err);
+                setProgressNDI(false);
+                setWalletCheckDialogOpen(false);
+            });
+    };
+
+    const natsListenerForNotification = (threadId) => {
+        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=true`;
+        const eventSource = new EventSource(endPoint);
+        eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
+            const data = JSON.parse(event.data);
+            setWalletCheckDialogOpen(false);
+
+            // eventSource.close();
+            const candidate = getCandidateById(selectedCandidateId);
+
+            if (data.status === 'exists') {
+                const voterVID = data.userDTO.vid;
+                console.log(voterVID);
+                submitVote(candidate, voterVID);
+            } else {
+                setErrorDialogOpen(true);
+                setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
+            }
+        });
+    };
+
+    const submitVote = async (candidate, voterVID) => {
+            const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
+            if (!bc_token) {
+                return globalLib.warningMsg("Could not load access token for blockchain.");
+            }
+    
+            const payload = {
+                voterName: 'Voter Name',
+                voterCid: voterVID,
+                candidateCid: candidate.candidateCid,
+                candidateId: candidate.id,
+                electionTypeId: electionTypeId,
+                isVoted: true,
+                voteTxnHash: 'vote-txn-hash',
+                bcAccessToken: bc_token
+            };
+            setLoading(true);
+            blockchainService
+                .saveVote(payload)
+                .then((res) => {
+                    if (!res.data || !res.data.message) {
+                        throw new Error('Response is missing data.message');
+                    }
+    
+                    // Show success message
+                    return globalLib.successMsg(res.data.message);
+                })
+                .then(() => {
+                    navigate('/vote-ndi-qr', {
+                        state: { electionId: electionTypeId }
+                    });
+                    return;
+                })
+                .catch((err) => {
+                    console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
+    
+                    globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
+                        setLoading(false);
+                        navigate('/vote-ndi-qr', {
+                            state: { electionId: electionTypeId }
+                        });
+                        return;
+                        // setTimeout(() => {
+                        //     window.location.reload();
+                        // }, 100);
+                    });
+                });
+        };
+
     const handleVoteClick = (candidateId) => {
-        setSelectedCandidateId(candidateId);
         const candidate = getCandidateById(candidateId);
+        setSelectedCandidateId(candidateId);
+
         setDialogState({
             open: true,
             type: 'confirm',
@@ -111,9 +209,6 @@ const LocalElectionScanPage = () => {
         }
         setSelectedCandidateId(null);
         setLoading(false);
-        // setTimeout(() => {
-        //     window.location.reload();
-        // }, 100);
     };
 
     return (
@@ -215,7 +310,8 @@ const LocalElectionScanPage = () => {
                             color="success"
                             variant="outlined"
                             onClick={() => {
-                                handleQRLoading();
+                                // handleQRLoading();
+                                handleNDINotificationRequest();
                             }}
                         >
                             Confirm
@@ -231,26 +327,45 @@ const LocalElectionScanPage = () => {
                 </>
             )}
 
-            {/* page for QR code */}
-            <Dialog open={dialogQRCodeOpen} onClose={(event, reason) =>{
-                //not to allow closing the dialog on click outside the dialog
-                if (reason !== 'backdropClick') {
-                    handleCloseDialogForQRCode();
-                  }
-            }} 
-            fullWidth maxWidth="sm">
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}> Bhutan NDI Face Recognition </DialogTitle>
+            <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
+                <IconButton
+                    aria-label="close"
+                    onClick={() => setErrorDialogOpen(false)}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8
+                    }}
+                >
+                    <CloseIcon color="error" />
+                </IconButton>
+                <Box display={'flex'} justifyContent={'center'}>
+                    <img src={CrossImg} alt="corssImg" width="30%" />
+                </Box>
                 <DialogContent>
-                    <NDIBiometricQRCodePage 
-                    electionTypeId={electionTypeId} 
-                    candidate={getCandidateById(selectedCandidateId)} />
+                    <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
+                        <Typography variant="h4" textAlign={'center'}>
+                            Error Message
+                        </Typography>
+                        <Typography variant="h5" color="error">
+                            {dialogMessage}
+                        </Typography>
+                    </Box>
                 </DialogContent>
-                <DialogActions sx={{ justifyContent: 'center' }}>
-                    <Button variant="contained" onClick={handleCloseDialogForQRCode} color="error">
-                        Close
-                    </Button>
-                </DialogActions>
             </Dialog>
+
+            <Dialog open={walletCheckDialogOpen} onClose={() => {}}>
+            <DialogContent>
+                <Box sx={{ p: 2, minWidth: 300 }} display="flex" flexDirection="column" alignItems="center" gap={2}>
+                    <Typography variant="h5" textAlign="center">
+                        Waiting for Biometric Confirmation
+                    </Typography>
+                    <Typography variant="body1" textAlign="center">
+                        Please check your phone’s wallet app and accept the biometric request to proceed with your vote.
+                    </Typography>
+                </Box>
+            </DialogContent>
+        </Dialog>
         </>
     );
 };

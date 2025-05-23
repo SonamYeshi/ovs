@@ -25,6 +25,7 @@ import NormalLoadingPage from 'common/NormalLoadingPage';
 
 import NdiService from '../../../services/ndi.service';
 import blockchainAuthService from 'services/blockchainAuth.service';
+import { clearRelationshipDID, setRelationshipDID } from '../../../utils/ndi-storage';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -50,7 +51,7 @@ const VoteNDIQRCodePage = () => {
 
     const generateQRCode = () => {
         setProgressNDI(true);
-        NdiService.proofNdiRequest(false)
+        NdiService.proofNdiRequest(false, null)
             .then((res) => {
                 const deepLink = res.data.deepLinkURL;
                 const invite = res.data.inviteURL;
@@ -68,23 +69,26 @@ const VoteNDIQRCodePage = () => {
             });
     };
 
+    const electionTypeId = electionId;
+    const election_Id = 1;
     const natsListener = (threadId) => {
-        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false`;
+        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${election_Id}`;
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
             const data = JSON.parse(event.data);
 
             if (data.status === 'exists') {
+                setRelationshipDID(data.userDTO.relationship_did);
                 setLoading(true); // Show loading spinner
 
                 setTimeout(async () => {
                     try {
-                        const isAllowed = await performExtraCheck(data.userDTO.cid, electionId);
+                        const isAllowed = await performExtraCheck(data.userDTO.vid, electionId);
                 
                         if (!isAllowed) {
                             navigate('/localElectionScanPage', {
                                 state: {
-                                    voterCid: data.userDTO.cid,
+                                    voterCid: data.userDTO.vid,
                                     electionTypeId: electionId
                                 }
                             });
@@ -101,6 +105,7 @@ const VoteNDIQRCodePage = () => {
                     }
                 }, 100);
             } else {
+                clearRelationshipDID();
                 setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
                 setErrorDialogOpen(true);
             }
