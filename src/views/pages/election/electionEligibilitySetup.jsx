@@ -67,23 +67,20 @@ const ElectionEligibilitySetup = () => {
             village: '',
             status: ''
         },
-        validationSchema: (context) =>
+        validationSchema: () =>
             Yup.object().shape({
                 electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
                 electionId: Yup.string().required(AppConstant().REQUIRED_FIELD),
-                dzongkhag: Yup.string().when([], {
-                    is: () => context?.parameterList?.dzongkhags,
-                    then: Yup.string().required('Dzongkhag is required')
-                }),
-                gewog: Yup.string().when([], {
-                    is: () => context?.parameterList?.gewogs,
-                    then: Yup.string().required('Gewog is required')
-                }),
-                village: Yup.string().when([], {
-                    is: () => context?.parameterList?.villages,
-                    then: Yup.string().required('Village is required')
-                })
-            }),
+                dzongkhag: parameterList?.dzongkhags
+                    ? Yup.string().required('Dzongkhag is required')
+                    : Yup.string().nullable(),
+                gewog: parameterList?.gewogs
+                    ? Yup.string().required('Gewog is required')
+                    : Yup.string().nullable(),
+                village: parameterList?.villages
+                    ? Yup.string().required('Village is required')
+                    : Yup.string().nullable(),
+                    }),
         validateOnChange: true,
         enableReinitialize: true,
 
@@ -109,7 +106,6 @@ const ElectionEligibilitySetup = () => {
             const response = await userService.getAllEligibilityCriteria();
             if (response.status === 200) {
                 setEligibilitySetup(response.data);
-                console.log(response.data);
             }
         } catch (error) {
             console.error('Failed to fetch election types:', error);
@@ -181,8 +177,8 @@ const ElectionEligibilitySetup = () => {
 
     useEffect(() => {
         getAllEligibilityCriteria();
-        getElectionByElectionType();
-        getElectionRuleByElection();
+        // getElectionByElectionType();
+        // getElectionRuleByElection();
     }, []);
 
     return (
