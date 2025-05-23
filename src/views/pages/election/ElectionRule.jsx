@@ -364,6 +364,8 @@ const ElectionRule = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
+                                    <fieldset style={{ border: '1px solid rgba(0, 0, 0, 0.23)', borderRadius: '4px', padding: '16px' }}>
+                                    <legend style={{ padding: '0 8px' }}>Voter Selection Criteria</legend>
                                         <FormGroup row>
                                             {electionNames.map((item) => (
                                                 <FormControlLabel
@@ -383,6 +385,7 @@ const ElectionRule = () => {
                                                 />
                                             ))}
                                         </FormGroup>
+                                        </fieldset>
                                     </Grid>
                                 </Grid>
                             </form>
