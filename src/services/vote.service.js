@@ -5,12 +5,6 @@ import authHeader from './auth-header';
 // const BASE_URL = "http://localhost:8080/";
 // const BASE_URL = "api/auth";
 
-const getCandidates = (electionTypeId) => {
-    return axios.get('candidate/getCandidates/' + electionTypeId, {
-        headers: authHeader()
-    });
-};
-
 // const saveVote = (data) => {
 //     return axios.post(
 //         "voter/recordVote",
@@ -65,7 +59,7 @@ const deleteSubElection = (id) => {
 };
 
 export default {
-    getCandidates,
+    // getCandidates,
     // saveVote,
     // getElectionResult,
     getElectionType,

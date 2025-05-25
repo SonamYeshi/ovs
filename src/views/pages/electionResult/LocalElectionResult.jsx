@@ -31,10 +31,14 @@ const LocalElectionResult = () => {
         confirmAction: null
     });
 
-    const electionId = location.state?.id;
+    const { electionId, electionTypeId} = location.state || {};
 
     useEffect(() => {
-        getVoteResult();
+        if (!electionId || !electionTypeId) {
+            navigate('/electionResult', { replace: true });
+          } else {
+            getVoteResult();
+          }
     }, []);
 
     const getVoteResult = async () => {
@@ -52,7 +56,7 @@ const LocalElectionResult = () => {
                 return;
             }
 
-            const response = await blockchainService.getElectionResult(electionId, token);
+            const response = await blockchainService.getElectionResult(electionTypeId, electionId, token);
             if (response.data.length !== 0) {
                 setCandidates(response.data);
             }else{

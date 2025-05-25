@@ -9,9 +9,10 @@ const saveCandidate = (data) => {
     });
 };
 
-const getCandidates = (electionTypeId) => {
-    console.log(electionTypeId);
-    return axios.get(`/candidate/getCandidates/${electionTypeId}`);
+const getCandidates = (electionTypeId, electionId) => {
+    return axios.get(`${BASE_URL}/getCandidates/${electionTypeId}/${electionId}`, {
+        headers: authHeader()
+    });
 };
 
 const getAllCandidates = () => {

@@ -8,6 +8,7 @@ import VoteIcon from 'assets/images/VoteIcon.png';
 import MainCard from 'ui-component/cards/MainCard';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 import voteService from 'services/vote.service';
+import electionSetupService from 'services/electionSetup.service';
 
 const Election = () => {
     const [electionTypes, setElectionTypes] = useState([]);
@@ -22,7 +23,7 @@ const Election = () => {
     useEffect(() => {
         const fetchElectionTypes = async () => {
             try {
-                const response = await voteService.getElectionType();
+                const response = await electionSetupService.getAllSubElectionType();
                 if (response.status === 200) {
                     setElectionTypes(response.data);
                 }
@@ -43,7 +44,9 @@ const Election = () => {
 
     const handleCardClick = (election) => {
         navigate('/vote-ndi-qr', {
-            state: { electionId: election.id }
+            state: { electionId: election.id
+                , electionTypeId: election.electionTypeId
+             }
         });
     };
 
@@ -80,7 +83,9 @@ const Election = () => {
                             }}
                         >
                             <Box display="flex" flexDirection="column" alignItems="center" gap={1} px={1} py={2}>
-                                <img src={election.image} alt={election.label} style={{ height: isXs ? 40 : 50, marginBottom: 8 }} />
+                                {/* <img src={election.image} alt={election.label} style={{ height: isXs ? 40 : 50, marginBottom: 8 }} /> */}
+                                
+                                <img src={VoteIcon} alt="Vote Icon" style={{ height: isXs ? 60 : 70, marginTop: -25 }} />
                                 <Typography
                                     variant="subtitle2"
                                     sx={{
@@ -90,11 +95,8 @@ const Election = () => {
                                         color: '#000'
                                     }}
                                 >
-                                    {election.label}
+                                    {election.electionTypeName}
                                 </Typography>
-
-                                <img src={VoteIcon} alt="Vote Icon" style={{ height: isXs ? 60 : 70, marginTop: -25 }} />
-
                                 <Typography
                                     variant="caption"
                                     sx={{

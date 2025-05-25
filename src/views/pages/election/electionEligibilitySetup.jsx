@@ -113,7 +113,6 @@ const ElectionEligibilitySetup = () => {
     };
 
     const handleEditClick = async (row) => {
-        console.log(row);
         resetForm();
         await getElectionByElectionType(row.electionTypeId);
 
@@ -276,7 +275,7 @@ const ElectionEligibilitySetup = () => {
                     />
 
                     <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm" TransitionComponent={Transition}>
-                        <DialogTitle>Add Election Rule</DialogTitle>
+                        <DialogTitle>Add Election Eligibility</DialogTitle>
                         <DialogContent dividers>
                             <form id="election-setup-form" onSubmit={handleSubmit}>
                                 <Grid container spacing={1}>

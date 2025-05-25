@@ -15,7 +15,7 @@ import axios from 'utils/axios';
 
 import { clearAuthTokens, setAuthTokens } from '../utils/auth-storage';
 import { clearBlockchainToken } from '../utils/bc-token-stogare';
-import { clearRelationshipDID } from '../utils/ndi-storage';
+import { clearDIDs } from '../utils/ndi-storage';
 
 import { useDispatch as useReduxDispatch } from '../store';
 
@@ -50,7 +50,7 @@ const setSession = async (serviceToken, refreshToken, user) => {
     } else {
         await clearAuthTokens();
         await clearBlockchainToken();
-        await clearRelationshipDID();
+        await clearDIDs();
         delete axios.defaults.headers.common.Authorization;
     }
 };

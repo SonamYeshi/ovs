@@ -177,14 +177,14 @@ const ElectionRule = () => {
                 setElectionNameList(response.data);
             }
         } catch (error) {
-            console.error('Error fetching candidate list:', error);
+            console.error('Error fetching election list:', error);
         }
     };
 
     useEffect(() => {
         getAllElectionRule();
         getAllElectionParameter();
-        getElectionByElectionType();
+        // getElectionByElectionType();
     }, []);
 
     return (
@@ -312,11 +312,11 @@ const ElectionRule = () => {
                                                 setElectionNameList([]); // Clear previous names
                                                 await getElectionByElectionType(selectedId);
                                             }}
-                                            onOpen={async () => {
-                                                if (values.electionTypeId) {
-                                                    await getElectionByElectionType(values.electionTypeId); // Refresh on open
-                                                }
-                                            }}
+                                            // onOpen={async () => {
+                                            //     if (values.electionTypeId) {
+                                            //         await getElectionByElectionType(values.electionTypeId); // Refresh on open
+                                            //     }
+                                            // }}
                                             error={touched.electionTypeId && Boolean(errors.electionTypeId)}
                                             helperText={touched.electionTypeId && errors.electionTypeId}
                                         >

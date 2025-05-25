@@ -23,13 +23,13 @@ import { TITLE } from 'common/color';
 import LoadingPage from 'common/LoadingPage';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import voteService from 'services/vote.service';
-import NDIBiometricQRCodePage from '../ndi/NDIBiometricQRCodePage';
 import globalLib from 'common/global-lib';
 
+import candidateService from 'services/candidate.service';
 import NdiService from '../../../services/ndi.service';
 import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
+import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -49,19 +49,27 @@ const LocalElectionScanPage = () => {
     const [progressNDI, setProgressNDI] = useState(true);
     const [loading, setLoading] = useState(false);
     const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
-    const { voterCid, electionTypeId } = location.state || {};
+    const { voterCid, electionTypeId, electionId } = location.state || {};
 
     const [errorDialogOpen, setErrorDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
 
     const [relationshipDID, setRelationshipDID] = useState(null);
+    const [holderDID, setHolderDID] = useState(null);
+
     const [walletCheckDialogOpen, setWalletCheckDialogOpen] = useState(false);
-
+    
     useEffect(() => {
+        if (!electionId || !electionTypeId) {
+            navigate('/vote-ndi-qr');
+            return;
+        }
+        
         setRelationshipDID(window.localStorage.getItem('relationship_did'));
+        setHolderDID(window.localStorage.getItem('holder_did'));
 
-        voteService
-            .getCandidates(electionTypeId)
+        candidateService
+            .getCandidates(electionTypeId, electionId)
             .then((response) => {
                 setCandidates(response.data);
             })
@@ -75,7 +83,7 @@ const LocalElectionScanPage = () => {
                     confirmAction: null
                 });
             });
-    }, []);
+    }, [electionId, electionTypeId, navigate]);
 
     const getCandidateById = (id) => candidates.find((c) => c.id === id);
 
@@ -97,18 +105,20 @@ const LocalElectionScanPage = () => {
     };
 
     const natsListenerForNotification = (threadId) => {
-        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=true`;
+        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=true&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
             setWalletCheckDialogOpen(false);
 
             // eventSource.close();
+            // console.log(data)
             const candidate = getCandidateById(selectedCandidateId);
 
             if (data.status === 'exists') {
+                setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
                 const voterVID = data.userDTO.vid;
-                console.log(voterVID);
+                // console.log(voterVID);
                 submitVote(candidate, voterVID);
             } else {
                 setErrorDialogOpen(true);
@@ -129,9 +139,12 @@ const LocalElectionScanPage = () => {
                 candidateCid: candidate.candidateCid,
                 candidateId: candidate.id,
                 electionTypeId: electionTypeId,
+                electionId: electionId,
                 isVoted: true,
                 voteTxnHash: 'vote-txn-hash',
-                bcAccessToken: bc_token
+                bcAccessToken: bc_token,
+                ndiRelationshipDID: relationshipDID,
+                ndiHolderDID: holderDID
             };
             setLoading(true);
             blockchainService
@@ -146,7 +159,9 @@ const LocalElectionScanPage = () => {
                 })
                 .then(() => {
                     navigate('/vote-ndi-qr', {
-                        state: { electionId: electionTypeId }
+                        state: { electionTypeId: electionTypeId
+                            , electionId: electionId
+                         }
                     });
                     return;
                 })
@@ -156,7 +171,8 @@ const LocalElectionScanPage = () => {
                     globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
                         setLoading(false);
                         navigate('/vote-ndi-qr', {
-                            state: { electionId: electionTypeId }
+                            state: { electionTypeId: electionTypeId
+                                , electionId: electionId }
                         });
                         return;
                         // setTimeout(() => {
@@ -203,7 +219,9 @@ const LocalElectionScanPage = () => {
         setDialogState((prev) => ({ ...prev, open: false }));
         if(candidates.length === 0){
             navigate('/vote-ndi-qr', {
-                state: { electionId: electionTypeId }
+                state: { electionTypeId: electionTypeId
+                    , electionId: electionId
+                 }
             });
             return;
         }
