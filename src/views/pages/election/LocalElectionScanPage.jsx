@@ -134,14 +134,11 @@ const LocalElectionScanPage = () => {
             }
     
             const payload = {
-                voterName: 'Voter Name',
-                voterCid: voterVID,
+                voterID: voterVID,
                 candidateCid: candidate.candidateCid,
                 candidateId: candidate.id,
                 electionTypeId: electionTypeId,
                 electionId: electionId,
-                isVoted: true,
-                voteTxnHash: 'vote-txn-hash',
                 bcAccessToken: bc_token,
                 ndiRelationshipDID: relationshipDID,
                 ndiHolderDID: holderDID
