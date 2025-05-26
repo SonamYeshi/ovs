@@ -113,7 +113,7 @@ const EcbQRCodePage = () => {
               globalLib.warningMsg(data.userDTO.message);
               setTimeout(async () => {
                 window.location.reload();
-              }, 2000);
+              }, 5000);
                 // setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
                 // setErrorDialogOpen(true);
             }
