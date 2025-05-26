@@ -215,11 +215,10 @@ const AddCandidate = () => {
     useEffect(() => {
         fetchElectionTypes();
         getAllCandidates();
-        getElectionByElectionType();
         getAllDzongkhags();
-        getAllGewogsByDzoId();
-        getAllVillagesByGewogId();
         // getElectionByElectionType();
+        // getAllGewogsByDzoId();
+        // getAllVillagesByGewogId();
     }, []);
 
     const handleEditClick = async (row) => {
