@@ -105,6 +105,7 @@ const AddCandidate = () => {
             fileInputRef.current.value = ''; // Reset input value
         }
     };
+
     useEffect(() => {
         return () => {
             if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -207,9 +208,10 @@ const AddCandidate = () => {
                 setElectionNameList(response.data);
             }
         } catch (error) {
-            console.error('Error fetching candidate list:', error);
+            console.error('Error fetching election list:', error);
         }
     };
+
     useEffect(() => {
         fetchElectionTypes();
         getAllCandidates();
@@ -217,6 +219,7 @@ const AddCandidate = () => {
         getAllDzongkhags();
         getAllGewogsByDzoId();
         getAllVillagesByGewogId();
+        // getElectionByElectionType();
     }, []);
 
     const handleEditClick = async (row) => {
@@ -332,6 +335,55 @@ const AddCandidate = () => {
                 <DialogContent dividers>
                     <Grid container spacing={1}>
                         <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
+                            <InputLabel>Election Type</InputLabel>
+
+                            <TextField
+                                size="small"
+                                value={values.electionTypeId}
+                                select
+                                fullWidth
+                                onChange={async (e) => {
+                                    const selectedId = e.target.value;
+                                    setFieldValue('electionTypeId', selectedId);
+                                    setFieldValue('electionId', ''); // Reset election name
+                                    setElectionNameList([]); // Clear previous names
+                                    await getElectionByElectionType(selectedId);
+                                }}
+                                // onOpen={async () => {
+                                //     if (values.electionTypeId) {
+                                //         await getElectionByElectionType(values.electionTypeId); // Refresh on open
+                                //     }
+                                // }}
+                                error={touched.electionTypeId && Boolean(errors.electionTypeId)}
+                                helperText={touched.electionTypeId && errors.electionTypeId}
+                            >
+                                {electionTypes.map((type) => (
+                                    <MenuItem key={type.id} value={type.id}>
+                                        {type.electionName}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
+                            <InputLabel id="electionName">Election Name</InputLabel>
+
+                            <TextField
+                                select
+                                size="small"
+                                fullWidth
+                                value={values.electionId}
+                                onChange={(e) => setFieldValue('electionId', e.target.value)}
+                                error={touched.electionId && Boolean(errors.electionId)}
+                                helperText={touched.electionId && errors.electionId}
+                            >
+                                {electionNameList.map((type) => (
+                                    <MenuItem key={type.id} value={type.id}>
+                                        {type.electionName}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
                             <InputLabel>Candidate Name</InputLabel>
                             <TextField
                                 fullWidth
@@ -436,55 +488,6 @@ const AddCandidate = () => {
                                     />
                                 )}
                             />
-                        </Grid>
-                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
-                            <InputLabel>Election Type</InputLabel>
-
-                            <TextField
-                                size="small"
-                                value={values.electionTypeId}
-                                select
-                                fullWidth
-                                onChange={async (e) => {
-                                    const selectedId = e.target.value;
-                                    setFieldValue('electionTypeId', selectedId);
-                                    setFieldValue('electionId', ''); // Reset election name
-                                    setElectionNameList([]); // Clear previous names
-                                    await getElectionByElectionType(selectedId);
-                                }}
-                                onOpen={async () => {
-                                    if (values.electionTypeId) {
-                                        await getElectionByElectionType(values.electionTypeId); // Refresh on open
-                                    }
-                                }}
-                                error={touched.electionTypeId && Boolean(errors.electionTypeId)}
-                                helperText={touched.electionTypeId && errors.electionTypeId}
-                            >
-                                {electionTypes.map((type) => (
-                                    <MenuItem key={type.id} value={type.id}>
-                                        {type.electionName}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-                        <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
-                            <InputLabel id="electionName">Election Name</InputLabel>
-
-                            <TextField
-                                select
-                                size="small"
-                                fullWidth
-                                value={values.electionId}
-                                onChange={(e) => setFieldValue('electionId', e.target.value)}
-                                error={touched.electionId && Boolean(errors.electionId)}
-                                helperText={touched.electionId && errors.electionId}
-                            >
-                                {electionNameList.map((type) => (
-                                    <MenuItem key={type.id} value={type.id}>
-                                        {type.electionName}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
                         </Grid>
 
                         {/* <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>

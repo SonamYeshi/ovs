@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Autocomplete } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -23,7 +23,7 @@ import electionRuleService from 'services/electionRule.service';
 import electionSetupService from 'services/electionSetup.service';
 import voteService from 'services/vote.service';
 import userService from 'services/userService';
-import commonService from 'services/commonService';
+
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
@@ -41,9 +41,6 @@ const ElectionEligibilitySetup = () => {
     const [deleteDialogOpenForEligibilitySetup, setDeleteDialogOpenForEligibilitySetup] = useState(false);
     const [eligibilitySetupToDelete, setEligibilitySetupToDelete] = useState(null);
     const [electionNameList, setElectionNameList] = useState([]);
-    const [dzongkhags, setDzongkhags] = useState([]);
-    const [gewogLists, setGewogLists] = useState([]);
-    const [villageLists, setVillageLists] = useState([]);
 
     const handleClickOpen = () => setDialogOpen(true);
 
@@ -70,20 +67,23 @@ const ElectionEligibilitySetup = () => {
             village: '',
             status: ''
         },
-        validationSchema: () =>
+        validationSchema: (context) =>
             Yup.object().shape({
                 electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
                 electionId: Yup.string().required(AppConstant().REQUIRED_FIELD),
-                dzongkhag: parameterList?.dzongkhags
-                    ? Yup.string().required('Dzongkhag is required')
-                    : Yup.string().nullable(),
-                gewog: parameterList?.gewogs
-                    ? Yup.string().required('Gewog is required')
-                    : Yup.string().nullable(),
-                village: parameterList?.villages
-                    ? Yup.string().required('Village is required')
-                    : Yup.string().nullable(),
-                    }),
+                dzongkhag: Yup.string().when([], {
+                    is: () => context?.parameterList?.dzongkhags,
+                    then: Yup.string().required('Dzongkhag is required')
+                }),
+                gewog: Yup.string().when([], {
+                    is: () => context?.parameterList?.gewogs,
+                    then: Yup.string().required('Gewog is required')
+                }),
+                village: Yup.string().when([], {
+                    is: () => context?.parameterList?.villages,
+                    then: Yup.string().required('Village is required')
+                })
+            }),
         validateOnChange: true,
         enableReinitialize: true,
 
@@ -109,53 +109,21 @@ const ElectionEligibilitySetup = () => {
             const response = await userService.getAllEligibilityCriteria();
             if (response.status === 200) {
                 setEligibilitySetup(response.data);
+                console.log(response.data);
             }
         } catch (error) {
             console.error('Failed to fetch election types:', error);
         }
     };
 
-    const getAllDzongkhags = async () => {
-        try {
-            const response = await commonService.getAllDzongkhags();
-            setDzongkhags(response.data);
-        } catch (error) {
-            console.error('Failed to fetch dzongkhag', error);
-        }
-    };
-
-    const getAllGewogsByDzoId = async (dzongkhag_id) => {
-        try {
-            const response = await commonService.getAllGewogsByDzoId(dzongkhag_id);
-            if (response.data) {
-                setGewogLists(response.data);
-            }
-        } catch (error) {
-            console.error('Error fetching gewog list:', error);
-        }
-    };
-    const getAllVillagesByGewogId = async (gewog_id) => {
-        try {
-            const response = await commonService.getAllVillagesByGewogId(gewog_id);
-            if (response.data) {
-                setVillageLists(response.data);
-            }
-        } catch (error) {
-            console.error('Error fetching village list:', error);
-        }
-    };
-
     const handleEditClick = async (row) => {
+        console.log(row);
         resetForm();
         await getElectionByElectionType(row.electionTypeId);
-        await getAllGewogsByDzoId(row.dzongkhag);
-        await getAllVillagesByGewogId(row.gewog);
+
         setFieldValue('id', row.id);
         setFieldValue('electionTypeId', row.electionTypeId);
         setFieldValue('electionId', row.electionId);
-        setFieldValue('dzongkhagName', row.dzongkhagName);
-        setFieldValue('gewogName', row.gewogName);
-        setFieldValue('villageName', row.villageName);
         setFieldValue('dzongkhag', row.dzongkhag);
         setFieldValue('gewog', row.gewog);
         setFieldValue('village', row.village);
@@ -215,11 +183,6 @@ const ElectionEligibilitySetup = () => {
         getAllEligibilityCriteria();
         getElectionByElectionType();
         getElectionRuleByElection();
-        getAllDzongkhags();
-        getAllGewogsByDzoId();
-        getAllVillagesByGewogId();
-        // getElectionByElectionType();
-        // getElectionRuleByElection();
     }, []);
 
     return (
@@ -257,17 +220,17 @@ const ElectionEligibilitySetup = () => {
                             { accessorKey: 'electionName', header: 'Election Name', size: 10 },
 
                             {
-                                accessorKey: 'dzongkhagName',
+                                accessorKey: 'dzongkhag',
                                 header: 'Dzongkhag',
                                 size: 10
                             },
                             {
-                                accessorKey: 'gewogName',
+                                accessorKey: 'gewog',
                                 header: 'Gewog',
                                 size: 10
                             },
                             {
-                                accessorKey: 'villageName',
+                                accessorKey: 'village',
                                 header: 'Village',
                                 size: 10
                             }
@@ -317,7 +280,7 @@ const ElectionEligibilitySetup = () => {
                     />
 
                     <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm" TransitionComponent={Transition}>
-                        <DialogTitle>Add Election Eligibility</DialogTitle>
+                        <DialogTitle>Add Election Rule</DialogTitle>
                         <DialogContent dividers>
                             <form id="election-setup-form" onSubmit={handleSubmit}>
                                 <Grid container spacing={1}>
@@ -354,32 +317,33 @@ const ElectionEligibilitySetup = () => {
 
                                     <Grid item sm={12} xs={12} md={12}>
                                         <InputLabel id="electionName">Election Name</InputLabel>
+                                        
+                                            <TextField
+                                                size="small"
+                                                select
+                                                fullWidth
+                                                value={values.electionId}
+                                                onChange={async (e) => {
+                                                    const selectedElectionId = e.target.value;
+                                                    const selectedElectionTypeId = values.electionTypeId; // still current value
 
-                                        <TextField
-                                            size="small"
-                                            select
-                                            fullWidth
-                                            value={values.electionId}
-                                            onChange={async (e) => {
-                                                const selectedElectionId = e.target.value;
-                                                const selectedElectionTypeId = values.electionTypeId; // still current value
+                                                    setFieldValue('electionId', selectedElectionId);
 
-                                                setFieldValue('electionId', selectedElectionId);
-
-                                                if (selectedElectionTypeId && selectedElectionId) {
-                                                    await getElectionRuleByElection(selectedElectionTypeId, selectedElectionId);
-                                                }
-                                            }}
-                                            error={touched.electionId && Boolean(errors.electionId)}
-                                            helperText={touched.electionId && errors.electionId}
-                                        >
-                                            {Array.isArray(electionNameList) &&
-                                                electionNameList.map((type) => (
-                                                    <MenuItem key={type.id} value={type.id}>
-                                                        {type.electionName}
-                                                    </MenuItem>
-                                                ))}
-                                        </TextField>
+                                                    if (selectedElectionTypeId && selectedElectionId) {
+                                                        await getElectionRuleByElection(selectedElectionTypeId, selectedElectionId);
+                                                    }
+                                                }}
+                                                error={touched.electionId && Boolean(errors.electionId)}
+                                                helperText={touched.electionId && errors.electionId}
+                                            >
+                                                {Array.isArray(electionNameList) &&
+                                                    electionNameList.map((type) => (
+                                                        <MenuItem key={type.id} value={type.id}>
+                                                            {type.electionName}
+                                                        </MenuItem>
+                                                    ))}
+                                            </TextField>
+                                    
                                     </Grid>
                                     <Box p={2}>
                                         <Typography variant="h4">Permanent Address</Typography>
@@ -387,95 +351,61 @@ const ElectionEligibilitySetup = () => {
                                     <Grid item xs={12}>
                                         {parameterList.dzongkhags && (
                                             <Box>
-                                                <InputLabel>Dzongkhag</InputLabel>
-                                                <Autocomplete
-                                                    size="small"
+                                                <TextField
+                                                    select
                                                     fullWidth
-                                                    options={dzongkhags}
-                                                    getOptionLabel={(option) => option.dzongkhag || ''}
-                                                    value={dzongkhags.find((dz) => dz.id === values.dzongkhag) || null}
-                                                    onChange={async (event, newValue) => {
-                                                        const selectedId = newValue?.id || null;
-                                                        setFieldValue('dzongkhag', selectedId);
-                                                        setFieldValue('gewog', '');
-                                                        setGewogLists([]);
-                                                        if (selectedId) {
-                                                            await getAllGewogsByDzoId(selectedId);
-                                                        }
-                                                    }}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            error={touched.dzongkhag && Boolean(errors.dzongkhag)}
-                                                            helperText={touched.dzongkhag && errors.dzongkhag}
-                                                            size="small"
-                                                        />
-                                                    )}
-                                                />
+                                                    size="small"
+                                                    label="Dzongkhag"
+                                                    value={values.dzongkhag}
+                                                    onChange={(e) => setFieldValue('dzongkhag', e.target.value)}
+                                                    error={touched.dzongkhag && Boolean(errors.dzongkhag)}
+                                                    helperText={touched.dzongkhag && errors.dzongkhag}
+                                                >
+                                                    <MenuItem value="">
+                                                        <em>Select</em>
+                                                    </MenuItem>
+                                                    <MenuItem value="Thimphu">Thimphu</MenuItem>
+                                                    <MenuItem value="Pemagatshel">Pemagatshel</MenuItem>
+                                                    <MenuItem value="Trashigang">Trashigang</MenuItem>
+                                                    <MenuItem value="Mongar">Mongar</MenuItem>
+                                                    <MenuItem value="Samdrupjongkhar">Samdrupjongkhar</MenuItem>
+                                                </TextField>
                                             </Box>
                                         )}
                                     </Grid>
                                     <Grid item xs={12}>
                                         {parameterList.gewogs && (
-                                            <Box>
-                                                <InputLabel>Gewog</InputLabel>
-
-                                                <Autocomplete
-                                                    size="small"
-                                                    fullWidth
-                                                    options={gewogLists}
-                                                    getOptionLabel={(option) => option.gewog || ''}
-                                                    value={gewogLists.find((g) => g.id === values.gewog) || null}
-                                                    onChange={(event, newValue) => {
-                                                        if (newValue) {
-                                                            setFieldValue('gewog', newValue.id);
-                                                            setFieldValue('village', '');
-                                                            setVillageLists([]);
-                                                            getAllVillagesByGewogId(newValue.id);
-                                                        } else {
-                                                            setFieldValue('gewog', '');
-                                                            setVillageLists([]);
-                                                            setFieldValue('village', '');
-                                                        }
-                                                    }}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            error={touched.gewog && Boolean(errors.gewog)}
-                                                            helperText={touched.gewog && errors.gewog}
-                                                        />
-                                                    )}
-                                                />
-                                            </Box>
+                                            <TextField
+                                                select
+                                                fullWidth
+                                                size="small"
+                                                label="Gewog"
+                                                value={values.gewog}
+                                                onChange={(e) => setFieldValue('gewog', e.target.value)}
+                                                error={touched.gewog && Boolean(errors.gewog)}
+                                                helperText={touched.gewog && errors.gewog}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>Select</em>
+                                                </MenuItem>
+                                                <MenuItem value="Nanong">Nanong</MenuItem>
+                                                <MenuItem value="Chang">Chang</MenuItem>
+                                                <MenuItem value="Lingmithang">Lingmithang</MenuItem>
+                                                <MenuItem value="Martshala">Martshala</MenuItem>
+                                            </TextField>
                                         )}
                                     </Grid>
                                     <Grid item xs={12}>
                                         {parameterList.villages && (
-                                            <Box>
-                                                {' '}
-                                                <InputLabel>Village</InputLabel>
-                                                <Autocomplete
-                                                    size="small"
-                                                    fullWidth
-                                                    options={villageLists}
-                                                    getOptionLabel={(option) => option.village || ''}
-                                                    value={villageLists.find((v) => v.id === values.village) || null}
-                                                    onChange={(event, newValue) => {
-                                                        if (newValue) {
-                                                            setFieldValue('village', newValue.id);
-                                                        } else {
-                                                            setFieldValue('village', '');
-                                                        }
-                                                    }}
-                                                    renderInput={(params) => (
-                                                        <TextField
-                                                            {...params}
-                                                            error={touched.village && Boolean(errors.village)}
-                                                            helperText={touched.village && errors.village}
-                                                        />
-                                                    )}
-                                                />
-                                            </Box>
+                                            <TextField
+                                                fullWidth
+                                                label="Village"
+                                                size="small"
+                                                value={values.village}
+                                                onChange={(e) => setFieldValue('village', e.target.value)}
+                                                error={touched.village && Boolean(errors.village)}
+                                                helperText={touched.village && errors.village}
+                                            />
                                         )}
                                     </Grid>
                                 </Grid>

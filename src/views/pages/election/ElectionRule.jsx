@@ -177,14 +177,14 @@ const ElectionRule = () => {
                 setElectionNameList(response.data);
             }
         } catch (error) {
-            console.error('Error fetching candidate list:', error);
+            console.error('Error fetching election list:', error);
         }
     };
 
     useEffect(() => {
         getAllElectionRule();
         getAllElectionParameter();
-        getElectionByElectionType();
+        // getElectionByElectionType();
     }, []);
 
     return (
@@ -312,11 +312,11 @@ const ElectionRule = () => {
                                                 setElectionNameList([]); // Clear previous names
                                                 await getElectionByElectionType(selectedId);
                                             }}
-                                            onOpen={async () => {
-                                                if (values.electionTypeId) {
-                                                    await getElectionByElectionType(values.electionTypeId); // Refresh on open
-                                                }
-                                            }}
+                                            // onOpen={async () => {
+                                            //     if (values.electionTypeId) {
+                                            //         await getElectionByElectionType(values.electionTypeId); // Refresh on open
+                                            //     }
+                                            // }}
                                             error={touched.electionTypeId && Boolean(errors.electionTypeId)}
                                             helperText={touched.electionTypeId && errors.electionTypeId}
                                         >
@@ -364,6 +364,8 @@ const ElectionRule = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
+                                    <fieldset style={{ border: '1px solid rgba(0, 0, 0, 0.23)', borderRadius: '4px', padding: '16px' }}>
+                                    <legend style={{ padding: '0 8px' }}>Voter Selection Criteria</legend>
                                         <FormGroup row>
                                             {electionNames.map((item) => (
                                                 <FormControlLabel
@@ -383,6 +385,7 @@ const ElectionRule = () => {
                                                 />
                                             ))}
                                         </FormGroup>
+                                        </fieldset>
                                     </Grid>
                                 </Grid>
                             </form>

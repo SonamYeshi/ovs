@@ -96,7 +96,6 @@ const SubElectionType = () => {
         try {
             const response = await electionSetupService.getAllSubElectionType();
             if (response.status === 200) {
-                console.log(response.data);
                 setSubElectionList(response.data);
             }
         } catch (error) {
@@ -112,7 +111,7 @@ const SubElectionType = () => {
         resetForm();
         setFieldValue('id', row.id);
         setFieldValue('electionName', row.electionName);
-        setFieldValue('electionTypeName', row.electionTypeName);
+        setFieldValue('electionTypeId', row.electionTypeId);
         setOpen(true);
     };
 

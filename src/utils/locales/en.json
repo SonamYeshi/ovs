@@ -47,5 +47,8 @@
     "masterSetup": "Master Setup",
     "subElectionType": "Election Name Setup",
     "election rule": "Election Rule Setup",
-    "electionParameterSetup": "Election Parameter Setup"
+    "electionParameterSetup": "Election Parameter Setup",
+
+    "votervc": "Voter VC",
+    "getvotervc": "Generate Voter VC"
 }

@@ -25,6 +25,7 @@ import NormalLoadingPage from 'common/NormalLoadingPage';
 
 import NdiService from '../../../services/ndi.service';
 import blockchainAuthService from 'services/blockchainAuth.service';
+import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -42,15 +43,20 @@ const VoteNDIQRCodePage = () => {
     const constant = AppConstant();
     const navigate = useNavigate();
     const location = useLocation();
-    const electionId = location.state?.electionId;
+    const { electionId, electionTypeId } = location.state || {};
+
 
     useEffect(() => {
-        generateQRCode();
-    }, []);
+        if (!electionId || !electionTypeId) {
+            navigate('/election', { replace: true });
+          } else {
+            generateQRCode();
+          }
+    }, [electionId, electionTypeId, navigate]);
 
     const generateQRCode = () => {
         setProgressNDI(true);
-        NdiService.proofNdiRequest(false)
+        NdiService.proofNdiRequest(false, null)
             .then((res) => {
                 const deepLink = res.data.deepLinkURL;
                 const invite = res.data.inviteURL;
@@ -69,23 +75,24 @@ const VoteNDIQRCodePage = () => {
     };
 
     const natsListener = (threadId) => {
-        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false`;
+        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
             const data = JSON.parse(event.data);
-
             if (data.status === 'exists') {
+                setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
                 setLoading(true); // Show loading spinner
 
                 setTimeout(async () => {
                     try {
-                        const isAllowed = await performExtraCheck(data.userDTO.cid, electionId);
+                        const isAllowed = await performExtraCheck(data.userDTO.vid, electionTypeId, electionId);
                 
                         if (!isAllowed) {
                             navigate('/localElectionScanPage', {
                                 state: {
-                                    voterCid: data.userDTO.cid,
-                                    electionTypeId: electionId
+                                    voterCid: data.userDTO.vid,
+                                    electionTypeId: electionTypeId,
+                                    electionId: electionId
                                 }
                             });
                         } else {
@@ -101,13 +108,14 @@ const VoteNDIQRCodePage = () => {
                     }
                 }, 100);
             } else {
+                clearDIDs();
                 setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
                 setErrorDialogOpen(true);
             }
         });
     };
 
-    const performExtraCheck = async (cid, electionTypeId) => {
+    const performExtraCheck = async (cid, electionTypeId, electionId) => {
         const token = await blockchainAuthService.fetchBlockchainAccessToken();
 
         if (!token) {
@@ -120,6 +128,7 @@ const VoteNDIQRCodePage = () => {
         const response = await axios.get(`${BASE_URL}blockchain/checkIfVoted`, {
             params: { voterCid: cid, 
                 electionTypeId: electionTypeId,
+                electionId: electionId,
                 bcToken: token
             },
         });

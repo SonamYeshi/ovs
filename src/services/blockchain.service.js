@@ -9,8 +9,8 @@ const getBlockchainToken = async () => {
     return response;
 };
 
-const getElectionResult = (electionId, bc_token) => {
-    return axios.get(BASE_URL+'blockchain/getElectionResult/'+electionId, {
+const getElectionResult = (electionTypeId, electionId, bc_token) => {
+    return axios.get(`${BASE_URL}blockchain/getElectionResult/${electionTypeId}/${electionId}`, {
         params: {
             bcToken: bc_token
         }
