@@ -32,9 +32,9 @@ const NotEligible = Loadable(lazy(() => import('views/pages/ndi/NotEligible')));
 const Candidates = Loadable(lazy(() => import('views/pages/ndi/CandidateDisplayPage')));
 const Dasbboard = Loadable(lazy(() => import('views/dashboard/Dashoard')));
 const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/ElectionEligibilitySetup')));
-const ElectionType = Loadable(lazy(() => import('views/pages/election/ElectionType')));
-const SubElectionType = Loadable(lazy(() => import('views/pages/election/SubElectionType')));
-const ElectionRule = Loadable(lazy(() => import('views/pages/election/ElectionRule')));
+const ElectionType = Loadable(lazy(() => import('views/pages/election/ElectionTypeSetup')));
+const SubElectionType = Loadable(lazy(() => import('views/pages/election/ElectionNameSetup')));
+const ElectionRule = Loadable(lazy(() => import('views/pages/election/ElectionRuleSetup')));
 const ElectionParameter = Loadable(lazy(() => import('views/pages/election/ElectionParameterSetup')));
 const EcbQRCodePage = Loadable(lazy(() => import('views/pages/ndi/EcbQRCodePage')));
 

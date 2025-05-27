@@ -1,36 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useDispatch } from 'store';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Button, Box, Tooltip, IconButton } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Slide from '@mui/material/Slide';
-import Typography from '@mui/material/Typography';
-import MainCard from 'ui-component/cards/MainCard';
-import AnimateButton from 'ui-component/extended/AnimateButton';
-import SecondaryAction from 'ui-component/cards/CardSecondaryAction';
-import { gridSpacing } from 'store/constant';
-import { BUTTON_ADD_COLOR, BUTTON_VIEW_COLOR, BUTTON_SAVE_COLOR, BUTTON_CANCEL_COLOR } from 'common/color';
-import { MaterialReactTable } from 'material-react-table';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
+import { Box, Button, IconButton } from '@mui/material';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Grid from '@mui/material/Grid';
+import Slide from '@mui/material/Slide';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR } from 'common/color';
+import { MaterialReactTable } from 'material-react-table';
 import voteService from 'services/vote.service';
-
-// third-party
+import { gridSpacing } from 'store/constant';
+import MainCard from 'ui-component/cards/MainCard';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-
-import LinkIcon from '@mui/icons-material/Link';
-import userService from 'services/userService';
 import globalLib from 'common/global-lib';
+import userService from 'services/userService';
 import AppConstant from 'utils/AppConstant';
-import candidateService from 'services/candidate.service';
 
 // animation
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
@@ -42,8 +32,6 @@ const validationSchema = yup.object({
 // ==============================|| FORM VALIDATION - LOGIN FORMIK ||============================== //
 
 const ElectionTypeSetup = () => {
-    const dispatch = useDispatch();
-
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [electionToDelete, setElectionToDelete] = useState(null);
     const [selectedElection, setSelectedElection] = useState(null);
@@ -83,7 +71,7 @@ const ElectionTypeSetup = () => {
 
     const handleViewClick = (election) => {
         formik.setValues({
-            id:election.id,
+            id: election.id,
             electionName: election.electionName
         });
     };
@@ -129,8 +117,6 @@ const ElectionTypeSetup = () => {
                             </Grid>
 
                             <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
-                                {/* <Stack direction="row" justifyContent="flex-end">*/}
-
                                 <Button
                                     variant="contained"
                                     type="submit"
@@ -141,8 +127,6 @@ const ElectionTypeSetup = () => {
                                 >
                                     Save
                                 </Button>
-
-                                {/* </Stack> */}
                             </Grid>
                         </Grid>
                     </form>

@@ -1,45 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
+    Box,
     Button,
-    TextField,
-    MenuItem,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
     IconButton,
     InputLabel,
-    FormControl,
-    Box,
-    Grid,
-    FormHelperText,
-    Typography,
-    Avatar,
-    Stack,
-    Tooltip
+    MenuItem,
+    TextField,
+    Typography
 } from '@mui/material';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import AddIcon from '@mui/icons-material/Add';
-import { cidRegex, cidErrMsg } from 'common/global-lib';
-import AppConstant from 'utils/AppConstant';
-import MainCard from 'ui-component/cards/MainCard';
-import { BUTTON_ADD_COLOR, BUTTON_SAVE_COLOR, BUTTON_VIEW_COLOR, BUTTON_CANCEL_COLOR } from 'common/color';
-import { MaterialReactTable } from 'material-react-table';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR } from 'common/color';
 import globalLib from 'common/global-lib';
-import candidateService from 'services/candidate.service';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import DeleteIcon from '@mui/icons-material/Delete';
-import voteService from 'services/vote.service';
+import { useFormik } from 'formik';
+import { MaterialReactTable } from 'material-react-table';
+import { useEffect, useState } from 'react';
 import electionSetupService from 'services/electionSetup.service';
+import voteService from 'services/vote.service';
+import MainCard from 'ui-component/cards/MainCard';
+import AppConstant from 'utils/AppConstant';
+import * as Yup from 'yup';
 
-const dzongkhags = ['Thimphu', 'Paro', 'Punakha', 'Samdrupjongkhar']; // Example values
-const gewogs = ['Gewog 1', 'Gewog 2', 'Martshala'];
-const villages = ['Village 1', 'Village 2', 'Choidung'];
 
-const SubElectionType = () => {
+
+const ElectionNameSetup = () => {
     const [open, setOpen] = useState(false);
     const [subElectionList, setSubElectionList] = useState([]);
     const handleClickOpen = () => setOpen(true);
@@ -128,7 +117,7 @@ const SubElectionType = () => {
                 getAllSubElectionType();
             }
         } catch (error) {
-            globalLib.warningMsg('Failed to delete Candidate.');
+            globalLib.warningMsg('Failed to delete Election Name.');
         } finally {
             setDeleteDialogOpenForSubElection(false);
             subEubElectionToDelete(null);
@@ -270,8 +259,7 @@ const SubElectionType = () => {
                                 '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
                             }}
                         >
-                            {/* {isEdit ? 'Update' : 'Save'}
-                             */}{' '}
+                         
                             Save
                         </Button>
 
@@ -291,7 +279,7 @@ const SubElectionType = () => {
             <Dialog open={deleteDialogOpenForSubElection} onClose={() => setDeleteDialogOpenForSubElection(false)} keepMounted>
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Confirm Delete</DialogTitle>
                 <DialogContent>
-                    <Typography textAlign={'center'}>Are you sure you want to delete this sub election?</Typography>
+                    <Typography textAlign={'center'}>Are you sure you want to delete this election name?</Typography>
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Button onClick={() => setDeleteDialogOpenForSubElection(false)} sx={{ color: '#002B69' }} variant="outlined">
@@ -306,4 +294,5 @@ const SubElectionType = () => {
     );
 };
 
-export default SubElectionType;
+export default ElectionNameSetup;
+

@@ -1,16 +1,13 @@
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import { Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, Autocomplete } from '@mui/material';
+import { Autocomplete, Box, Button, IconButton } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Slide from '@mui/material/Slide';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -19,11 +16,11 @@ import globalLib from 'common/global-lib';
 import { useFormik } from 'formik';
 import { MaterialReactTable } from 'material-react-table';
 import React, { useEffect, useState } from 'react';
+import commonService from 'services/commonService';
 import electionRuleService from 'services/electionRule.service';
 import electionSetupService from 'services/electionSetup.service';
-import voteService from 'services/vote.service';
 import userService from 'services/userService';
-import commonService from 'services/commonService';
+import voteService from 'services/vote.service';
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
@@ -111,7 +108,7 @@ const ElectionEligibilitySetup = () => {
                 setEligibilitySetup(response.data);
             }
         } catch (error) {
-            console.error('Failed to fetch election types:', error);
+            console.error('Failed to fetch Eligibility Criteria:', error);
         }
     };
 
@@ -207,7 +204,7 @@ const ElectionEligibilitySetup = () => {
                 setParameterList(response.data);
             }
         } catch (error) {
-            console.error('Error fetching candidate list:', error);
+            console.error('Error fetching election ', error);
         }
     };
 

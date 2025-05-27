@@ -32,7 +32,7 @@ const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={r
 
 // ==============================|| FORM VALIDATION - LOGIN FORMIK ||============================== //
 
-const ElectionRule = () => {
+const ElectionRuleSetup = () => {
     const [electionTypes, setElectionTypes] = useState([]);
     const [electionNames, setElectionNames] = useState([]);
     const [selectedElections, setSelectedElections] = useState({});
@@ -439,4 +439,4 @@ const ElectionRule = () => {
     );
 };
 
-export default ElectionRule;
+export default ElectionRuleSetup;

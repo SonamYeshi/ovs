@@ -1,51 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
+    Autocomplete,
+    Box,
     Button,
-    TextField,
-    MenuItem,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
     IconButton,
     InputLabel,
-    FormControl,
-    Box,
-    Grid,
-    FormHelperText,
-    Typography,
-    Avatar,
-    Stack,
-    Tooltip,
-    Autocomplete
+    MenuItem,
+    TextField,
+    Typography
 } from '@mui/material';
+import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR } from 'common/color';
+import globalLib, { cidErrMsg, cidRegex } from 'common/global-lib';
 import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import AddIcon from '@mui/icons-material/Add';
-import { cidRegex, cidErrMsg } from 'common/global-lib';
-import AppConstant from 'utils/AppConstant';
-import MainCard from 'ui-component/cards/MainCard';
-import { BUTTON_ADD_COLOR, BUTTON_SAVE_COLOR, BUTTON_VIEW_COLOR, BUTTON_CANCEL_COLOR } from 'common/color';
 import { MaterialReactTable } from 'material-react-table';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import globalLib from 'common/global-lib';
+import { useEffect, useRef, useState } from 'react';
 import candidateService from 'services/candidate.service';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import DeleteIcon from '@mui/icons-material/Delete';
-import voteService from 'services/vote.service';
-import electionSetupService from 'services/electionSetup.service';
 import commonService from 'services/commonService';
-
-// const dzongkhags = ['Thimphu', 'Paro', 'Punakha', 'Samdrupjongkhar'];
-const gewogs = ['Gewog 1', 'Gewog 2', 'Martshala'];
-const villages = ['Village 1', 'Village 2', 'Choidung'];
+import electionSetupService from 'services/electionSetup.service';
+import voteService from 'services/vote.service';
+import MainCard from 'ui-component/cards/MainCard';
+import AppConstant from 'utils/AppConstant';
+import * as Yup from 'yup';
 
 const AddCandidate = () => {
     const [open, setOpen] = useState(false);
     const [candidateList, setCandidateList] = useState([]);
-    const handleClickOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
     const [previewUrl, setPreviewUrl] = useState(null);
     const fileInputRef = useRef(null);
     const [electionTypes, setElectionTypes] = useState([]);
@@ -55,6 +41,9 @@ const AddCandidate = () => {
     const [electionNameList, setElectionNameList] = useState([]);
     const [gewogLists, setGewogLists] = useState([]);
     const [villageLists, setVillageLists] = useState([]);
+
+    const handleClickOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     const { values, handleSubmit, setFieldValue, touched, errors, resetForm } = useFormik({
         initialValues: {
@@ -112,6 +101,8 @@ const AddCandidate = () => {
         };
     }, [previewUrl]);
 
+    // *******saving candidates******* //
+
     const saveCandidate = (values) => {
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
@@ -130,18 +121,19 @@ const AddCandidate = () => {
             });
     };
 
+    // *******getting lists of candidates******* //
     const getAllCandidates = async () => {
         try {
             const response = await candidateService.getAllCandidates();
             if (response.status === 200) {
                 setCandidateList(response.data);
-               
             }
         } catch (error) {
-            console.error('Failed to fetch election types:', error);
+            console.error('Failed to fetch candidates:', error);
         }
     };
 
+    // *******deleting candidates******* //
     const handleDeleteClick = (election) => {
         setCandidateToDelete(election);
         setDeleteDialogOpenForCandidate(true);
@@ -162,6 +154,7 @@ const AddCandidate = () => {
         }
     };
 
+    // *******getting lists of election types******* //
     const fetchElectionTypes = async () => {
         try {
             const response = await voteService.getElectionType();
@@ -171,6 +164,7 @@ const AddCandidate = () => {
         }
     };
 
+    // *******getting lists of dzongkhags******* //
     const getAllDzongkhags = async () => {
         try {
             const response = await commonService.getAllDzongkhags();
@@ -180,6 +174,7 @@ const AddCandidate = () => {
         }
     };
 
+    // *******getting lists of gewogs******* //
     const getAllGewogsByDzoId = async (dzongkhag_id) => {
         try {
             const response = await commonService.getAllGewogsByDzoId(dzongkhag_id);
@@ -190,6 +185,8 @@ const AddCandidate = () => {
             console.error('Error fetching gewog list:', error);
         }
     };
+
+    // *******getting lists of villages******* //
     const getAllVillagesByGewogId = async (gewog_id) => {
         try {
             const response = await commonService.getAllVillagesByGewogId(gewog_id);
@@ -201,6 +198,7 @@ const AddCandidate = () => {
         }
     };
 
+    // *******getting lists of elections******* //
     const getElectionByElectionType = async (electionTypeId) => {
         try {
             const response = await electionSetupService.getElectionByElectionType(electionTypeId);
@@ -222,6 +220,7 @@ const AddCandidate = () => {
         // getElectionByElectionType();
     }, []);
 
+    // *******edit candidates******* //
     const handleEditClick = async (row) => {
         resetForm();
         await getElectionByElectionType(row.electionTypeId);
@@ -286,7 +285,6 @@ const AddCandidate = () => {
                     }
                 ]}
                 data={candidateList ?? []}
-                // data={candidateList}
                 enableColumnFilter
                 enableRowActions
                 positionActionsColumn="last"
@@ -456,7 +454,6 @@ const AddCandidate = () => {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
-                               
                                         error={touched.gewog && Boolean(errors.gewog)}
                                         helperText={touched.gewog && errors.gewog}
                                     />
@@ -482,7 +479,6 @@ const AddCandidate = () => {
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
-                                      
                                         error={touched.village && Boolean(errors.village)}
                                         helperText={touched.village && errors.village}
                                     />
