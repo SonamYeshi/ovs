@@ -15,7 +15,7 @@ import {
     TableHead,
     TableRow,
     Typography,
-    IconButton,
+    IconButton
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CrossImg from 'assets/images/corssImg.png';
@@ -58,13 +58,13 @@ const LocalElectionScanPage = () => {
     const [holderDID, setHolderDID] = useState(null);
 
     const [walletCheckDialogOpen, setWalletCheckDialogOpen] = useState(false);
-    
+
     useEffect(() => {
         if (!electionId || !electionTypeId) {
             navigate('/vote-ndi-qr');
             return;
         }
-        
+
         setRelationshipDID(window.localStorage.getItem('relationship_did'));
         setHolderDID(window.localStorage.getItem('holder_did'));
 
@@ -128,56 +128,53 @@ const LocalElectionScanPage = () => {
     };
 
     const submitVote = async (candidate, voterVID) => {
-            const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
-            if (!bc_token) {
-                return globalLib.warningMsg("Could not load access token for blockchain.");
-            }
-    
-            const payload = {
-                voterID: voterVID,
-                candidateCid: candidate.candidateCid,
-                candidateId: candidate.id,
-                electionTypeId: electionTypeId,
-                electionId: electionId,
-                bcAccessToken: bc_token,
-                ndiRelationshipDID: relationshipDID,
-                ndiHolderDID: holderDID
-            };
-            setLoading(true);
-            blockchainService
-                .saveVote(payload)
-                .then((res) => {
-                    if (!res.data || !res.data.message) {
-                        throw new Error('Response is missing data.message');
-                    }
-    
-                    // Show success message
-                    return globalLib.successMsg(res.data.message);
-                })
-                .then(() => {
+        const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
+        if (!bc_token) {
+            return globalLib.warningMsg('Could not load access token for blockchain.');
+        }
+
+        const payload = {
+            voterID: voterVID,
+            candidateCid: candidate.candidateCid,
+            candidateId: candidate.id,
+            electionTypeId: electionTypeId,
+            electionId: electionId,
+            bcAccessToken: bc_token,
+            ndiRelationshipDID: relationshipDID,
+            ndiHolderDID: holderDID
+        };
+        setLoading(true);
+        blockchainService
+            .saveVote(payload)
+            .then((res) => {
+                if (!res.data || !res.data.message) {
+                    throw new Error('Response is missing data.message');
+                }
+
+                // Show success message
+                return globalLib.successMsg(res.data.message);
+            })
+            .then(() => {
+                navigate('/vote-ndi-qr', {
+                    state: { electionTypeId: electionTypeId, electionId: electionId }
+                });
+                return;
+            })
+            .catch((err) => {
+                console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
+
+                globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
+                    setLoading(false);
                     navigate('/vote-ndi-qr', {
-                        state: { electionTypeId: electionTypeId
-                            , electionId: electionId
-                         }
+                        state: { electionTypeId: electionTypeId, electionId: electionId }
                     });
                     return;
-                })
-                .catch((err) => {
-                    console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
-    
-                    globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
-                        setLoading(false);
-                        navigate('/vote-ndi-qr', {
-                            state: { electionTypeId: electionTypeId
-                                , electionId: electionId }
-                        });
-                        return;
-                        // setTimeout(() => {
-                        //     window.location.reload();
-                        // }, 100);
-                    });
+                    // setTimeout(() => {
+                    //     window.location.reload();
+                    // }, 100);
                 });
-        };
+            });
+    };
 
     const handleVoteClick = (candidateId) => {
         const candidate = getCandidateById(candidateId);
@@ -207,18 +204,16 @@ const LocalElectionScanPage = () => {
     const getArrowIconColor = (candidateId) => {
         return selectedCandidateId === candidateId ? '#2bc039' : '#003366';
     };
-    
+
     const getVoteButtonColor = (candidateId) => {
         return selectedCandidateId === candidateId ? '#667FA5' : '#003366';
     };
 
     const handleDialogClose = () => {
         setDialogState((prev) => ({ ...prev, open: false }));
-        if(candidates.length === 0){
+        if (candidates.length === 0) {
             navigate('/vote-ndi-qr', {
-                state: { electionTypeId: electionTypeId
-                    , electionId: electionId
-                 }
+                state: { electionTypeId: electionTypeId, electionId: electionId }
             });
             return;
         }
@@ -301,11 +296,13 @@ const LocalElectionScanPage = () => {
                 </Paper>
             </Box>
             {/* Dialog */}
-            <Dialog open={dialogState.open} onClose={(event, reason) =>{
-                if(reason !== "backdropClick"){
-                    handleDialogClose();
-                }
-            }}
+            <Dialog
+                open={dialogState.open}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick') {
+                        handleDialogClose();
+                    }
+                }}
             >
                 <DialogContent>
                     <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
@@ -369,18 +366,30 @@ const LocalElectionScanPage = () => {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={walletCheckDialogOpen} onClose={() => {}}>
-            <DialogContent>
-                <Box sx={{ p: 2, minWidth: 300 }} display="flex" flexDirection="column" alignItems="center" gap={2}>
-                    <Typography variant="h5" textAlign="center">
-                        Waiting for Biometric Confirmation
-                    </Typography>
-                    <Typography variant="body1" textAlign="center">
-                        Please check your phone’s wallet app and accept the biometric request to proceed with your vote.
-                    </Typography>
-                </Box>
-            </DialogContent>
-        </Dialog>
+            <Dialog
+                open={walletCheckDialogOpen}
+                onClose={() => {}}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 3,
+                        p: { xs: 2, sm: 4 },
+                        maxWidth: 400,
+                        textAlign: 'center'
+                    }
+                }}
+            >
+                <DialogContent>
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+                        <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+                            Waiting for Biometric Confirmation 
+                        </Typography>
+
+                        <Typography variant="body1" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary' }}>
+                            Please check your phone’s wallet app and accept the biometric request to proceed with your vote.
+                        </Typography>
+                    </Box>
+                </DialogContent>
+            </Dialog>
         </>
     );
 };

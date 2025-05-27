@@ -71,16 +71,10 @@ const ElectionEligibilitySetup = () => {
             Yup.object().shape({
                 electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
                 electionId: Yup.string().required(AppConstant().REQUIRED_FIELD),
-                dzongkhag: parameterList?.dzongkhags
-                    ? Yup.string().required('Dzongkhag is required')
-                    : Yup.string().nullable(),
-                gewog: parameterList?.gewogs
-                    ? Yup.string().required('Gewog is required')
-                    : Yup.string().nullable(),
-                village: parameterList?.villages
-                    ? Yup.string().required('Village is required')
-                    : Yup.string().nullable(),
-                    }),
+                dzongkhag: parameterList?.dzongkhags ? Yup.string().required('Dzongkhag is required') : Yup.string().nullable(),
+                gewog: parameterList?.gewogs ? Yup.string().required('Gewog is required') : Yup.string().nullable(),
+                village: parameterList?.villages ? Yup.string().required('Village is required') : Yup.string().nullable()
+            }),
         validateOnChange: true,
         enableReinitialize: true,
 
@@ -311,7 +305,17 @@ const ElectionEligibilitySetup = () => {
                         )}
                     />
 
-                    <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm" TransitionComponent={Transition}>
+                    <Dialog
+                        open={dialogOpen}
+                        onClose={(event, reason) => {
+                            if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                                setDialogOpen(false);
+                            }
+                        }}
+                        fullWidth
+                        maxWidth="sm"
+                        TransitionComponent={Transition}
+                    >
                         <DialogTitle>Add Election Eligibility</DialogTitle>
                         <DialogContent dividers>
                             <form id="election-setup-form" onSubmit={handleSubmit}>
@@ -500,7 +504,11 @@ const ElectionEligibilitySetup = () => {
                     </Dialog>
                     <Dialog
                         open={deleteDialogOpenForEligibilitySetup}
-                        onClose={() => setDeleteDialogOpenForEligibilitySetup(false)}
+                        onClose={(event, reason) => {
+                            if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                                setDeleteDialogOpenForEligibilitySetup(false);
+                            }
+                        }}
                         keepMounted
                     >
                         <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Confirm Delete</DialogTitle>

@@ -39,6 +39,8 @@ const successMsg = (msg) => {
         icon: 'success',
         confirmButtonColor: '#3085d6',
         confirmButtonText: 'OK',
+        allowOutsideClick: false, 
+        allowEscapeKey: false,
         customClass: {
             container: 'sweet-alert-modal'
         },
@@ -58,6 +60,8 @@ const warningMsg = (msg) => {
         icon: 'error',
         confirmButtonColor: '#d33',
         confirmButtonText: 'OK',
+        allowOutsideClick: false, 
+        allowEscapeKey: false,
         customClass: {
             container: 'sweet-alert-modal'
         },

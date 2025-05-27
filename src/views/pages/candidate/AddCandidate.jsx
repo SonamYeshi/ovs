@@ -326,7 +326,16 @@ const AddCandidate = () => {
                 )}
             />
 
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+            <Dialog
+                open={open}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleClose();
+                    }
+                }}
+                fullWidth
+                maxWidth="sm"
+            >
                 <DialogTitle>Add Candidate</DialogTitle>
 
                 <DialogContent dividers>
@@ -564,7 +573,15 @@ const AddCandidate = () => {
                     </Box>
                 </DialogActions>
             </Dialog>
-            <Dialog open={deleteDialogOpenForCandidate} onClose={() => setDeleteDialogOpenForCandidate(false)} keepMounted>
+            <Dialog
+                open={deleteDialogOpenForCandidate}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        setDeleteDialogOpenForCandidate(false);
+                    }
+                }}
+                keepMounted
+            >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <Typography textAlign={'center'}>Are you sure you want to delete this candiate?</Typography>

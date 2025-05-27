@@ -182,7 +182,16 @@ const ElectionTypeSetup = () => {
                 />
             </MainCard>
 
-            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} TransitionComponent={Transition} keepMounted>
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        setDeleteDialogOpen(false);
+                    }
+                }}
+                TransitionComponent={Transition}
+                keepMounted
+            >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <Typography textAlign={'center'}>Are you sure you want to delete this election type?</Typography>

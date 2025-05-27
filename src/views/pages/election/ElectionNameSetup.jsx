@@ -26,8 +26,6 @@ import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
 
-
-
 const ElectionNameSetup = () => {
     const [open, setOpen] = useState(false);
     const [subElectionList, setSubElectionList] = useState([]);
@@ -158,8 +156,6 @@ const ElectionNameSetup = () => {
                         size: 100
                     },
                     { accessorKey: 'electionName', header: 'Election name', size: 10 }
-
-                   
                 ]}
                 data={subElectionList ?? []}
                 // data={subElectionList}
@@ -205,7 +201,16 @@ const ElectionNameSetup = () => {
                 )}
             />
 
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+            <Dialog
+                open={open}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        handleClose();
+                    }
+                }}
+                fullWidth
+                maxWidth="sm"
+            >
                 <DialogTitle>Add Sub Election Type</DialogTitle>
 
                 <DialogContent dividers>
@@ -259,7 +264,6 @@ const ElectionNameSetup = () => {
                                 '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
                             }}
                         >
-                         
                             Save
                         </Button>
 
@@ -276,7 +280,15 @@ const ElectionNameSetup = () => {
                     </Box>
                 </DialogActions>
             </Dialog>
-            <Dialog open={deleteDialogOpenForSubElection} onClose={() => setDeleteDialogOpenForSubElection(false)} keepMounted>
+            <Dialog
+                open={deleteDialogOpenForSubElection}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                        setDeleteDialogOpenForSubElection(false);
+                    }
+                }}
+                keepMounted
+            >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <Typography textAlign={'center'}>Are you sure you want to delete this election name?</Typography>
@@ -295,4 +307,3 @@ const ElectionNameSetup = () => {
 };
 
 export default ElectionNameSetup;
-

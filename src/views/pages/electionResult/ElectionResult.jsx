@@ -88,7 +88,13 @@ const ElectionResult = () => {
                     <MainCard
                         onClick={() => handleCardClick(election)}
                         sx={{
-                            height: 150,
+                            height: {
+                                xs: 200,
+                                sm: 200,
+                                md: 200,
+                                lg: 200,
+                                xl: 200
+                            },
                             cursor: 'pointer',
                             transition: 'box-shadow 0.5s',
                             '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }

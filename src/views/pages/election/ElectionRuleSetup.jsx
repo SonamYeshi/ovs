@@ -291,7 +291,17 @@ const ElectionRuleSetup = () => {
                         )}
                     />
 
-                    <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="sm" TransitionComponent={Transition}>
+                    <Dialog
+                        open={dialogOpen}
+                        onClose={(event, reason) => {
+                            if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                                setDialogOpen(false);
+                            }
+                        }}
+                        fullWidth
+                        maxWidth="sm"
+                        TransitionComponent={Transition}
+                    >
                         <DialogTitle>Add Election Rule</DialogTitle>
                         <DialogContent dividers>
                             <form id="election-setup-form" onSubmit={handleSubmit}>
@@ -364,27 +374,27 @@ const ElectionRuleSetup = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
-                                    <fieldset style={{ border: '1px solid rgba(0, 0, 0, 0.23)', borderRadius: '4px', padding: '16px' }}>
-                                    <legend style={{ padding: '0 8px' }}>Voter Selection Criteria</legend>
-                                        <FormGroup row>
-                                            {electionNames.map((item) => (
-                                                <FormControlLabel
-                                                    key={item.id || item.name}
-                                                    control={
-                                                        <Checkbox
-                                                            checked={selectedElections[item.parameterName] || false}
-                                                            onChange={(e) =>
-                                                                setSelectedElections({
-                                                                    ...selectedElections,
-                                                                    [item.parameterName]: e.target.checked
-                                                                })
-                                                            }
-                                                        />
-                                                    }
-                                                    label={item.parameterName}
-                                                />
-                                            ))}
-                                        </FormGroup>
+                                        <fieldset style={{ border: '1px solid rgba(0, 0, 0, 0.23)', borderRadius: '4px', padding: '16px' }}>
+                                            <legend style={{ padding: '0 8px' }}>Voter Selection Criteria</legend>
+                                            <FormGroup row>
+                                                {electionNames.map((item) => (
+                                                    <FormControlLabel
+                                                        key={item.id || item.name}
+                                                        control={
+                                                            <Checkbox
+                                                                checked={selectedElections[item.parameterName] || false}
+                                                                onChange={(e) =>
+                                                                    setSelectedElections({
+                                                                        ...selectedElections,
+                                                                        [item.parameterName]: e.target.checked
+                                                                    })
+                                                                }
+                                                            />
+                                                        }
+                                                        label={item.parameterName}
+                                                    />
+                                                ))}
+                                            </FormGroup>
                                         </fieldset>
                                     </Grid>
                                 </Grid>
@@ -413,7 +423,11 @@ const ElectionRuleSetup = () => {
                     </Dialog>
                     <Dialog
                         open={deleteDialogOpenForElectionRuleSetup}
-                        onClose={() => setDeleteDialogOpenForElectionRuleSetup(false)}
+                        onClose={(event, reason) => {
+                            if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                                setDeleteDialogOpenForElectionRuleSetup(false);
+                            }
+                        }}
                         keepMounted
                     >
                         <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Confirm Delete</DialogTitle>
