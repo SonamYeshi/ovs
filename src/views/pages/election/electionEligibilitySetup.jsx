@@ -210,13 +210,11 @@ const ElectionEligibilitySetup = () => {
 
     useEffect(() => {
         getAllEligibilityCriteria();
-        getElectionByElectionType();
-        getElectionRuleByElection();
-        getAllDzongkhags();
-        getAllGewogsByDzoId();
-        getAllVillagesByGewogId();
         // getElectionByElectionType();
         // getElectionRuleByElection();
+        getAllDzongkhags();
+        // getAllGewogsByDzoId();
+        // getAllVillagesByGewogId();
     }, []);
 
     return (

@@ -213,11 +213,10 @@ const AddCandidate = () => {
     useEffect(() => {
         fetchElectionTypes();
         getAllCandidates();
-        getElectionByElectionType();
         getAllDzongkhags();
-        getAllGewogsByDzoId();
-        getAllVillagesByGewogId();
         // getElectionByElectionType();
+        // getAllGewogsByDzoId();
+        // getAllVillagesByGewogId();
     }, []);
 
     // *******edit candidates******* //
