@@ -4,6 +4,9 @@ import { FormattedMessage } from 'react-intl';
 // assets
 import { IconDashboard, IconDeviceAnalytics } from '@tabler/icons-react';
 import electionTypeImg from 'assets/images/Election type.svg';
+import electionNameImg from 'assets/images/Election name Setup.svg';
+import electionRuleImg from 'assets/images/Election Rule Setup.svg';
+import electionEgilibilityImg from 'assets/images/Election Eligibility Setup.svg';
 
 const icons = {
     IconDashboard: IconDashboard,
@@ -42,8 +45,8 @@ const candidate = {
             type: 'item',
             icon: () => (
                 <img
-                    src={electionTypeImg}
-                    alt="dashboard"
+                    src={electionNameImg}
+                    alt="electionNameImg"
                     style={{
                         width: 24,
                         height: 24,
@@ -66,8 +69,8 @@ const candidate = {
             type: 'item',
             icon: () => (
                 <img
-                    src={electionTypeImg}
-                    alt="dashboard"
+                    src={electionRuleImg}
+                    alt="electionRuleImg"
                     style={{
                         width: 24,
                         height: 24,
@@ -83,8 +86,8 @@ const candidate = {
             type: 'item',
             icon: () => (
                 <img
-                    src={electionTypeImg}
-                    alt="dashboard"
+                    src={electionEgilibilityImg}
+                    alt="electionEgilibilityImg"
                     style={{
                         width: 24,
                         height: 24,
