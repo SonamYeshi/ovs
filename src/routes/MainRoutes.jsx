@@ -31,7 +31,7 @@ const VoteNDIQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoteNDIQRC
 const NotEligible = Loadable(lazy(() => import('views/pages/ndi/NotEligible')));
 const Candidates = Loadable(lazy(() => import('views/pages/ndi/CandidateDisplayPage')));
 const Dasbboard = Loadable(lazy(() => import('views/dashboard/Dashoard')));
-const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/ElectionEligibilitySetup')));
+const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/EligibilitySetup')));
 const ElectionType = Loadable(lazy(() => import('views/pages/election/ElectionTypeSetup')));
 const SubElectionType = Loadable(lazy(() => import('views/pages/election/ElectionNameSetup')));
 const ElectionRule = Loadable(lazy(() => import('views/pages/election/ElectionRuleSetup')));

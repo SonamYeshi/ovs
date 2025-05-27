@@ -1,3 +1,5 @@
+
+
 import AddIcon from '@mui/icons-material/Add';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import { Autocomplete, Box, Button, IconButton } from '@mui/material';
@@ -30,7 +32,7 @@ const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={r
 
 // ==============================|| FORM VALIDATION - LOGIN FORMIK ||============================== //
 
-const ElectionEligibilitySetup = () => {
+const EligibilitySetup = () => {
     const [electionTypes, setElectionTypes] = useState([]);
     const [parameterList, setParameterList] = useState([]);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -534,4 +536,4 @@ const ElectionEligibilitySetup = () => {
     );
 };
 
-export default ElectionEligibilitySetup;
+export default EligibilitySetup;
