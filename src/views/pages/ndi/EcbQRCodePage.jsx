@@ -25,7 +25,8 @@ import globalLib from 'common/global-lib';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 
 import NdiService from '../../../services/ndi.service';
-import blockchainAuthService from 'services/blockchainAuth.service';
+import vcIssuanceService from 'services/vc-issuance-service';
+import VCIssueLoading from 'common/VCIssueLoading';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -65,6 +66,7 @@ const EcbQRCodePage = () => {
                 setProgressNDI(false);
     
                 natsListener(threadId);
+                
             })
             .catch((err) => {
                 setAlertMessage('Failed to load QR code. Please try again.');
@@ -75,78 +77,67 @@ const EcbQRCodePage = () => {
     const natsListener = (threadId) => {
         const endPoint = `${BASE_URL}vc/nats-subscribe?threadId=${threadId}`;
         const eventSource = new EventSource(endPoint);
+        // setLoading(true);
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
-            const data = JSON.parse(event.data);
+            // setLoading(true)
+            try{
+                const data = JSON.parse(event.data);
+                const message = data.userDTO?.message || 'No message received';
+                console.log(data)
+                if (data.status === 'exists') {
+                    // await globalLib.successMsg(message);
+                    getnerateVC(data.userDTO.cid, data.userDTO.idType, data.userDTO.dob, data.userDTO.relationDID, data.userDTO.holderDID,);
+                    // setLoading(false);
+                    // eventSource.close();
+                } else {
+                    await globalLib.warningMsg(message);
+                }
 
-            if (data.status === 'exists') {
-                setLoading(true); // Show loading spinner
-                globalLib.successMsg(data.userDTO.message);
-                setTimeout(async () => {
-                  setLoading(false);
-                  window.location.reload();
-                }, 2000);
-                
-                // setTimeout(async () => {
-                //     try {
-                //         const isAllowed = await performExtraCheck(data.userDTO.cid, electionId);
-                
-                //         if (!isAllowed) {
-                //             navigate('/localElectionScanPage', {
-                //                 state: {
-                //                     voterCid: data.userDTO.cid,
-                //                     electionTypeId: electionId
-                //                 }
-                //             });
-                //         } else {
-                //             setLoading(false);
-                //             setDialogMessage('You have already voted for this election.');
-                //             setErrorDialogOpen(true);
-                //         }
-                //     } catch (err) {
-                //         setLoading(false);
-                //         setDialogMessage('Failed to verify voter eligibility.');
-                //         setErrorDialogOpen(true);
-                //         console.error('Extra check error:', err);
-                //     }
-                // }, 100);
-            } else {
-              globalLib.warningMsg(data.userDTO.message);
-              setTimeout(async () => {
-                window.location.reload();
-              }, 5000);
-                // setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
-                // setErrorDialogOpen(true);
-            }
-        });
-    };
+                // setLoading(false);
+                eventSource.close();
 
-    const performExtraCheck = async (cid, electionTypeId) => {
-        const token = await blockchainAuthService.fetchBlockchainAccessToken();
-
-        if (!token) {
-            setLoading(false);
-            setDialogMessage('Could not authenticate with the blockchain.');
-            setErrorDialogOpen(true);
-            return;
+            }catch (err) {
+            console.error('NDI_SSI_EVENT error:', err);
+            // setLoading(false);
+            globalLib.warningMsg('Something went wrong while processing the event.');
+            eventSource.close();
         }
-
-        const response = await axios.get(`${BASE_URL}blockchain/checkIfVoted`, {
-            params: { voterCid: cid, 
-                electionTypeId: electionTypeId,
-                bcToken: token
-            },
         });
-
-        return response.data;
     };
 
-    const openDialog = (message, type = 'error') => {
-      setDialogMessage(message);
-      setDialogType(type);
-      setDialogOpen(true);
-  };
+    const getnerateVC = async (cid, idType, dob, relation_did, holder_did) => {
+        const payload = {
+            cid: cid,
+            idType: idType,
+            dob: dob,
+            relationDID: relation_did,
+            holderDID: holder_did
+        };
+        setLoading(true);
+        vcIssuanceService
+        .generateVC(payload)
+        .then((res) => {
+            if (!res.data || !res.data.message) {
+                throw new Error('Response is missing data.message');
+            }
+
+            // Show success message
+            return globalLib.successMsg(res.data.message);
+        })
+        .then(() => {
+            window.location.reload();
+        })
+        .catch((err) => {
+            console.error('Error generating VC', err);
+
+            globalLib.warningMsg(err?.response.data?.message || 'Something went wrong').then(() => {
+                setLoading(false);
+            });
+        });
+    };
 
     const handleDialogClose = () => {
+        setLoading(false);
         setDialogOpen(false);
         generateQRCode(); 
     };
@@ -319,7 +310,7 @@ const EcbQRCodePage = () => {
                 {/* lodaing page */}
                 {loading && (
                     <>
-                        <NormalLoadingPage />
+                        <VCIssueLoading />
                     </>
                 )}
             </Box>
