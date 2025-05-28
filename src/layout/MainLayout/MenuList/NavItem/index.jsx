@@ -130,10 +130,6 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                             sx={{
                                 minWidth: level === 1 ? 36 : 18,
                                 color: '#ffffff',
-                                // color: isSelected ? 'inherit' : 'inherit',
-                                // '&:hover': {
-                                //     color: '#ffffff'
-                                // },
                                 ...(!drawerOpen &&
                                     level === 1 && {
                                         borderRadius: `${borderRadius}px`,
@@ -169,11 +165,12 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                                         variant={isSelected ? 'h5' : 'body1'}
                                         sx={{
                                             color: isSelected ? '#ffffff' : '#1c2833',
+                                            width: 200,
+                                            transition: 'color 0.3s ease',
                                             '&:hover': {
-                                                color: '#ffffff'
+                                                color: isSelected ? '#ffffff' : '#ffffff' // Stays the same on hover
                                             }
                                         }}
-                                        width={200}
                                     >
                                         {item.title}
                                     </Typography>
@@ -182,10 +179,15 @@ const NavItem = ({ item, level, isParents = false, setSelectedID }) => {
                                     item.caption && (
                                         <Typography
                                             variant="caption"
-                                            sx={{ ...theme.typography.subMenuCaption }}
+                                            sx={{
+                                                ...theme.typography.subMenuCaption,
+                                                color: isSelected ? '#ffffff' : '#1c2833',
+                                                '&:hover': {
+                                                    color: isSelected ? '#ffffff' : '#1c2833'
+                                                }
+                                            }}
                                             display="block"
                                             gutterBottom
-                                            // color="#ffffff"
                                         >
                                             {item.caption}
                                         </Typography>

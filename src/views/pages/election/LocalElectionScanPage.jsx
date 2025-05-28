@@ -30,13 +30,15 @@ import NdiService from '../../../services/ndi.service';
 import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
 import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
-
+import electionSetupService from 'services/electionSetup.service';
+import MainCard from 'ui-component/cards/MainCard';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const LocalElectionScanPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedCandidateId, setSelectedCandidateId] = useState(null);
+    const [electionTypes, setElectionTypes] = useState([]);
     const [candidates, setCandidates] = useState([]);
     const [selectedCandidate, setSelectedCandidate] = useState(null);
     const [dialogState, setDialogState] = useState({
@@ -221,175 +223,197 @@ const LocalElectionScanPage = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        const fetchElectionTypes = async () => {
+            try {
+                const response = await electionSetupService.getAllSubElectionType();
+                if (response.status === 200) {
+                    setElectionTypes(response.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch election types:', error);
+            }
+        };
+
+        fetchElectionTypes();
+    }, []);
     return (
         <>
-            <Box mt={4}>
-                {' '}
-                <Typography variant="h2" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
-                    Local Government Elections
-                </Typography>
-            </Box>
-            <Box
-                mt={1}
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}
-            >
-                <Paper elevation={3} sx={{ borderRadius: 4, p: 4, width: '80%', maxWidth: 900 }}>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center"></TableCell>
-                                    <TableCell align="center"></TableCell>
-                                    <TableCell align="center"></TableCell>
-                                    <TableCell align="center"></TableCell>
-                                    <TableCell align="center"></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {candidates.map((candidate, index) => (
-                                    <TableRow key={candidate.id}>
-                                        <TableCell align="center">{index + 1}</TableCell>
-                                        <TableCell>{candidate.candidateName}</TableCell>
-                                        <TableCell align="center">
-                                            <Avatar
-                                                src={candidate.proPicUrl}
-                                                alt={candidate.candidateName}
-                                                sx={{ width: 70, height: 70 }}
-                                                variant="circular"
-                                            />
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <ArrowCircleLeftIcon
-                                                fontSize="large"
-                                                sx={{
-                                                    color: getArrowIconColor(candidate.id)
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => handleVoteClick(candidate.id)}
-                                                sx={{
-                                                    backgroundColor: getVoteButtonColor(candidate.id),
-                                                    borderRadius: '30px',
-                                                    px: 7,
-                                                    py: 2.5,
-                                                    minWidth: '100px',
-                                                    textTransform: 'none',
-                                                    '&:hover': {
-                                                        backgroundColor: '#003366'
-                                                    }
-                                                }}
-                                            >
-                                                Vote
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
-            </Box>
-            {/* Dialog */}
-            <Dialog
-                open={dialogState.open}
-                onClose={(event, reason) => {
-                    if (reason !== 'backdropClick') {
-                        handleDialogClose();
-                    }
-                }}
-            >
-                <DialogContent>
-                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-                        <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
-                            {dialogState.message}
-                        </Typography>
-                    </Box>
-                </DialogContent>
-                <DialogActions style={{ justifyContent: 'center' }}>
-                    <Button size="small" color="error" variant="outlined" onClick={handleDialogClose}>
-                        {dialogState.type === 'confirm' ? 'No' : 'Close'}
-                    </Button>
-
-                    {dialogState.type === 'confirm' && (
-                        <Button
-                            size="small"
-                            color="success"
-                            variant="outlined"
-                            onClick={() => {
-                                // handleQRLoading();
-                                handleNDINotificationRequest();
-                            }}
-                        >
-                            Confirm
-                        </Button>
-                    )}
-                </DialogActions>
-            </Dialog>
-
-            {/* lodaing page */}
-            {loading && (
-                <>
-                    <LoadingPage />
-                </>
-            )}
-
-            <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
-                <IconButton
-                    aria-label="close"
-                    onClick={() => setErrorDialogOpen(false)}
+            <MainCard>
+                <Box mt={4}>
+                    <Typography variant="h3" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
+                        {electionTypes.map((type) => (
+                            <div key={type.id}>{type.electionTypeName}</div>
+                        ))}
+                    </Typography>
+                    <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
+                        {electionTypes.map((type) => (
+                            <div key={type.id}> [{type.electionName}] </div>
+                        ))}
+                    </Typography>
+                </Box>
+                <Box
+                    mt={1}
                     sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8
+                        display: 'flex',
+                        justifyContent: 'center'
                     }}
                 >
-                    <CloseIcon color="error" />
-                </IconButton>
-                <Box display={'flex'} justifyContent={'center'}>
-                    <img src={CrossImg} alt="corssImg" width="30%" />
+                    <Paper elevation={3} sx={{ borderRadius: 4, p: 4, width: '80%', maxWidth: 900 }}>
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center"></TableCell>
+                                        <TableCell align="center"></TableCell>
+                                        <TableCell align="center"></TableCell>
+                                        <TableCell align="center"></TableCell>
+                                        <TableCell align="center"></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {candidates.map((candidate, index) => (
+                                        <TableRow key={candidate.id}>
+                                            <TableCell align="center">{index + 1}</TableCell>
+                                            <TableCell>{candidate.candidateName}</TableCell>
+                                            <TableCell align="center">
+                                                <Avatar
+                                                    src={candidate.proPicUrl}
+                                                    alt={candidate.candidateName}
+                                                    sx={{ width: 70, height: 70 }}
+                                                    variant="circular"
+                                                />
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <ArrowCircleLeftIcon
+                                                    fontSize="large"
+                                                    sx={{
+                                                        color: getArrowIconColor(candidate.id)
+                                                    }}
+                                                />
+                                            </TableCell>
+                                            <TableCell align="center">
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={() => handleVoteClick(candidate.id)}
+                                                    sx={{
+                                                        backgroundColor: getVoteButtonColor(candidate.id),
+                                                        borderRadius: '30px',
+                                                        px: 7,
+                                                        py: 2.5,
+                                                        minWidth: '100px',
+                                                        textTransform: 'none',
+                                                        '&:hover': {
+                                                            backgroundColor: '#003366'
+                                                        }
+                                                    }}
+                                                >
+                                                    Vote
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
                 </Box>
-                <DialogContent>
-                    <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
-                        <Typography variant="h4" textAlign={'center'}>
-                            Error Message
-                        </Typography>
-                        <Typography variant="h5" color="error">
-                            {dialogMessage}
-                        </Typography>
-                    </Box>
-                </DialogContent>
-            </Dialog>
+                {/* Dialog */}
+                <Dialog
+                    open={dialogState.open}
+                    onClose={(event, reason) => {
+                        if (reason !== 'backdropClick') {
+                            handleDialogClose();
+                        }
+                    }}
+                >
+                    <DialogContent>
+                        <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
+                            <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
+                                {dialogState.message}
+                            </Typography>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions style={{ justifyContent: 'center' }}>
+                        <Button size="small" color="error" variant="outlined" onClick={handleDialogClose}>
+                            {dialogState.type === 'confirm' ? 'No' : 'Close'}
+                        </Button>
 
-            <Dialog
-                open={walletCheckDialogOpen}
-                onClose={() => {}}
-                PaperProps={{
-                    sx: {
-                        borderRadius: 3,
-                        p: { xs: 2, sm: 4 },
-                        maxWidth: 400,
-                        textAlign: 'center'
-                    }
-                }}
-            >
-                <DialogContent>
-                    <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
-                        <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
-                            Waiting for Biometric Confirmation 
-                        </Typography>
+                        {dialogState.type === 'confirm' && (
+                            <Button
+                                size="small"
+                                color="success"
+                                variant="outlined"
+                                onClick={() => {
+                                    // handleQRLoading();
+                                    handleNDINotificationRequest();
+                                }}
+                            >
+                                Confirm
+                            </Button>
+                        )}
+                    </DialogActions>
+                </Dialog>
 
-                        <Typography variant="body1" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary' }}>
-                            Please check your phone’s wallet app and accept the biometric request to proceed with your vote.
-                        </Typography>
+                {/* lodaing page */}
+                {loading && (
+                    <>
+                        <LoadingPage />
+                    </>
+                )}
+
+                <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
+                    <IconButton
+                        aria-label="close"
+                        onClick={() => setErrorDialogOpen(false)}
+                        sx={{
+                            position: 'absolute',
+                            right: 8,
+                            top: 8
+                        }}
+                    >
+                        <CloseIcon color="error" />
+                    </IconButton>
+                    <Box display={'flex'} justifyContent={'center'}>
+                        <img src={CrossImg} alt="corssImg" width="30%" />
                     </Box>
-                </DialogContent>
-            </Dialog>
+                    <DialogContent>
+                        <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
+                            <Typography variant="h4" textAlign={'center'}>
+                                Error Message
+                            </Typography>
+                            <Typography variant="h5" color="error">
+                                {dialogMessage}
+                            </Typography>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog
+                    open={walletCheckDialogOpen}
+                    onClose={() => {}}
+                    PaperProps={{
+                        sx: {
+                            borderRadius: 3,
+                            p: { xs: 2, sm: 4 },
+                            maxWidth: 400,
+                            textAlign: 'center'
+                        }
+                    }}
+                >
+                    <DialogContent>
+                        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+                            <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+                                Waiting for Biometric Confirmation
+                            </Typography>
+
+                            <Typography variant="body1" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary' }}>
+                                Please check your phone’s wallet app and accept the biometric request to proceed with your vote.
+                            </Typography>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
+            </MainCard>
         </>
     );
 };
