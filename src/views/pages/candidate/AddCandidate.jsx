@@ -29,6 +29,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
 import blockchainAuthService from 'services/blockchainAuth.service';
+import Processing from 'common/Processing';
 
 const AddCandidate = () => {
     const [open, setOpen] = useState(false);
@@ -42,7 +43,7 @@ const AddCandidate = () => {
     const [electionNameList, setElectionNameList] = useState([]);
     const [gewogLists, setGewogLists] = useState([]);
     const [villageLists, setVillageLists] = useState([]);
-
+    const [loading, setLoading] = useState(false);
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
@@ -109,6 +110,7 @@ const AddCandidate = () => {
         Object.entries(values).forEach(([key, value]) => {
             formData.append(key, value);
         });
+        setLoading(true);
         const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
         if (!bc_token) {
             return globalLib.warningMsg('Could not load access token for blockchain.');
@@ -123,9 +125,11 @@ const AddCandidate = () => {
                 getAllCandidates();
                 resetForm();
                 setOpen(false);
+                setLoading(false);
             })
             .catch((error) => {
                 globalLib.warningMsg(error?.response?.data?.error || 'Failed to register candidate');
+                setLoading(false)
             });
     };
 
@@ -501,53 +505,6 @@ const AddCandidate = () => {
                                 )}
                             />
                         </Grid>
-
-                        {/* <Grid item sm={12} xs={12} md={6} lg={6} xl={6}>
-                            <InputLabel sx={{ mb: 1 }}>
-                                Profile Pic <span style={{ color: '#FA0101' }}>*</span>
-                            </InputLabel>
-
-                            <Box display="flex" flexDirection="column" gap={1}>
-                                <Button
-                                    variant="contained"
-                                    component="label"
-                                    startIcon={<UploadFileIcon />}
-                                    sx={{
-                                        textTransform: 'none',
-                                        background: BUTTON_ADD_COLOR,
-                                        '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
-                                    }}
-                                >
-                                    Choose File
-                                    <input type="file" accept="image/*" hidden ref={fileInputRef} onChange={handleFileChange} />
-                                </Button>
-
-                               
-                                {values.profilePic && (
-                                    <>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Selected: <strong>{values.profilePic.name}</strong>
-                                        </Typography>
-
-                                        <Stack direction="row" alignItems="center" spacing={2}>
-                                            <Avatar
-                                                alt="Profile Preview"
-                                                src={previewUrl}
-                                                sx={{ width: 80, height: 80, border: '1px solid #ddd' }}
-                                                variant="rounded"
-                                            />
-                                            <IconButton onClick={handleRemoveImage}>
-                                                {' '}
-                                                <DeleteIcon color="error" />
-                                            </IconButton>
-                                        </Stack>
-                                    </>
-                                )}
-
-                              
-                                {touched.profilePic && errors.profilePic && <FormHelperText error>{errors.profilePic}</FormHelperText>}
-                            </Box>
-                        </Grid> */}
                     </Grid>
                 </DialogContent>
 
@@ -603,6 +560,11 @@ const AddCandidate = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {loading && (
+                    <>
+                        <Processing text="Registering..."/>
+                    </>
+                )}
         </MainCard>
     );
 };
