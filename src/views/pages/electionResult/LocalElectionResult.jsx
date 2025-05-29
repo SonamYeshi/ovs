@@ -14,13 +14,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
-import electionSetupService from 'services/electionSetup.service';
 import MainCard from 'ui-component/cards/MainCard';
 
 const LocalElectionResult = () => {
     const navigate = useNavigate();
     const [candidates, setCandidates] = useState([]);
-    const [electionTypes, setElectionTypes] = useState([]);
     const location = useLocation();
     const [loading, setLoading] = useState(true);
     const [dialogState, setDialogState] = useState({
@@ -30,8 +28,8 @@ const LocalElectionResult = () => {
         message: '',
         confirmAction: null
     });
-
-    const { electionId, electionTypeId } = location.state || {};
+    const [voteCount, setVoteCount] = useState([]);
+    const { electionId, electionTypeId, electionName, electionTypeName } = location.state || {};
 
     useEffect(() => {
         if (!electionId || !electionTypeId) {
@@ -58,7 +56,8 @@ const LocalElectionResult = () => {
 
             const response = await blockchainService.getElectionResult(electionTypeId, electionId, token);
             if (response.data.length !== 0) {
-                setCandidates(response.data);
+                setCandidates(response.data.candidates);
+                setVoteCount(response.data.totalVotes);
             } else {
                 setDialogState({
                     open: true,
@@ -81,20 +80,7 @@ const LocalElectionResult = () => {
             setLoading(false);
         }
     };
-    useEffect(() => {
-        const fetchElectionTypes = async () => {
-            try {
-                const response = await electionSetupService.getAllSubElectionType();
-                if (response.status === 200) {
-                    setElectionTypes(response.data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch election types:', error);
-            }
-        };
 
-        fetchElectionTypes();
-    }, []);
     const handleDialogClose = () => {
         setDialogState((prev) => ({ ...prev, open: false }));
         navigate('/electionResult');
@@ -110,17 +96,16 @@ const LocalElectionResult = () => {
             <MainCard>
                 <Box mt={4}>
                     <Typography variant="h3" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
-                        {electionTypes.map((type) => (
-                            <div key={type.id}>{type.electionTypeName}</div>
-                        ))}
+                        <div> {electionTypeName}</div>
                     </Typography>
                     <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
-                        {electionTypes.map((type) => (
-                            <div key={type.id}> [{type.electionName}] </div>
-                        ))}
+                        <div>{electionName} </div>
                     </Typography>
                     <Typography variant="h5" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
-                        Vote counts
+                        Total Voters : {voteCount}
+                    </Typography>
+                    <Typography variant="h5" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
+                        Vote counts : {voteCount}
                     </Typography>
                 </Box>
                 <Box

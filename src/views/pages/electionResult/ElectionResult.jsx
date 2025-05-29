@@ -14,33 +14,6 @@ import MainCard from 'ui-component/cards/MainCard';
 
 import electionSetupService from 'services/electionSetup.service';
 
-const electionCards = [
-    {
-        id: 1,
-        title: 'Local Government Elections',
-        img: LocalGovtImg,
-        link: '/localElectionResult'
-    },
-    {
-        id: 2,
-        title: 'National Assembly Elections',
-        img: NationalCouncilImg,
-        link: '/localElectionResult'
-    },
-    {
-        id: 3,
-        title: 'National Council Elections',
-        img: NationalAssemblyImg,
-        link: '/localElectionResult'
-    },
-    {
-        id: 4,
-        title: 'Bye-Elections',
-        img: VoteIcon,
-        link: '/localElectionResult'
-    }
-];
-
 const ElectionResult = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -72,7 +45,9 @@ const ElectionResult = () => {
     const handleCardClick = (election) => {
         navigate('/localElectionResult', { 
             state: { electionTypeId: election.electionTypeId
-                , electionId: election.id
+                , electionId: election.id,
+                electionName: election.electionName,
+                electionTypeName: election.electionTypeName
              } 
         });
     };

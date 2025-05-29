@@ -28,6 +28,7 @@ import voteService from 'services/vote.service';
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
+import blockchainAuthService from 'services/blockchainAuth.service';
 
 const AddCandidate = () => {
     const [open, setOpen] = useState(false);
@@ -103,21 +104,28 @@ const AddCandidate = () => {
 
     // *******saving candidates******* //
 
-    const saveCandidate = (values) => {
+    const saveCandidate = async (values) => {
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
             formData.append(key, value);
         });
+        const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
+        if (!bc_token) {
+            return globalLib.warningMsg('Could not load access token for blockchain.');
+        }
+        formData.append('bc_authToken', bc_token)
+
         candidateService
             .saveCandidate(formData)
             .then((response) => {
+                console.log(response.data)
                 globalLib.successMsg(response.data);
                 getAllCandidates();
                 resetForm();
                 setOpen(false);
             })
             .catch((error) => {
-                globalLib.warningMsg(error?.response?.data?.message || 'Failed to save candidate');
+                globalLib.warningMsg(error?.response?.data?.error || 'Failed to register candidate');
             });
     };
 
