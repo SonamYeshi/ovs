@@ -51,7 +51,7 @@ const LocalElectionScanPage = () => {
     const [progressNDI, setProgressNDI] = useState(true);
     const [loading, setLoading] = useState(false);
     const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
-    const { voterCid, electionTypeId, electionId } = location.state || {};
+    const { voterCid, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
 
     const [errorDialogOpen, setErrorDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
@@ -242,14 +242,10 @@ const LocalElectionScanPage = () => {
             <MainCard>
                 <Box mt={4}>
                     <Typography variant="h3" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
-                        {electionTypes.map((type) => (
-                            <div key={type.id}>{type.electionTypeName}</div>
-                        ))}
+                        <div>{electionTypeName}</div>
                     </Typography>
                     <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
-                        {electionTypes.map((type) => (
-                            <div key={type.id}> [{type.electionName}] </div>
-                        ))}
+                        <div> {electionName} </div>
                     </Typography>
                 </Box>
                 <Box

@@ -43,7 +43,8 @@ const VoteNDIQRCodePage = () => {
     const constant = AppConstant();
     const navigate = useNavigate();
     const location = useLocation();
-    const { electionId, electionTypeId } = location.state || {};
+    const {  electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
+    
 
 
     useEffect(() => {
@@ -92,7 +93,10 @@ const VoteNDIQRCodePage = () => {
                                 state: {
                                     voterCid: data.userDTO.vid,
                                     electionTypeId: electionTypeId,
-                                    electionId: electionId
+                                    electionId: electionId,
+                                    electionTypeName: electionTypeName,
+                                    electionName: electionName,
+
                                 }
                             });
                         } else {

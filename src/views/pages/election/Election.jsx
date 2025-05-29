@@ -61,7 +61,9 @@ const Election = () => {
             navigate('/vote-ndi-qr', {
                 state: {
                     electionId: selectedElection.id,
-                    electionTypeId: selectedElection.electionTypeId
+                    electionTypeId: selectedElection.electionTypeId,
+                    electionTypeName: selectedElection.electionTypeName,
+                    electionName: selectedElection.electionName
                 }
             });
         }
