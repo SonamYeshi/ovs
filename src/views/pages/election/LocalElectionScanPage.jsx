@@ -32,6 +32,8 @@ import blockchainService from 'services/blockchain.service';
 import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
 import electionSetupService from 'services/electionSetup.service';
 import MainCard from 'ui-component/cards/MainCard';
+import voteSuccessSound from 'assets/images/successAudio.mp3'
+import voteFailureSound from 'assets/images/failureAudio.mp3'
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const LocalElectionScanPage = () => {
@@ -129,6 +131,7 @@ const LocalElectionScanPage = () => {
         });
     };
 
+   
     const submitVote = async (candidate, voterVID) => {
         const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
         if (!bc_token) {
@@ -145,7 +148,9 @@ const LocalElectionScanPage = () => {
             ndiRelationshipDID: relationshipDID,
             ndiHolderDID: holderDID
         };
+
         setLoading(true);
+
         blockchainService
             .saveVote(payload)
             .then((res) => {
@@ -153,7 +158,10 @@ const LocalElectionScanPage = () => {
                     throw new Error('Response is missing data.message');
                 }
 
-                // Show success message
+                // ✅ Play sound here
+                const audio = new Audio(voteSuccessSound);
+                audio.play().catch((err) => console.error('Error playing sound:', err));
+
                 return globalLib.successMsg(res.data.message);
             })
             .then(() => {
@@ -163,7 +171,8 @@ const LocalElectionScanPage = () => {
                 return;
             })
             .catch((err) => {
-                console.error('Error submitting vote', err?.response?.data?.error || err.message || err);
+                const audio = new Audio(voteFailureSound);
+                audio.play().catch((err) => console.error('Error playing sound:', err));
 
                 globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
                     setLoading(false);
@@ -171,13 +180,10 @@ const LocalElectionScanPage = () => {
                         state: { electionTypeId: electionTypeId, electionId: electionId }
                     });
                     return;
-                    // setTimeout(() => {
-                    //     window.location.reload();
-                    // }, 100);
                 });
             });
     };
-
+    
     const handleVoteClick = (candidateId) => {
         const candidate = getCandidateById(candidateId);
         setSelectedCandidateId(candidateId);

@@ -43,12 +43,13 @@ const ElectionResult = () => {
     }, []);
 
     const handleCardClick = (election) => {
-        navigate('/localElectionResult', { 
-            state: { electionTypeId: election.electionTypeId
-                , electionId: election.id,
+        navigate('/localElectionResult', {
+            state: {
+                electionTypeId: election.electionTypeId,
+                electionId: election.id,
                 electionName: election.electionName,
                 electionTypeName: election.electionTypeName
-             } 
+            }
         });
     };
 
@@ -116,5 +117,3 @@ const ElectionResult = () => {
 };
 
 export default ElectionResult;
-
-
