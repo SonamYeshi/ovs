@@ -32,8 +32,8 @@ import blockchainService from 'services/blockchain.service';
 import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
 import electionSetupService from 'services/electionSetup.service';
 import MainCard from 'ui-component/cards/MainCard';
-import voteSuccessSound from 'assets/images/successAudio.mp3'
-import voteFailureSound from 'assets/images/failureAudio.mp3'
+import voteSuccessSound from 'assets/images/successAudio.mp3';
+import voteFailureSound from 'assets/images/failureAudio.mp3';
 import Processing from 'common/Processing';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -133,7 +133,6 @@ const LocalElectionScanPage = () => {
         });
     };
 
-   
     const submitVote = async (candidate, voterVID) => {
         setValidatingLoad(true);
         const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
@@ -152,7 +151,7 @@ const LocalElectionScanPage = () => {
             ndiHolderDID: holderDID
         };
         setValidatingLoad(false);
-        
+
         setLoading(true);
         blockchainService
             .saveVote(payload)
@@ -186,7 +185,7 @@ const LocalElectionScanPage = () => {
                 });
             });
     };
-    
+
     const handleVoteClick = (candidateId) => {
         const candidate = getCandidateById(candidateId);
         setSelectedCandidateId(candidateId);
@@ -363,7 +362,7 @@ const LocalElectionScanPage = () => {
                 {/* lodaing page */}
                 {validatingLoad && (
                     <>
-                        <Processing text='Validating...' />
+                        <Processing text="Validating..." />
                     </>
                 )}
                 {loading && (
@@ -392,7 +391,7 @@ const LocalElectionScanPage = () => {
                             <Typography variant="h4" textAlign={'center'}>
                                 Error Message
                             </Typography>
-                            <Typography variant="h5" color="error">
+                            <Typography variant="h5" color="error" textAlign={'center'}>
                                 {dialogMessage}
                             </Typography>
                         </Box>
@@ -417,11 +416,30 @@ const LocalElectionScanPage = () => {
                                 Waiting for Biometric Verification
                             </Typography>
 
-                            <Typography variant="body1" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary' }}>
+                            <Typography
+                                variant="body1"
+                                sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary', fontWeight: 'bold' }}
+                            >
                                 Open your <span style={{ color: '#5AC994' }}>Bhutan NDI</span> App for Biometric authentication
                             </Typography>
                         </Box>
                     </DialogContent>
+                    {/* <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Button
+                            onClick={
+                                () => {
+                                    setWalletCheckDialogOpen(false);
+                                    handleDialogClose();
+                                }
+
+                                // navigate('/localElectionScanPage')
+                            }
+                            color="error"
+                            variant="contained"
+                        >
+                            Cancel
+                        </Button>
+                    </DialogActions> */}
                 </Dialog>
             </MainCard>
         </>
