@@ -9,8 +9,8 @@ const saveCandidate = (data) => {
     });
 };
 
-const getCandidates = (electionTypeId, electionId) => {
-    return axios.get(`${BASE_URL}/getCandidates/${electionTypeId}/${electionId}`, {
+const getCandidates = (electionTypeId, electionId, dzongkhag, gewog, village) => {
+    return axios.get(`${BASE_URL}/getCandidates/${electionTypeId}/${electionId}/${dzongkhag}/${gewog}/${village}`, {
         headers: authHeader()
     });
 };

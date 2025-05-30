@@ -134,11 +134,11 @@ const LocalElectionResult = () => {
                                     {candidates.map((item, index) => (
                                         <TableRow key={item.candidateId}>
                                             <TableCell align="center">{index + 1}</TableCell>
-                                            <TableCell>{item.candidateName}</TableCell>
+                                            <TableCell>{item.candidateId}</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     src={item.proPicUrl}
-                                                    alt={item.candidateName}
+                                                    alt={item.candidateId}
                                                     sx={{ width: 70, height: 70 }}
                                                     variant="circular"
                                                 />

@@ -34,6 +34,7 @@ import electionSetupService from 'services/electionSetup.service';
 import MainCard from 'ui-component/cards/MainCard';
 import voteSuccessSound from 'assets/images/successAudio.mp3'
 import voteFailureSound from 'assets/images/failureAudio.mp3'
+import Processing from 'common/Processing';
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const LocalElectionScanPage = () => {
@@ -52,8 +53,9 @@ const LocalElectionScanPage = () => {
     });
     const [progressNDI, setProgressNDI] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [validatingLoad, setValidatingLoad] = useState(false);
     const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
-    const { voterCid, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
+    const { voterVid, dzongkhag, gewog, village, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
 
     const [errorDialogOpen, setErrorDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
@@ -73,7 +75,7 @@ const LocalElectionScanPage = () => {
         setHolderDID(window.localStorage.getItem('holder_did'));
 
         candidateService
-            .getCandidates(electionTypeId, electionId)
+            .getCandidates(electionTypeId, electionId, dzongkhag, gewog, village)
             .then((response) => {
                 setCandidates(response.data);
             })
@@ -133,6 +135,7 @@ const LocalElectionScanPage = () => {
 
    
     const submitVote = async (candidate, voterVID) => {
+        setValidatingLoad(true);
         const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
         if (!bc_token) {
             return globalLib.warningMsg('Could not load access token for blockchain.');
@@ -148,9 +151,9 @@ const LocalElectionScanPage = () => {
             ndiRelationshipDID: relationshipDID,
             ndiHolderDID: holderDID
         };
-
+        setValidatingLoad(false);
+        
         setLoading(true);
-
         blockchainService
             .saveVote(payload)
             .then((res) => {
@@ -358,6 +361,11 @@ const LocalElectionScanPage = () => {
                 </Dialog>
 
                 {/* lodaing page */}
+                {validatingLoad && (
+                    <>
+                        <Processing text='Validating...' />
+                    </>
+                )}
                 {loading && (
                     <>
                         <LoadingPage />
@@ -406,11 +414,11 @@ const LocalElectionScanPage = () => {
                     <DialogContent>
                         <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
                             <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
-                                Waiting for Biometric Confirmation
+                                Waiting for Biometric Verification
                             </Typography>
 
                             <Typography variant="body1" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary' }}>
-                                Please check your phone’s wallet app and accept the biometric request to proceed with your vote.
+                                Open your <span style={{ color: '#5AC994' }}>Bhutan NDI</span> App for Biometric authentication
                             </Typography>
                         </Box>
                     </DialogContent>
