@@ -66,7 +66,7 @@ const VoteNDIQRCodePage = () => {
                 setUrl(invite);
                 setDeepLinkUrl(deepLink);
                 setProgressNDI(false);
-    
+
                 natsListener(threadId);
             })
             .catch((err) => {
@@ -75,42 +75,34 @@ const VoteNDIQRCodePage = () => {
             });
     };
 
+    
     const natsListener = (threadId) => {
+        // console.log("THREADID:", threadId);
         const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
+    
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
             const data = JSON.parse(event.data);
+            console.log(data);
+    
+            eventSource.close();
             if (data.status === 'exists') {
                 setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
                 setLoading(true); // Show loading spinner
-
-                setTimeout(async () => {
-                    try {
-                        const isAllowed = await performExtraCheck(data.userDTO.vid, electionTypeId, electionId);
-                
-                        if (!isAllowed) {
-                            navigate('/localElectionScanPage', {
-                                state: {
-                                    voterCid: data.userDTO.vid,
-                                    electionTypeId: electionTypeId,
-                                    electionId: electionId,
-                                    electionTypeName: electionTypeName,
-                                    electionName: electionName,
-
-                                }
-                            });
-                        } else {
-                            setLoading(false);
-                            setDialogMessage('You have already voted for this election.');
-                            setErrorDialogOpen(true);
-                        }
-                    } catch (err) {
-                        setLoading(false);
-                        setDialogMessage('Failed to verify voter eligibility.');
-                        setErrorDialogOpen(true);
-                        console.error('Extra check error:', err);
+    
+                // Directly navigate without checking if already voted
+                navigate('/localElectionScanPage', {
+                    state: {
+                        voterVid: data.userDTO.vid,
+                        village: data.userDTO.village,
+                        dzongkhag: data.userDTO.dzongkhag,
+                        gewog: data.userDTO.gewog,
+                        electionTypeId: electionTypeId,
+                        electionId: electionId,
+                        electionTypeName: electionTypeName,
+                        electionName: electionName,
                     }
-                }, 100);
+                });
             } else {
                 clearDIDs();
                 setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
@@ -118,8 +110,57 @@ const VoteNDIQRCodePage = () => {
             }
         });
     };
+    
 
-    const performExtraCheck = async (cid, electionTypeId, electionId) => {
+    // const natsListener = (threadId) => {
+    //     const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${electionId}`;
+    //     const eventSource = new EventSource(endPoint);
+    //     eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
+    //         const data = JSON.parse(event.data);
+    //         console.log(data)
+    //         if (data.status === 'exists') {
+    //             setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
+    //             setLoading(true); // Show loading spinner
+
+    //             // setTimeout(async () => {
+    //                 try {
+    //                     const isAllowed = await checkIfAlreadyVoted(data.userDTO.vid, electionTypeId, electionId);
+                
+    //                     if (!isAllowed) {
+    //                         navigate('/localElectionScanPage', {
+    //                             state: {
+    //                                 voterVid: data.userDTO.vid,
+    //                                 village: data.userDTO.village,
+    //                                 dzongkhag: data.userDTO.dzongkhag,
+    //                                 gewog: data.userDTO.gewog,
+    //                                 electionTypeId: electionTypeId,
+    //                                 electionId: electionId,
+    //                                 electionTypeName: electionTypeName,
+    //                                 electionName: electionName,
+
+    //                             }
+    //                         });
+    //                     } else {
+    //                         setLoading(false);
+    //                         setDialogMessage('You have already voted for this election.');
+    //                         setErrorDialogOpen(true);
+    //                     }
+    //                 } catch (err) {
+    //                     setLoading(false);
+    //                     setDialogMessage('Failed to verify voter eligibility.');
+    //                     setErrorDialogOpen(true);
+    //                     console.error('Extra check error:', err);
+    //                 }
+    //             // }, 100);
+    //         } else {
+    //             clearDIDs();
+    //             setDialogMessage(data.userDTO.message || 'Voters Eligibility Failed.');
+    //             setErrorDialogOpen(true);
+    //         }
+    //     });
+    // };
+
+    const checkIfAlreadyVoted = async (vid, electionTypeId, electionId) => {
         const token = await blockchainAuthService.fetchBlockchainAccessToken();
 
         if (!token) {
@@ -130,7 +171,7 @@ const VoteNDIQRCodePage = () => {
         }
 
         const response = await axios.get(`${BASE_URL}blockchain/checkIfVoted`, {
-            params: { voterCid: cid, 
+            params: { voterVid: vid, 
                 electionTypeId: electionTypeId,
                 electionId: electionId,
                 bcToken: token
@@ -145,17 +186,11 @@ const VoteNDIQRCodePage = () => {
         generateQRCode(); 
     };
     
-
-    const electionTitles = {
-        1: 'Local Government',
-        2: 'National Assembly Election',
-        3: 'National Council Election'
-    };
     return (
         <MainCard>
-            {/* <Typography variant="h3" textAlign={'center'}>
-                {electionTitles[electionId] || 'Mock Election'}
-            </Typography> */}
+            <Typography variant="h3" textAlign={'center'}>
+                { electionName }
+            </Typography>
             <Box
                 sx={{
                     maxWidth: 500,
