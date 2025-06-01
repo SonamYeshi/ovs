@@ -145,12 +145,23 @@ const Election = () => {
                         handleDialogClose();
                     }
                 }}
+                maxWidth="sm" // Reduces the width
+                fullWidth // Ensures it adapts to smaller screens
+                sx={{
+                    '& .MuiDialog-paper': {
+                        borderRadius: 3,
+                        paddingX: 2,
+                        paddingY: 2,
+                    }
+                }}
             >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Notice</DialogTitle>
                 <DialogContent>
-                    <Typography variant="caption" fontSize={'13px'}>
-                        Before you can vote, you must first obtain your Voter VC. To get your Voter VC, please visit the 'Generate Voter VC'
-                        page, scan the QR code, and share your details through the Bhutan NDI Wallet.
+                    <Typography variant="body1" fontWeight="bold" fontSize={'15px'} textAlign="center" gutterBottom sx={{ marginBottom: 2 }}>
+                        You need to have your Voter VC available in your <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to cast your vote.
+                    </Typography>
+                    <Typography variant="caption" fontWeight="bold" fontSize={'13px'} textAlign="center">
+                        If you don’t have it yet, visit the ‘Generate Voter VC’ page, scan the QR code, and share your details using the <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to get it.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>

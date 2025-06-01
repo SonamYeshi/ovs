@@ -98,10 +98,10 @@ const LocalElectionResult = () => {
                     <Typography variant="h3" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
                         <div> {electionTypeName}</div>
                     </Typography>
-                    <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
+                    <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 3 }}>
                         <div>{electionName} </div>
                     </Typography>
-                    <Typography variant="h5" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
+                    <Typography variant="h5" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
                         Total Voters : {voteCount}
                     </Typography>
                     <Typography variant="h5" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>

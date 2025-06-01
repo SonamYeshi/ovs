@@ -14,8 +14,8 @@ const icons = {
 // ==============================|| MENU ITEMS - DASHBOARD ||============================== //
 
 const candidate = {
-    id: 'candidate',
-    title: <FormattedMessage id="candidate" />,
+    id: 'candidatesetup',
+    title: <FormattedMessage id="candidatesetup" />,
     icon: icons.IconDashboard,
     type: 'group',
     children: [

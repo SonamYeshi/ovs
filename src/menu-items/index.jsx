@@ -8,7 +8,7 @@ import ecbVoterVC from './ecbVoterVC';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems = {
-    items: [dashboard,ecbVoterVC,Candiate,MasterSetup, Election]
+    items: [dashboard, ecbVoterVC, MasterSetup, Candiate, Election]
 };
 
 export default menuItems;
