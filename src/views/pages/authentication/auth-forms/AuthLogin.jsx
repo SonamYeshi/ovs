@@ -70,43 +70,14 @@ const JWTLogin = ({ loginProp, ...others }) => {
             })}
             onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 let response = await login(values.email, values.password, navigate);
-
-                if (response.response.status === 403) {
-                    setStatus({ success: false });
-                    setErrors({ submit: response.message });
-                } else if (response.response.data.status === 404) {
-                    setStatus({ success: false });
-                    setErrors({
-                        submit: response.response.data.message
-                    });
+                
+                if (response.success) {
+                    setStatus({ success: true });
                 } else {
                     setStatus({ success: false });
-                    setErrors({ submit: 'Error occurred!.' });
+                    setErrors({ submit: response.message || 'An error occurred.' });
                 }
             }}
-            // onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-            //     try {
-            //         const response = await login(values.email, values.password, navigate);
-
-            //         // Assume successful login navigates, or handle it here if needed
-            //         setStatus({ success: true });
-            //     } catch (error) {
-            //         console.error('Login error:', error);
-
-            //         const status = error?.response?.status;
-            //         const message = error?.response?.data?.message || 'Error occurred!';
-
-            //         setStatus({ success: false });
-
-            //         if (status === 403) {
-            //             setErrors({ submit: message });
-            //         } else if (status === 404) {
-            //             setErrors({ submit: message });
-            //         } else {
-            //             setErrors({ submit: message });
-            //         }
-            //     }
-            // }}
         >
             {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                 <form noValidate onSubmit={handleSubmit} {...others}>

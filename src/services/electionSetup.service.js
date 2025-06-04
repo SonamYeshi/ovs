@@ -5,7 +5,6 @@ import authHeader from './auth-header';
 const BASE_URL = 'api/v1/electionSetup';
 
 const saveElectionType = (data) => {
-    // console.log(authHeader());
     return axios.post(
         BASE_URL + "/saveElectionType",
         data,

@@ -19,7 +19,6 @@ import { clearDIDs } from '../utils/ndi-storage';
 
 import { useDispatch as useReduxDispatch } from '../store';
 
-import userService from 'services/userService';
 import authServices from 'services/auth.service';
 
 const chance = new Chance();
@@ -62,26 +61,6 @@ export const JWTProvider = ({ children }) => {
     const reduxDispatch = useReduxDispatch();
     const [state, dispatch] = useReducer(accountReducer, initialState);
 
-    // Refresh access token
-    // const getRefreshToken = async () => {
-    //     try {
-    //         const refreshTokenStored = localStorage.getItem('refreshToken');
-    //         const data = {
-    //             refreshToken: refreshTokenStored
-    //         };
-
-    //         const response = await userService.getRefreshToken(data);
-    //         // const response = await axios.post('http://localhost:8080/api/auth/refreshtoken', {refreshToken});
-    //         const { accessToken, refreshToken, user } = response.data;
-    //         setSession(accessToken, refreshToken, user);
-    //         return accessToken;
-    //     } catch (err) {
-    //         console.error('Refresh token failed', err);
-    //         logout();
-    //         return null;
-    //     }
-    // };
-
     const init = async () => {
         try {
             const accessToken = window.localStorage.getItem('serviceToken'),
@@ -112,13 +91,18 @@ export const JWTProvider = ({ children }) => {
     }, []);
 
     const login = async (username, password, navigate) => {
-        const response = await authServices.login(username, password);
-        // console.log(response);
-        if (response.success) {
+        try {
+            const response = await authServices.login(username, password);
+            if (!response.success) {
+                return {
+                    success: false,
+                    status: response?.error?.response.status || 500,
+                    message: response?.error.response?.data?.message || 'Login failed.'
+                };
+            }
+    
             const { serviceToken, refreshToken, user } = response.response.data;
-
             await setSession(serviceToken, refreshToken, user);
-
             dispatch({
                 type: LOGIN,
                 payload: {
@@ -126,9 +110,15 @@ export const JWTProvider = ({ children }) => {
                     user
                 }
             });
-            navigate('/dashboard');
-        } else {
-            return response.error;
+    
+            return { success: true };
+        } catch (error) {
+            console.error('Login error:', error);
+            return {
+                success: false,
+                status: error?.response?.status || 500,
+                message: error?.response?.data?.message || 'Unexpected error occurred'
+            };
         }
     };
 
