@@ -24,10 +24,10 @@ import axios from 'axios';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 
 import NdiService from '../../../services/ndi.service';
-import blockchainAuthService from 'services/blockchainAuth.service';
+// import blockchainAuthService from 'services/blockchainAuth.service';
 import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL + 'api/v1/ndi';
 
 const VoteNDIQRCodePage = () => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
@@ -38,14 +38,11 @@ const VoteNDIQRCodePage = () => {
     const [errorDialogOpen, setErrorDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const [voterCid, setVoterCid] = useState(null);
 
     const constant = AppConstant();
     const navigate = useNavigate();
     const location = useLocation();
     const {  electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
-    
-
 
     useEffect(() => {
         if (!electionId || !electionTypeId) {
@@ -77,8 +74,7 @@ const VoteNDIQRCodePage = () => {
 
     
     const natsListener = (threadId) => {
-        // console.log("THREADID:", threadId);
-        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${electionId}`;
+        const endPoint = `${BASE_URL}/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
     
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
@@ -111,6 +107,10 @@ const VoteNDIQRCodePage = () => {
         });
     };
     
+    const handleDialogClose = () => {
+        setErrorDialogOpen(false);
+        generateQRCode(); 
+    };
 
     // const natsListener = (threadId) => {
     //     const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${electionId}`;
@@ -160,31 +160,26 @@ const VoteNDIQRCodePage = () => {
     //     });
     // };
 
-    const checkIfAlreadyVoted = async (vid, electionTypeId, electionId) => {
-        const token = await blockchainAuthService.fetchBlockchainAccessToken();
+    // const checkIfAlreadyVoted = async (vid, electionTypeId, electionId) => {
+    //     const token = await blockchainAuthService.fetchBlockchainAccessToken();
 
-        if (!token) {
-            setLoading(false);
-            setDialogMessage('Could not authenticate with the blockchain.');
-            setErrorDialogOpen(true);
-            return;
-        }
+    //     if (!token) {
+    //         setLoading(false);
+    //         setDialogMessage('Could not authenticate with the blockchain.');
+    //         setErrorDialogOpen(true);
+    //         return;
+    //     }
 
-        const response = await axios.get(`${BASE_URL}blockchain/checkIfVoted`, {
-            params: { voterVid: vid, 
-                electionTypeId: electionTypeId,
-                electionId: electionId,
-                bcToken: token
-            },
-        });
+    //     const response = await axios.get(`${BASE_URL}blockchain/checkIfVoted`, {
+    //         params: { voterVid: vid, 
+    //             electionTypeId: electionTypeId,
+    //             electionId: electionId,
+    //             bcToken: token
+    //         },
+    //     });
 
-        return response.data;
-    };
-
-    const handleDialogClose = () => {
-        setErrorDialogOpen(false);
-        generateQRCode(); 
-    };
+    //     return response.data;
+    // };
     
     return (
         <MainCard>

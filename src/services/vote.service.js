@@ -2,68 +2,59 @@
 import axios from 'utils/axios';
 import authHeader from './auth-header';
 
-// const BASE_URL = "http://localhost:8080/";
-// const BASE_URL = "api/auth";
+const BASE_URL = "api/v1/voter";
 
-// const saveVote = (data) => {
-//     return axios.post(
-//         "voter/recordVote",
-//         data,
-//         {
-//             headers: authHeader()
-//         }
-//     );
-// };
-// const getElectionResult = (electionId, bc_token) => {
-//     alert(bc_token)
-//     return axios.get('blockchain/getElectionResult/'+electionId, {
+// const getElectionType = () => {
+//     return axios.get(BASE_URL+'/getElectionType', {
 //         // headers: authHeader()
-//         headers: {
-//             Authorization: `Bearer ${bc_token}`
-//         }
 //     });
 // };
 
-const getElectionType = () => {
-    return axios.get('voter/getElectionType', {
-        // headers: authHeader()
-    });
-};
-
-const deleteElection = (id) => {
-    return axios.delete('voter/deleteElection/' + id);
+const saveElectionEligibility = (data) => {
+    return axios.post(
+        BASE_URL + "/saveEligibility",
+        data,
+        {
+            headers: authHeader()
+        }
+    )
 };
 
 const getAllEligibilityCriteria = () => {
-    return axios.get('voter/getAllEligibilityCriteria');
+    return axios.get(BASE_URL+'/getAllEligibilityCriteria');
 };
 
 const deleteEligibilityCriteria = (id) => {
-    return axios.delete('voter/deleteEligibilityCriteria/' + id);
+    return axios.delete(BASE_URL+'/deleteEligibilityCriteria/' + id);
 };
+
+// const deleteElection = (id) => {
+//     return axios.delete(BASE_URL+'/deleteElection/' + id);
+// };
 
 // sub election type
 
 const saveSubElectionType = (data) => {
-    return axios.post('voter/saveSubElectionType', data, {
+    return axios.post(BASE_URL+'/saveSubElectionType', data, {
         headers: authHeader()
     });
 };
 
 const getAllSubElectionType = () => {
-    return axios.get('voter/getAllSubElectionType');
+    return axios.get(BASE_URL+'/getAllSubElectionType');
 };
 
 const deleteSubElection = (id) => {
-    return axios.delete('voter/deleteSubElection/' + id);
+    return axios.delete(BASE_URL+'/deleteSubElection/' + id);
 };
 
 export default {
     // getCandidates,
     // saveVote,
     // getElectionResult,
-    getElectionType,
-    deleteElection,
+    // getElectionType,
+    saveElectionEligibility,
+    // deleteElection,
     getAllEligibilityCriteria,
     deleteEligibilityCriteria,
     saveSubElectionType,

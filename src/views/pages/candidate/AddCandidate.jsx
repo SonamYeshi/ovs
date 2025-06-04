@@ -169,7 +169,7 @@ const AddCandidate = () => {
     // *******getting lists of election types******* //
     const fetchElectionTypes = async () => {
         try {
-            const response = await voteService.getElectionType();
+            const response = await electionSetupService.getElectionType();
             setElectionTypes(response.data);
         } catch (error) {
             console.error('Failed to fetch election types', error);

@@ -2,11 +2,30 @@
 import axios from 'utils/axios';
 import authHeader from './auth-header';
 
-const BASE_URL = 'electionSetup';
+const BASE_URL = 'api/v1/electionSetup';
 
+const saveElectionType = (data) => {
+    // console.log(authHeader());
+    return axios.post(
+        BASE_URL + "/saveElectionType",
+        data,
+        {
+            headers: authHeader()
+        }
+    )
+};
+
+const getElectionType = () => {
+    return axios.get(BASE_URL+'/getAllElectionType', {
+        // headers: authHeader()
+    });
+};
+
+const deleteElectionType = (id) => {
+    return axios.delete(BASE_URL+'/deleteElectionType/' + id);
+};
 
 // sub election type
-
 const saveSubElectionType = (data) => {
     return axios.post(BASE_URL + '/saveElection', data, {
         headers: authHeader()
@@ -29,6 +48,9 @@ const getElectionByElectionType = (id) => {
 };
 
 export default {
+    saveElectionType,
+    getElectionType,
+    deleteElectionType,
     saveSubElectionType,
     getAllSubElectionType,
     deleteSubElection,

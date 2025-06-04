@@ -13,13 +13,13 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR } from 'common/color';
 import { MaterialReactTable } from 'material-react-table';
-import voteService from 'services/vote.service';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import globalLib from 'common/global-lib';
-import userService from 'services/userService';
+import electionSetupService from 'services/electionSetup.service';
+
 import AppConstant from 'utils/AppConstant';
 
 // animation
@@ -43,7 +43,7 @@ const ElectionTypeSetup = () => {
         validationSchema,
         onSubmit: async (values, { resetForm }) => {
             try {
-                const response = await userService.saveElectionType(values);
+                const response = await electionSetupService.saveElectionType(values);
                 if (response.status === 200) {
                     globalLib.successMsg(response.data);
                     fetchElectionTypes();
@@ -57,7 +57,7 @@ const ElectionTypeSetup = () => {
 
     const fetchElectionTypes = async () => {
         try {
-            const response = await voteService.getElectionType();
+            const response = await electionSetupService.getElectionType();
             if (response.status === 200) {
                 setSelectedElection(response.data);
             }
@@ -83,7 +83,7 @@ const ElectionTypeSetup = () => {
     const confirmDeleteElection = async () => {
         if (!electionToDelete) return;
         try {
-            const response = await voteService.deleteElection(electionToDelete.id);
+            const response = await electionSetupService.deleteElectionType(electionToDelete.id);
             if (response.status === 200) {
                 globalLib.successMsg(response.data);
                 fetchElectionTypes();

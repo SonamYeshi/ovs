@@ -73,7 +73,7 @@ const LocalElectionResult = () => {
                 open: true,
                 type: 'Close',
                 title: 'Error',
-                message: 'An error occurred while fetching vote results.',
+                message: 'No voting result found for this election.',
                 confirmAction: null
             });
         } finally {

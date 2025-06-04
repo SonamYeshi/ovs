@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios from "utils/axios";
 import authHeader from "./auth-header";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = 'api/v1/vc';
 
 const generateVC = (data) => {
     return axios.post(
-        BASE_URL+"vc/generateVC",
+        BASE_URL+"/generateVC",
         data,
         {
             headers: authHeader()

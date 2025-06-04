@@ -1,7 +1,7 @@
 import axios from 'utils/axios';
 import { clearAuthTokens } from '../utils/auth-storage';
 
-const BASE_URL = 'api/auth';
+const BASE_URL = 'api/v1/auth';
 
 // Login function
 const login = async (username, password) => {

@@ -1,7 +1,7 @@
 import axios from 'utils/axios';
 import authHeader from './auth-header';
 
-const BASE_URL = 'candidate';
+const BASE_URL = 'api/v1/candidate';
 
 const saveCandidate = (data) => {
     return axios.post(BASE_URL + '/saveCandidate', data, {

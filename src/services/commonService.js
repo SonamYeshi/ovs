@@ -2,7 +2,7 @@
 import axios from 'utils/axios';
 import authHeader from './auth-header';
 
-const BASE_URL = 'common';
+const BASE_URL = 'api/v1/common';
 
 const getAllDzongkhags = () => {
     return axios.get(BASE_URL + '/getAllDzongkhags');

@@ -13,22 +13,19 @@ import { Box, Grid, Typography, Button, IconButton } from '@mui/material';
 import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined';
 import { faPlayCircle } from '@fortawesome/free-solid-svg-icons';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useNavigate, useLocation } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import CrossImg from 'assets/images/corssImg.png';
 import CloseIcon from '@mui/icons-material/Close';
 import MainCard from 'ui-component/cards/MainCard';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import axios from 'axios';
 import globalLib from 'common/global-lib';
-import NormalLoadingPage from 'common/NormalLoadingPage';
 
 import NdiService from '../../../services/ndi.service';
 import vcIssuanceService from 'services/vc-issuance-service';
 import VCIssueLoading from 'common/VCIssueLoading';
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL + 'api/v1/vc';
 
 const EcbQRCodePage = () => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
@@ -36,18 +33,11 @@ const EcbQRCodePage = () => {
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
     const [progressNDI, setProgressNDI] = useState(true);
     const [alertMessage, setAlertMessage] = useState(null);
-    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const [voterCid, setVoterCid] = useState(null);
-
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogType, setDialogType] = useState('error');
-
     const constant = AppConstant();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const electionId = location.state?.electionId;
 
     useEffect(() => {
         generateQRCode();
@@ -75,30 +65,24 @@ const EcbQRCodePage = () => {
     };
 
     const natsListener = (threadId) => {
-        const endPoint = `${BASE_URL}vc/nats-subscribe?threadId=${threadId}`;
+        const endPoint = `${BASE_URL}/nats-subscribe?threadId=${threadId}`;
         const eventSource = new EventSource(endPoint);
-        // setLoading(true);
+        
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
-            // setLoading(true)
+            
             try{
                 const data = JSON.parse(event.data);
                 const message = data.userDTO?.message || 'No message received';
-                console.log(data)
+                
                 if (data.status === 'exists') {
-                    // await globalLib.successMsg(message);
                     getnerateVC(data.userDTO.cid, data.userDTO.idType, data.userDTO.dob, data.userDTO.relationDID, data.userDTO.holderDID,);
-                    // setLoading(false);
-                    // eventSource.close();
                 } else {
                     await globalLib.warningMsg(message);
                 }
 
-                // setLoading(false);
                 eventSource.close();
-
             }catch (err) {
             console.error('NDI_SSI_EVENT error:', err);
-            // setLoading(false);
             globalLib.warningMsg('Something went wrong while processing the event.');
             eventSource.close();
         }
@@ -120,8 +104,6 @@ const EcbQRCodePage = () => {
             if (!res.data || !res.data.message) {
                 throw new Error('Response is missing data.message');
             }
-
-            // Show success message
             return globalLib.successMsg(res.data.message);
         })
         .then(() => {
@@ -142,17 +124,8 @@ const EcbQRCodePage = () => {
         generateQRCode(); 
     };
     
-
-    const electionTitles = {
-        1: 'Local Government',
-        2: 'National Assembly Election',
-        3: 'National Council Election'
-    };
     return (
         <MainCard>
-            {/* <Typography variant="h3" textAlign={'center'}>
-                {electionTitles[electionId] || 'Mock Election'}
-            </Typography> */}
             <Box
                 sx={{
                     maxWidth: 500,

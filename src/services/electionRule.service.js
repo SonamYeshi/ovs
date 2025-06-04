@@ -2,7 +2,7 @@
 import axios from 'utils/axios';
 import authHeader from './auth-header';
 
-const BASE_URL = 'electionRule';
+const BASE_URL = 'api/v1/electionRule';
 
 // sub election type
 

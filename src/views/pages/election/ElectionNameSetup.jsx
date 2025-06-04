@@ -21,7 +21,6 @@ import { useFormik } from 'formik';
 import { MaterialReactTable } from 'material-react-table';
 import { useEffect, useState } from 'react';
 import electionSetupService from 'services/electionSetup.service';
-import voteService from 'services/vote.service';
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
@@ -70,7 +69,7 @@ const ElectionNameSetup = () => {
 
     const fetchElectionTypes = async () => {
         try {
-            const response = await voteService.getElectionType();
+            const response = await electionSetupService.getElectionType();
             if (response.status === 200) {
                 setElectionTypes(response.data);
             }

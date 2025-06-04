@@ -30,20 +30,18 @@ import NdiService from '../../../services/ndi.service';
 import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
 import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
-import electionSetupService from 'services/electionSetup.service';
 import MainCard from 'ui-component/cards/MainCard';
 import voteSuccessSound from 'assets/images/successAudio.mp3';
 import voteFailureSound from 'assets/images/failureAudio.mp3';
 import Processing from 'common/Processing';
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+const BASE_URL = import.meta.env.VITE_BASE_URL+'api/v1/ndi';
 
 const LocalElectionScanPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedCandidateId, setSelectedCandidateId] = useState(null);
-    const [electionTypes, setElectionTypes] = useState([]);
     const [candidates, setCandidates] = useState([]);
-    const [selectedCandidate, setSelectedCandidate] = useState(null);
     const [dialogState, setDialogState] = useState({
         open: false,
         type: '',
@@ -51,19 +49,15 @@ const LocalElectionScanPage = () => {
         message: '',
         confirmAction: null
     });
-    const [progressNDI, setProgressNDI] = useState(true);
     const [loading, setLoading] = useState(false);
     const [validatingLoad, setValidatingLoad] = useState(false);
-    const [dialogQRCodeOpen, setDialogQRCodeOpen] = useState(false);
-    const { voterVid, dzongkhag, gewog, village, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
-
     const [errorDialogOpen, setErrorDialogOpen] = useState(false);
     const [dialogMessage, setDialogMessage] = useState('');
-
     const [relationshipDID, setRelationshipDID] = useState(null);
     const [holderDID, setHolderDID] = useState(null);
-
     const [walletCheckDialogOpen, setWalletCheckDialogOpen] = useState(false);
+
+    const { voterVid, dzongkhag, gewog, village, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
 
     useEffect(() => {
         if (!electionId || !electionTypeId) {
@@ -80,7 +74,6 @@ const LocalElectionScanPage = () => {
                 setCandidates(response.data);
             })
             .catch((error) => {
-                // console.error('Error fetching candidates:', error);
                 setDialogState({
                     open: true,
                     type: 'result',
@@ -89,7 +82,7 @@ const LocalElectionScanPage = () => {
                     confirmAction: null
                 });
             });
-    }, [electionId, electionTypeId, navigate]);
+    }, [electionId, electionTypeId]);
 
     const getCandidateById = (id) => candidates.find((c) => c.id === id);
 
@@ -99,32 +92,28 @@ const LocalElectionScanPage = () => {
         NdiService.proofNdiRequest(true, relationshipDID)
             .then((res) => {
                 const threadId = res.data.threadId;
-                setProgressNDI(false);
 
                 natsListenerForNotification(threadId);
             })
             .catch((err) => {
                 console.log(err);
-                setProgressNDI(false);
                 setWalletCheckDialogOpen(false);
             });
     };
 
     const natsListenerForNotification = (threadId) => {
-        const endPoint = `${BASE_URL}ndi/nats-subscribe?threadId=${threadId}&isBiometric=true&electionTypeId=${electionTypeId}&electionId=${electionId}`;
+        const endPoint = `${BASE_URL}/nats-subscribe?threadId=${threadId}&isBiometric=true&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
+
         eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
             const data = JSON.parse(event.data);
             setWalletCheckDialogOpen(false);
-
-            // eventSource.close();
-            // console.log(data)
             const candidate = getCandidateById(selectedCandidateId);
 
             if (data.status === 'exists') {
                 setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
                 const voterVID = data.userDTO.vid;
-                // console.log(voterVID);
+                
                 submitVote(candidate, voterVID);
             } else {
                 setErrorDialogOpen(true);
@@ -135,6 +124,7 @@ const LocalElectionScanPage = () => {
 
     const submitVote = async (candidate, voterVID) => {
         setValidatingLoad(true);
+
         const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
         if (!bc_token) {
             return globalLib.warningMsg('Could not load access token for blockchain.');
@@ -230,21 +220,7 @@ const LocalElectionScanPage = () => {
         setSelectedCandidateId(null);
         setLoading(false);
     };
-
-    useEffect(() => {
-        const fetchElectionTypes = async () => {
-            try {
-                const response = await electionSetupService.getAllSubElectionType();
-                if (response.status === 200) {
-                    setElectionTypes(response.data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch election types:', error);
-            }
-        };
-
-        fetchElectionTypes();
-    }, []);
+    
     return (
         <>
             <MainCard>
@@ -349,7 +325,6 @@ const LocalElectionScanPage = () => {
                                 color="success"
                                 variant="outlined"
                                 onClick={() => {
-                                    // handleQRLoading();
                                     handleNDINotificationRequest();
                                 }}
                             >
@@ -424,22 +399,6 @@ const LocalElectionScanPage = () => {
                             </Typography>
                         </Box>
                     </DialogContent>
-                    {/* <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button
-                            onClick={
-                                () => {
-                                    setWalletCheckDialogOpen(false);
-                                    handleDialogClose();
-                                }
-
-                                // navigate('/localElectionScanPage')
-                            }
-                            color="error"
-                            variant="contained"
-                        >
-                            Cancel
-                        </Button>
-                    </DialogActions> */}
                 </Dialog>
             </MainCard>
         </>

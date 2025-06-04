@@ -21,7 +21,6 @@ import React, { useEffect, useState } from 'react';
 import commonService from 'services/commonService';
 import electionRuleService from 'services/electionRule.service';
 import electionSetupService from 'services/electionSetup.service';
-import userService from 'services/userService';
 import voteService from 'services/vote.service';
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
@@ -49,7 +48,7 @@ const EligibilitySetup = () => {
     useEffect(() => {
         const fetchElectionTypes = async () => {
             try {
-                const response = await voteService.getElectionType();
+                const response = await electionSetupService.getElectionType();
                 setElectionTypes(response.data);
             } catch (error) {
                 console.error('Failed to fetch election types', error);
@@ -82,7 +81,7 @@ const EligibilitySetup = () => {
 
         onSubmit: async (values) => {
             try {
-                const response = await userService.saveElectionEligibility(values);
+                const response = await voteService.saveElectionEligibility(values);
                 if (response.status === 200) {
                     globalLib.successMsg(response.data);
                     getAllEligibilityCriteria();
@@ -99,7 +98,7 @@ const EligibilitySetup = () => {
 
     const getAllEligibilityCriteria = async () => {
         try {
-            const response = await userService.getAllEligibilityCriteria();
+            const response = await voteService.getAllEligibilityCriteria();
             if (response.status === 200) {
                 setEligibilitySetup(response.data);
             }
@@ -166,7 +165,7 @@ const EligibilitySetup = () => {
     const confirmDeleteEligibilitySetup = async () => {
         if (!eligibilitySetupToDelete) return;
         try {
-            const response = await userService.deleteEligibilityCriteria(eligibilitySetupToDelete.id);
+            const response = await voteService.deleteEligibilityCriteria(eligibilitySetupToDelete.id);
             if (response.status === 200) {
                 globalLib.successMsg(response.data);
                 getAllEligibilityCriteria();
