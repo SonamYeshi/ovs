@@ -9,7 +9,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 import voteService from 'services/vote.service';
 import electionSetupService from 'services/electionSetup.service';
-import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR } from 'common/color';
+import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR, TITLE } from 'common/color';
+import AppBar from 'ui-component/extended/AppBar';
 
 const Election = () => {
     const [electionTypes, setElectionTypes] = useState([]);
@@ -81,105 +82,133 @@ const Election = () => {
 
     return (
         <>
-            <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
-                {electionTypes.map((election) => (
-                    <Grid item xs={12} sm={6} md={3} key={election.id}>
-                        <MainCard
-                            onClick={() => handleCardClick(election)}
-                            sx={{
-                                height: {
-                                    xs: 200,
-                                    sm: 200,
-                                    md: 200,
-                                    lg: 200,
-                                    xl: 200
-                                },
-                                cursor: 'pointer',
-                                transition: 'box-shadow 0.5s',
-                                '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                            }}
-                        >
-                            <Box sx={{ textDecoration: 'none' }} display={'flex'} flexDirection="column" alignItems="center" gap={2}>
-                                <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
-                                <Typography
-                                    variant="subtitle2"
-                                    sx={{
-                                        fontSize: {
-                                            xs: '13px',
-                                            sm: '10px',
-                                            md: '17px',
-                                            lg: '15px',
-                                            xl: '1rem'
-                                        },
-                                        color: '#000000'
-                                    }}
-                                >
-                                    {election.electionTypeName}
-                                </Typography>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        fontSize: {
-                                            xs: '13px',
-                                            sm: '10px',
-                                            md: '17px',
-                                            lg: '15px',
-                                            xl: '1rem'
-                                        },
-                                        color: '#000000'
-                                    }}
-                                >
-                                    {election.electionName}
-                                </Typography>
-                            </Box>
-                        </MainCard>
-                    </Grid>
-                ))}
-            </Grid>
+            <AppBar />
+            <Box >
+                <Box sx={{ background: TITLE, color: '#ffffff' }} p={1} >
+                    {' '}
+                    <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff' }}>
+                        Election Types
+                    </Typography>
+                </Box>
 
-            {/* Confirmation Dialog */}
-            <Dialog
-                open={dialogOpen}
-                onClose={(event, reason) => {
-                    if (reason !== 'backdropClick') {
-                        handleDialogClose();
-                    }
-                }}
-                maxWidth="sm" // Reduces the width
-                fullWidth // Ensures it adapts to smaller screens
-                sx={{
-                    '& .MuiDialog-paper': {
-                        borderRadius: 3,
-                        paddingX: 2,
-                        paddingY: 2,
-                    }
-                }}
-            >
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Notice</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body1" fontWeight="bold" fontSize={'15px'} textAlign="center" gutterBottom sx={{ marginBottom: 2 }}>
-                        You need to have your Voter VC available in your <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to cast your vote.
-                    </Typography>
-                    <Typography variant="caption" fontWeight="bold" fontSize={'13px'} textAlign="center">
-                        If you don’t have it yet, visit the ‘Generate Voter VC’ page, scan the QR code, and share your details using the <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to get it.
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Button onClick={handleDialogClose} color="error" variant="contained">
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleProceed}
-                        sx={{
-                            background: BUTTON_ADD_COLOR,
-                            '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
-                        }}
-                        variant="contained"
-                    >
-                        Proceed
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }} p={5}>
+                    {electionTypes.map((election) => (
+                        <Grid item xs={12} sm={6} md={3} key={election.id}>
+                            <MainCard
+                                onClick={() => handleCardClick(election)}
+                                sx={{
+                                    height: {
+                                        xs: 200,
+                                        sm: 200,
+                                        md: 200,
+                                        lg: 200,
+                                        xl: 200
+                                    },
+                                    border: '2px solid #002B69',
+                                    cursor: 'pointer',
+                                    transition: 'box-shadow 0.5s',
+                                    '&:hover': {
+                                        boxShadow: '0px 10px 20px #002B69'
+                                    }
+                                }}
+                            >
+                                <Box sx={{ textDecoration: 'none' }} display={'flex'} flexDirection="column" alignItems="center" gap={2}>
+                                    <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{
+                                            fontSize: {
+                                                xs: '13px',
+                                                sm: '10px',
+                                                md: '17px',
+                                                lg: '15px',
+                                                xl: '1rem'
+                                            },
+                                            color: '#000000'
+                                        }}
+                                    >
+                                        {election.electionTypeName}
+                                    </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        sx={{
+                                            fontSize: {
+                                                xs: '13px',
+                                                sm: '10px',
+                                                md: '17px',
+                                                lg: '15px',
+                                                xl: '1rem'
+                                            },
+                                            color: '#000000'
+                                        }}
+                                    >
+                                        {election.electionName}
+                                    </Typography>
+                                </Box>
+                            </MainCard>
+                        </Grid>
+                    ))}
+                </Grid>
+
+                {/* Confirmation Dialog */}
+                <Dialog
+                    open={dialogOpen}
+                    onClose={(event, reason) => {
+                        if (reason !== 'backdropClick') {
+                            handleDialogClose();
+                        }
+                    }}
+                    maxWidth="sm" // Reduces the width
+                    fullWidth // Ensures it adapts to smaller screens
+                    sx={{
+                        '& .MuiDialog-paper': {
+                            borderRadius: 3,
+                            paddingX: 2,
+                            paddingY: 2
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Notice</DialogTitle>
+                    <DialogContent>
+                        <Typography
+                            variant="body1"
+                            fontWeight="bold"
+                            fontSize={'15px'}
+                            textAlign="center"
+                            gutterBottom
+                            sx={{ marginBottom: 2 }}
+                        >
+                            You need to have your Voter VC available in your{' '}
+                            <span style={{ color: '#5AC994' }}>
+                                <strong>Bhutan NDI</strong>
+                            </span>{' '}
+                            Wallet to cast your vote.
+                        </Typography>
+                        <Typography variant="caption" fontWeight="bold" fontSize={'13px'} textAlign="center">
+                            If you don’t have it yet, visit the ‘Generate Voter VC’ page, scan the QR code, and share your details using the{' '}
+                            <span style={{ color: '#5AC994' }}>
+                                <strong>Bhutan NDI</strong>
+                            </span>{' '}
+                            Wallet to get it.
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <Button onClick={handleDialogClose} color="error" variant="contained">
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleProceed}
+                            sx={{
+                                background: BUTTON_ADD_COLOR,
+                                '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
+                            }}
+                            variant="contained"
+                        >
+                            Proceed
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </Box>
         </>
     );
 };

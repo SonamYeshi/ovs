@@ -53,6 +53,7 @@ const ProfileSection = () => {
     const handleLogout = async () => {
         try {
             await logout();
+            navigate('/');
         } catch (err) {
             console.error(err);
         }
@@ -175,25 +176,6 @@ const ProfileSection = () => {
                                                         '& .MuiListItemButton-root': { mt: 0.5 }
                                                     }}
                                                 >
-                                                    {/* <ListItemButton
-                                                        sx={{ borderRadius: `${borderRadius}px` }}
-                                                        selected={selectedIndex === 0}
-                                                        onClick={(event) =>
-                                                            handleListItemClick(event, 0, '/apps/user/account-profile/profile1')
-                                                        }
-                                                    >
-                                                        <ListItemIcon>
-                                                            <IconSettings stroke={1.5} size="20px" />
-                                                        </ListItemIcon>
-                                                        <ListItemText
-                                                            primary={
-                                                                <Typography variant="body2">
-                                                                    <FormattedMessage id="account-settings" />
-                                                                </Typography>
-                                                            }
-                                                        />
-                                                    </ListItemButton> */}
-
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${borderRadius}px` }}
                                                         selected={selectedIndex === 4}

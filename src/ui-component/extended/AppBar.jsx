@@ -19,16 +19,12 @@ import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-
-// project imports
-import Logo from 'ui-component/Logo';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Logo from 'assets/images/ecb-logo.gif';
 import { ThemeMode } from 'config';
-
-// assets
 import { IconBook, IconCreditCard, IconDashboard, IconHome2 } from '@tabler/icons-react';
 import MenuIcon from '@mui/icons-material/Menu';
-
-// elevation scroll
+import { BUTTON_ADD_COLOR, TITLE } from 'common/color';
 function ElevationScroll({ children, window }) {
     const theme = useTheme();
     const trigger = useScrollTrigger({
@@ -55,7 +51,8 @@ ElevationScroll.propTypes = {
 
 const AppBar = ({ ...others }) => {
     const [drawerToggle, setDrawerToggle] = useState(false);
-
+    const theme = useTheme();
+    const isMatch = useMediaQuery(theme.breakpoints.down('md'));
     const drawerToggler = (open) => (event) => {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
             return;
@@ -65,90 +62,65 @@ const AppBar = ({ ...others }) => {
 
     return (
         <ElevationScroll {...others}>
-            <MuiAppBar>
+            <MuiAppBar
+                position="static"
+                sx={{
+                    borderBottom: '2px solid #003366', // Change this color to your desired value
+                    boxShadow: 'none' // Optional: remove default shadow if needed
+                }}
+            >
                 <Container>
                     <Toolbar sx={{ py: 2.5, px: `0 !important` }}>
-                        <Typography sx={{ flexGrow: 1, textAlign: 'left' }}>
-                            <Logo />
+                        <Typography sx={{ flexGrow: 1, textAlign: 'left' }} href="/" component={Link}>
+                            <img src={Logo} alt="" style={{ width: isMatch ? '22%' : '8%' }} />
                         </Typography>
-                        <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
-                            <Button color="inherit" component={Link} href="#">
+                        <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 1 }}>
+                            <Button
+                                component={Link}
+                                href="/"
+                                sx={{
+                                    color: '#002B69'
+                                    // background: BUTTON_ADD_COLOR,
+                                    // '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
+                                }}
+                            >
                                 Home
                             </Button>
-                            <Button color="inherit" component={RouterLink} to="/login" target="_blank">
-                                Dashboard
-                            </Button>
-                            <Button color="inherit" component={Link} href="https://codedthemes.gitbook.io/berry" target="_blank">
-                                Documentation
+
+                            <Button
+                                component={Link}
+                                href="/ecbQrCode"
+                                sx={{
+                                    color: '#002B69'
+                                    // background: BUTTON_ADD_COLOR,
+                                    // '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
+                                }}
+                            >
+                                Generate Voter VC
                             </Button>
                             <Button
                                 component={Link}
-                                href="https://links.codedthemes.com/hsqll"
-                                disableElevation
-                                variant="contained"
-                                color="secondary"
+                                href="/election"
+                                sx={{
+                                    color: '#002B69'
+                                    // background: BUTTON_ADD_COLOR,
+                                    // '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
+                                }}
                             >
-                                Purchase Now
+                                Election
+                            </Button>
+                            <Button
+                                component={Link}
+                                href="/login"
+                                sx={{
+                                    color: '#ffffff',
+                                    background: BUTTON_ADD_COLOR,
+                                    '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
+                                }}
+                            >
+                                Login
                             </Button>
                         </Stack>
-                        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-                            <IconButton color="inherit" onClick={drawerToggler(true)} size="large">
-                                <MenuIcon />
-                            </IconButton>
-                            <Drawer anchor="top" open={drawerToggle} onClose={drawerToggler(false)}>
-                                {drawerToggle && (
-                                    <Box
-                                        sx={{ width: 'auto' }}
-                                        role="presentation"
-                                        onClick={drawerToggler(false)}
-                                        onKeyDown={drawerToggler(false)}
-                                    >
-                                        <List>
-                                            <Link sx={{ textDecoration: 'none' }} href="#" target="_blank">
-                                                <ListItemButton component="a">
-                                                    <ListItemIcon>
-                                                        <IconHome2 />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary="Home" />
-                                                </ListItemButton>
-                                            </Link>
-                                            <Link sx={{ textDecoration: 'none' }} href="/login" target="_blank">
-                                                <ListItemButton component="a">
-                                                    <ListItemIcon>
-                                                        <IconDashboard />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary="Dashboard" />
-                                                </ListItemButton>
-                                            </Link>
-                                            <Link
-                                                sx={{ textDecoration: 'none' }}
-                                                href="https://codedthemes.gitbook.io/berry"
-                                                target="_blank"
-                                            >
-                                                <ListItemButton component="a">
-                                                    <ListItemIcon>
-                                                        <IconBook />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary="Documentation" />
-                                                </ListItemButton>
-                                            </Link>
-                                            <Link
-                                                sx={{ textDecoration: 'none' }}
-                                                href="https://links.codedthemes.com/hsqll"
-                                                target="_blank"
-                                            >
-                                                <ListItemButton component="a">
-                                                    <ListItemIcon>
-                                                        <IconCreditCard />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary="Purchase Now" />
-                                                </ListItemButton>
-                                            </Link>
-                                        </List>
-                                    </Box>
-                                )}
-                            </Drawer>
-                        </Box>
                     </Toolbar>
                 </Container>
             </MuiAppBar>

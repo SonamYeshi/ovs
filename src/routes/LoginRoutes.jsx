@@ -12,6 +12,10 @@ const AuthRegister = Loadable(lazy(() => import('views/pages/authentication/auth
 const AuthForgotPassword = Loadable(lazy(() => import('views/pages/authentication/authentication3/ForgotPassword3')));
 const AuthResetPassword = Loadable(lazy(() => import('views/pages/authentication/authentication3/ResetPassword3')));
 const AuthCheckMail = Loadable(lazy(() => import('views/pages/authentication/authentication3/CheckMail3')));
+const Election = Loadable(lazy(() => import('views/pages/election/Election')));
+const LocalElectionScanPage = Loadable(lazy(() => import('views/pages/election/LocalElectionScanPage')));
+const VoteNDIQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoteNDIQRCodePage')));
+const EcbQRCodePage = Loadable(lazy(() => import('views/pages/ndi/EcbQRCodePage')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -44,6 +48,22 @@ const LoginRoutes = {
         {
             path: '/check-mail',
             element: <AuthCheckMail />
+        },
+        {
+            path: '/election',
+            element: <Election />
+        },
+        {
+            path: '/vote-ndi-qr',
+            element: <VoteNDIQRCodePage />
+        },
+        {
+            path: '/localElectionScanPage',
+            element: <LocalElectionScanPage />
+        },
+        {
+            path: '/ecbQrCode',
+            element: <EcbQRCodePage />
         }
     ]
 };

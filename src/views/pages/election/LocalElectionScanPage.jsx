@@ -34,6 +34,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import voteSuccessSound from 'assets/images/successAudio.mp3';
 import voteFailureSound from 'assets/images/failureAudio.mp3';
 import Processing from 'common/Processing';
+import AppBar from 'ui-component/extended/AppBar';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL+'api/v1/ndi';
 
@@ -223,184 +224,188 @@ const LocalElectionScanPage = () => {
     
     return (
         <>
-            <MainCard>
-                <Box mt={4}>
-                    <Typography variant="h3" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
+            <AppBar />
+            <Box>
+                <Box sx={{ background: TITLE, color: '#ffffff' }} p={1}>
+                    {' '}
+                    <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff', mb:1 }}>
                         <div>{electionTypeName}</div>
                     </Typography>
-                    <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
+                    <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: '#ffffff', mb: 1 }}>
                         <div> {electionName} </div>
                     </Typography>
                 </Box>
-                <Box
-                    mt={1}
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <Paper elevation={3} sx={{ borderRadius: 4, p: 4, width: '80%', maxWidth: 900 }}>
-                        <TableContainer component={Paper}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="center"></TableCell>
-                                        <TableCell align="center"></TableCell>
-                                        <TableCell align="center"></TableCell>
-                                        <TableCell align="center"></TableCell>
-                                        <TableCell align="center"></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {candidates.map((candidate, index) => (
-                                        <TableRow key={candidate.id}>
-                                            <TableCell align="center">{index + 1}</TableCell>
-                                            <TableCell>{candidate.candidateName}</TableCell>
-                                            <TableCell align="center">
-                                                <Avatar
-                                                    src={candidate.proPicUrl}
-                                                    alt={candidate.candidateName}
-                                                    sx={{ width: 70, height: 70 }}
-                                                    variant="circular"
-                                                />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <ArrowCircleLeftIcon
-                                                    fontSize="large"
-                                                    sx={{
-                                                        color: getArrowIconColor(candidate.id)
-                                                    }}
-                                                />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <Button
-                                                    variant="contained"
-                                                    onClick={() => handleVoteClick(candidate.id)}
-                                                    sx={{
-                                                        backgroundColor: getVoteButtonColor(candidate.id),
-                                                        borderRadius: '30px',
-                                                        px: 7,
-                                                        py: 2.5,
-                                                        minWidth: '100px',
-                                                        textTransform: 'none',
-                                                        '&:hover': {
-                                                            backgroundColor: '#003366'
-                                                        }
-                                                    }}
-                                                >
-                                                    Vote
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Paper>
-                </Box>
-                {/* Dialog */}
-                <Dialog
-                    open={dialogState.open}
-                    onClose={(event, reason) => {
-                        if (reason !== 'backdropClick') {
-                            handleDialogClose();
-                        }
-                    }}
-                >
-                    <DialogContent>
-                        <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-                            <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
-                                {dialogState.message}
-                            </Typography>
-                        </Box>
-                    </DialogContent>
-                    <DialogActions style={{ justifyContent: 'center' }}>
-                        <Button size="small" color="error" variant="outlined" onClick={handleDialogClose}>
-                            {dialogState.type === 'confirm' ? 'No' : 'Close'}
-                        </Button>
-
-                        {dialogState.type === 'confirm' && (
-                            <Button
-                                size="small"
-                                color="success"
-                                variant="outlined"
-                                onClick={() => {
-                                    handleNDINotificationRequest();
-                                }}
-                            >
-                                Confirm
-                            </Button>
-                        )}
-                    </DialogActions>
-                </Dialog>
-
-                {/* lodaing page */}
-                {validatingLoad && (
-                    <>
-                        <Processing text="Validating..." />
-                    </>
-                )}
-                {loading && (
-                    <>
-                        <LoadingPage />
-                    </>
-                )}
-
-                <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
-                    <IconButton
-                        aria-label="close"
-                        onClick={() => setErrorDialogOpen(false)}
+                <MainCard sx={{ p: 5 }}>
+                    <Box
+                        mt={1}
                         sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: 8
+                            display: 'flex',
+                            justifyContent: 'center'
                         }}
                     >
-                        <CloseIcon color="error" />
-                    </IconButton>
-                    <Box display={'flex'} justifyContent={'center'}>
-                        <img src={CrossImg} alt="corssImg" width="30%" />
+                        <Paper elevation={3} sx={{ borderRadius: 2, p: 4, width: '80%', maxWidth: 900 }}>
+                            <TableContainer component={Paper}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center"></TableCell>
+                                            <TableCell align="center"></TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {candidates.map((candidate, index) => (
+                                            <TableRow key={candidate.id}>
+                                                <TableCell align="center">{index + 1}</TableCell>
+                                                <TableCell>{candidate.candidateName}</TableCell>
+                                                <TableCell align="center">
+                                                    <Avatar
+                                                        src={candidate.proPicUrl}
+                                                        alt={candidate.candidateName}
+                                                        sx={{ width: 70, height: 70 }}
+                                                        variant="circular"
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <ArrowCircleLeftIcon
+                                                        fontSize="large"
+                                                        sx={{
+                                                            color: getArrowIconColor(candidate.id)
+                                                        }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => handleVoteClick(candidate.id)}
+                                                        sx={{
+                                                            backgroundColor: getVoteButtonColor(candidate.id),
+                                                            borderRadius: '30px',
+                                                            px: 7,
+                                                            py: 2.5,
+                                                            minWidth: '100px',
+                                                            textTransform: 'none',
+                                                            '&:hover': {
+                                                                backgroundColor: '#003366'
+                                                            }
+                                                        }}
+                                                    >
+                                                        Vote
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Paper>
                     </Box>
-                    <DialogContent>
-                        <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
-                            <Typography variant="h4" textAlign={'center'}>
-                                Error Message
-                            </Typography>
-                            <Typography variant="h5" color="error" textAlign={'center'}>
-                                {dialogMessage}
-                            </Typography>
-                        </Box>
-                    </DialogContent>
-                </Dialog>
+                    {/* Dialog */}
+                    <Dialog
+                        open={dialogState.open}
+                        onClose={(event, reason) => {
+                            if (reason !== 'backdropClick') {
+                                handleDialogClose();
+                            }
+                        }}
+                    >
+                        <DialogContent>
+                            <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
+                                <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
+                                    {dialogState.message}
+                                </Typography>
+                            </Box>
+                        </DialogContent>
+                        <DialogActions style={{ justifyContent: 'center' }}>
+                            <Button size="small" color="error" variant="outlined" onClick={handleDialogClose}>
+                                {dialogState.type === 'confirm' ? 'No' : 'Close'}
+                            </Button>
 
-                <Dialog
-                    open={walletCheckDialogOpen}
-                    onClose={() => {}}
-                    PaperProps={{
-                        sx: {
-                            borderRadius: 3,
-                            p: { xs: 2, sm: 4 },
-                            maxWidth: 400,
-                            textAlign: 'center'
-                        }
-                    }}
-                >
-                    <DialogContent>
-                        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
-                            <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
-                                Waiting for Biometric Verification
-                            </Typography>
+                            {dialogState.type === 'confirm' && (
+                                <Button
+                                    size="small"
+                                    color="success"
+                                    variant="outlined"
+                                    onClick={() => {
+                                        handleNDINotificationRequest();
+                                    }}
+                                >
+                                    Confirm
+                                </Button>
+                            )}
+                        </DialogActions>
+                    </Dialog>
 
-                            <Typography
-                                variant="body1"
-                                sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary', fontWeight: 'bold' }}
-                            >
-                                Open your <span style={{ color: '#5AC994' }}>Bhutan NDI</span> App for Biometric authentication
-                            </Typography>
+                    {/* lodaing page */}
+                    {validatingLoad && (
+                        <>
+                            <Processing text="Validating..." />
+                        </>
+                    )}
+                    {loading && (
+                        <>
+                            <LoadingPage />
+                        </>
+                    )}
+
+                    <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
+                        <IconButton
+                            aria-label="close"
+                            onClick={() => setErrorDialogOpen(false)}
+                            sx={{
+                                position: 'absolute',
+                                right: 8,
+                                top: 8
+                            }}
+                        >
+                            <CloseIcon color="error" />
+                        </IconButton>
+                        <Box display={'flex'} justifyContent={'center'}>
+                            <img src={CrossImg} alt="corssImg" width="30%" />
                         </Box>
-                    </DialogContent>
-                </Dialog>
-            </MainCard>
+                        <DialogContent>
+                            <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
+                                <Typography variant="h4" textAlign={'center'}>
+                                    Error Message
+                                </Typography>
+                                <Typography variant="h5" color="error" textAlign={'center'}>
+                                    {dialogMessage}
+                                </Typography>
+                            </Box>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog
+                        open={walletCheckDialogOpen}
+                        onClose={() => {}}
+                        PaperProps={{
+                            sx: {
+                                borderRadius: 3,
+                                p: { xs: 2, sm: 4 },
+                                maxWidth: 400,
+                                textAlign: 'center'
+                            }
+                        }}
+                    >
+                        <DialogContent>
+                            <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+                                <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+                                    Waiting for Biometric Verification
+                                </Typography>
+
+                                <Typography
+                                    variant="body1"
+                                    sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary', fontWeight: 'bold' }}
+                                >
+                                    Open your <span style={{ color: '#5AC994' }}>Bhutan NDI</span> App for Biometric authentication
+                                </Typography>
+                            </Box>
+                        </DialogContent>
+                    </Dialog>
+                </MainCard>
+            </Box>
         </>
     );
 };

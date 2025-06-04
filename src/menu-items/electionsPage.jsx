@@ -37,23 +37,23 @@ const reports = {
     icon: icons.IconApps,
     type: 'group',
     children: [
-        {
-            id: 'elections',
-            title: <FormattedMessage id="elections" />,
-            type: 'item',
-            icon: () => (
-                <img
-                    src={electionImg}
-                    alt="dashboard"
-                    style={{
-                        width: 24,
-                        height: 24,
-                        filter: 'invert(48%) sepia(100%) saturate(2000%) hue-rotate(10deg)'
-                    }}
-                />
-            ),
-            url: '/election'
-        },
+        // {
+        //     id: 'elections',
+        //     title: <FormattedMessage id="elections" />,
+        //     type: 'item',
+        //     icon: () => (
+        //         <img
+        //             src={electionImg}
+        //             alt="dashboard"
+        //             style={{
+        //                 width: 24,
+        //                 height: 24,
+        //                 filter: 'invert(48%) sepia(100%) saturate(2000%) hue-rotate(10deg)'
+        //             }}
+        //         />
+        //     ),
+        //     url: '/election'
+        // },
         {
             id: 'electionResult',
             title: <FormattedMessage id="electionResult" />,

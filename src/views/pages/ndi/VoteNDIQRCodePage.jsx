@@ -22,6 +22,8 @@ import MainCard from 'ui-component/cards/MainCard';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from 'axios';
 import NormalLoadingPage from 'common/NormalLoadingPage';
+import AppBar from 'ui-component/extended/AppBar';
+import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR, TITLE } from 'common/color';
 
 import NdiService from '../../../services/ndi.service';
 // import blockchainAuthService from 'services/blockchainAuth.service';
@@ -42,14 +44,14 @@ const VoteNDIQRCodePage = () => {
     const constant = AppConstant();
     const navigate = useNavigate();
     const location = useLocation();
-    const {  electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
+    const { electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
 
     useEffect(() => {
         if (!electionId || !electionTypeId) {
             navigate('/election', { replace: true });
-          } else {
+        } else {
             generateQRCode();
-          }
+        }
     }, [electionId, electionTypeId, navigate]);
 
     const generateQRCode = () => {
@@ -59,7 +61,7 @@ const VoteNDIQRCodePage = () => {
                 const deepLink = res.data.deepLinkURL;
                 const invite = res.data.inviteURL;
                 const threadId = res.data.threadId;
-    
+
                 setUrl(invite);
                 setDeepLinkUrl(deepLink);
                 setProgressNDI(false);
@@ -72,20 +74,19 @@ const VoteNDIQRCodePage = () => {
             });
     };
 
-    
     const natsListener = (threadId) => {
         const endPoint = `${BASE_URL}/nats-subscribe?threadId=${threadId}&isBiometric=false&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
-    
+
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
             const data = JSON.parse(event.data);
             console.log(data);
-    
+
             eventSource.close();
             if (data.status === 'exists') {
                 setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
                 setLoading(true); // Show loading spinner
-    
+
                 // Directly navigate without checking if already voted
                 navigate('/localElectionScanPage', {
                     state: {
@@ -96,7 +97,7 @@ const VoteNDIQRCodePage = () => {
                         electionTypeId: electionTypeId,
                         electionId: electionId,
                         electionTypeName: electionTypeName,
-                        electionName: electionName,
+                        electionName: electionName
                     }
                 });
             } else {
@@ -106,10 +107,10 @@ const VoteNDIQRCodePage = () => {
             }
         });
     };
-    
+
     const handleDialogClose = () => {
         setErrorDialogOpen(false);
-        generateQRCode(); 
+        generateQRCode();
     };
 
     // const natsListener = (threadId) => {
@@ -125,7 +126,7 @@ const VoteNDIQRCodePage = () => {
     //             // setTimeout(async () => {
     //                 try {
     //                     const isAllowed = await checkIfAlreadyVoted(data.userDTO.vid, electionTypeId, electionId);
-                
+
     //                     if (!isAllowed) {
     //                         navigate('/localElectionScanPage', {
     //                             state: {
@@ -171,7 +172,7 @@ const VoteNDIQRCodePage = () => {
     //     }
 
     //     const response = await axios.get(`${BASE_URL}blockchain/checkIfVoted`, {
-    //         params: { voterVid: vid, 
+    //         params: { voterVid: vid,
     //             electionTypeId: electionTypeId,
     //             electionId: electionId,
     //             bcToken: token
@@ -180,165 +181,174 @@ const VoteNDIQRCodePage = () => {
 
     //     return response.data;
     // };
-    
-    return (
-        <MainCard>
-            <Typography variant="h3" textAlign={'center'}>
-                { electionName }
-            </Typography>
-            <Box
-                sx={{
-                    maxWidth: 500,
-                    margin: 'auto',
-                    padding: '20px',
-                    backgroundColor: '#F8F8F8',
-                    borderRadius: '20px',
-                    marginTop: '30px'
-                }}
-            >
-                <Typography variant="h6" align="center">
-                    Scan with <span style={{ color: '#5AC994' }}>Bhutan NDI</span> Wallet
-                </Typography>
 
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+    return (
+        <>
+            <AppBar />
+
+            <Box >
+                <Box sx={{ background: TITLE, color: '#ffffff' }} p={1} >
+                    {' '}
+                    <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff' }}>
+                        {electionName}
+                    </Typography>
+                </Box>
+                <MainCard sx={{ p: 5 }}>
                     <Box
                         sx={{
-                            border: '2px solid',
-                            borderRadius: '15px',
-                            padding: '10px',
-                            borderColor: constant.NDI.TEXT_COLOR,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            minHeight: '190px',
-                            minWidth: '190px'
+                            maxWidth: 500,
+                            margin: 'auto',
+                            padding: '20px',
+                            backgroundColor: '#F8F8F8',
+                            borderRadius: '20px',
+                            marginTop: '1px'
                         }}
                     >
-                        {progressNDI ? (
-                            <Box sx={{ textAlign: 'center' }}>
-                                <CircularProgress size={40} thickness={4} sx={{ mb: 1 }} />
-                                <Typography sx={{ mt: 2 }}>Generating QR code...</Typography>
+                        <Typography variant="h6" align="center">
+                            Scan with <span style={{ color: '#5AC994' }}>Bhutan NDI</span> Wallet
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                            <Box
+                                sx={{
+                                    border: '2px solid',
+                                    borderRadius: '15px',
+                                    padding: '10px',
+                                    borderColor: constant.NDI.TEXT_COLOR,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    minHeight: '190px',
+                                    minWidth: '190px'
+                                }}
+                            >
+                                {progressNDI ? (
+                                    <Box sx={{ textAlign: 'center' }}>
+                                        <CircularProgress size={40} thickness={4} sx={{ mb: 1 }} />
+                                        <Typography sx={{ mt: 2 }}>Generating QR code...</Typography>
+                                    </Box>
+                                ) : alertMessage ? (
+                                    <Typography color="error">{alertMessage}</Typography>
+                                ) : (
+                                    <QRCode logoImage={NDIlogobg} value={url} />
+                                )}
                             </Box>
-                        ) : alertMessage ? (
-                            <Typography color="error">{alertMessage}</Typography>
-                        ) : (
-                            <QRCode logoImage={NDIlogobg} value={url} />
+                        </Box>
+
+                        <Box sx={{ textAlign: 'center', mt: 3 }}>
+                            <ol style={{ display: 'inline-block', textAlign: 'left', fontSize: '12px', color: 'gray' }}>
+                                <li>Open Bhutan NDI Wallet on your phone.</li>
+                                <li>
+                                    Tap the Scan button located on the menu bar
+                                    <img
+                                        src={ScanButton}
+                                        alt="Scan"
+                                        style={{
+                                            width: 21,
+                                            height: 21,
+                                            margin: '0 6px',
+                                            verticalAlign: 'middle'
+                                        }}
+                                    />
+                                    <br />
+                                    and capture code.
+                                </li>
+                            </ol>
+                        </Box>
+
+                        {isMobile && (
+                            <>
+                                <Divider sx={{ my: 2 }}>
+                                    <Typography>OR</Typography>
+                                </Divider>
+                                <Box sx={{ textAlign: 'center', mb: 2 }}>
+                                    <BaseInlineColorText
+                                        textAlign="center"
+                                        style={{ color: constant.NDI.TEXT_COLOR, fontWeight: 'bold', fontSize: '16px' }}
+                                        ix={{
+                                            href: deepLinkUrl,
+                                            target: '_blank',
+                                            rel: 'noreferrer'
+                                        }}
+                                        first="Open "
+                                        mid="Bhutan NDI"
+                                        last=" Wallet "
+                                        linkLabel="here"
+                                        linkStyle={{ color: '#0000EE' }}
+                                    />
+                                </Box>
+                            </>
+                        )}
+
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                            <BaseButton
+                                label="Watch video guide"
+                                onClick={() => window.open('https://www.youtube.com/watch?v=A_k79pml9k8', '_blank')}
+                                endIcon={<PlayCircleOutlinedIcon icon={faPlayCircle} />}
+                                ix={{ variant: 'contained', type: 'button' }}
+                                sx={{
+                                    background: constant.NDI.TEXT_COLOR,
+                                    borderRadius: '20px',
+                                    width: '145px',
+                                    height: '30px',
+                                    fontSize: '10px',
+                                    textTransform: 'none'
+                                }}
+                            />
+                        </Box>
+
+                        <Typography align="center" sx={{ fontSize: '10px', color: 'gray' }}>
+                            <strong>Download Now!</strong>
+                        </Typography>
+
+                        <Grid container justifyContent="center" spacing={1} sx={{ mt: 1 }}>
+                            <Grid item>
+                                <Button onClick={() => window.open(constant.NDI.NDI_GOOGLE_STORE_URL, '_blank')}>
+                                    <img src={GooglePlay} alt="Google Store" style={{ height: 27, width: 90 }} />
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button onClick={() => window.open(constant.NDI.NDI_APPLE_STORE_URL, '_blank')}>
+                                    <img src={AppStore} alt="Apple Store" style={{ height: 27, width: 90 }} />
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Dialog open={errorDialogOpen} onClose={handleDialogClose}>
+                            <IconButton
+                                aria-label="close"
+                                onClick={handleDialogClose}
+                                sx={{
+                                    position: 'absolute',
+                                    right: 8,
+                                    top: 8
+                                }}
+                            >
+                                <CloseIcon color="error" />
+                            </IconButton>
+                            <Box display={'flex'} justifyContent={'center'}>
+                                <img src={CrossImg} alt="corssImg" width="30%" />
+                            </Box>
+                            <DialogContent>
+                                <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
+                                    <Typography variant="h4" textAlign={'center'}>
+                                        Error Message
+                                    </Typography>
+                                    <Typography variant="h5" color="error" textAlign={'center'}>
+                                        {dialogMessage}
+                                    </Typography>
+                                </Box>
+                            </DialogContent>
+                        </Dialog>
+                        {/* lodaing page */}
+                        {loading && (
+                            <>
+                                <NormalLoadingPage />
+                            </>
                         )}
                     </Box>
-                </Box>
-
-                <Box sx={{ textAlign: 'center', mt: 3 }}>
-                    <ol style={{ display: 'inline-block', textAlign: 'left', fontSize: '12px', color: 'gray' }}>
-                        <li>Open Bhutan NDI Wallet on your phone.</li>
-                        <li>
-                            Tap the Scan button located on the menu bar
-                            <img
-                                src={ScanButton}
-                                alt="Scan"
-                                style={{
-                                    width: 21,
-                                    height: 21,
-                                    margin: '0 6px',
-                                    verticalAlign: 'middle'
-                                }}
-                            />
-                            <br />
-                            and capture code.
-                        </li>
-                    </ol>
-                </Box>
-
-                {isMobile && (
-                    <>
-                        <Divider sx={{ my: 2 }}>
-                            <Typography>OR</Typography>
-                        </Divider>
-                        <Box sx={{ textAlign: 'center', mb: 2 }}>
-                            <BaseInlineColorText
-                                textAlign="center"
-                                style={{ color: constant.NDI.TEXT_COLOR, fontWeight: 'bold', fontSize: '16px' }}
-                                ix={{
-                                    href: deepLinkUrl,
-                                    target: '_blank',
-                                    rel: 'noreferrer'
-                                }}
-                                first="Open "
-                                mid="Bhutan NDI"
-                                last=" Wallet "
-                                linkLabel="here"
-                                linkStyle={{ color: '#0000EE' }}
-                            />
-                        </Box>
-                    </>
-                )}
-
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                    <BaseButton
-                        label="Watch video guide"
-                        onClick={() => window.open('https://www.youtube.com/watch?v=A_k79pml9k8', '_blank')}
-                        endIcon={<PlayCircleOutlinedIcon icon={faPlayCircle} />}
-                        ix={{ variant: 'contained', type: 'button' }}
-                        sx={{
-                            background: constant.NDI.TEXT_COLOR,
-                            borderRadius: '20px',
-                            width: '145px',
-                            height: '30px',
-                            fontSize: '10px',
-                            textTransform: 'none'
-                        }}
-                    />
-                </Box>
-
-                <Typography align="center" sx={{ fontSize: '10px', color: 'gray' }}>
-                    <strong>Download Now!</strong>
-                </Typography>
-
-                <Grid container justifyContent="center" spacing={1} sx={{ mt: 1 }}>
-                    <Grid item>
-                        <Button onClick={() => window.open(constant.NDI.NDI_GOOGLE_STORE_URL, '_blank')}>
-                            <img src={GooglePlay} alt="Google Store" style={{ height: 27, width: 90 }} />
-                        </Button>
-                    </Grid>
-                    <Grid item>
-                        <Button onClick={() => window.open(constant.NDI.NDI_APPLE_STORE_URL, '_blank')}>
-                            <img src={AppStore} alt="Apple Store" style={{ height: 27, width: 90 }} />
-                        </Button>
-                    </Grid>
-                </Grid>
-                <Dialog open={errorDialogOpen} onClose={handleDialogClose}>
-                    <IconButton
-                        aria-label="close"
-                        onClick={handleDialogClose}
-                        sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: 8
-                        }}
-                    >
-                        <CloseIcon color="error" />
-                    </IconButton>
-                    <Box display={'flex'} justifyContent={'center'}>
-                        <img src={CrossImg} alt="corssImg" width="30%" />
-                    </Box>
-                    <DialogContent>
-                        <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
-                            <Typography variant="h4" textAlign={'center'}>
-                                Error Message
-                            </Typography>
-                            <Typography variant="h5" color="error" textAlign={'center'}>
-                                {dialogMessage}
-                            </Typography>
-                        </Box>
-                    </DialogContent>
-                </Dialog>
-                {/* lodaing page */}
-                {loading && (
-                    <>
-                        <NormalLoadingPage />
-                    </>
-                )}
+                </MainCard>
             </Box>
-        </MainCard>
+        </>
     );
 };
 

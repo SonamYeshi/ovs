@@ -37,6 +37,8 @@ const SubElectionType = Loadable(lazy(() => import('views/pages/election/Electio
 const ElectionRule = Loadable(lazy(() => import('views/pages/election/ElectionRuleSetup')));
 const ElectionParameter = Loadable(lazy(() => import('views/pages/election/ElectionParameterSetup')));
 const EcbQRCodePage = Loadable(lazy(() => import('views/pages/ndi/EcbQRCodePage')));
+const HomePage = Loadable(lazy(() => import('views/pages/landing/HomePage')));
+
 
 
 
@@ -62,6 +64,10 @@ const MainRoutes = {
             element: <Dasbboard />
         },
         {
+            path: '/home',
+            element: <HomePage />
+        },
+        {
             path: '/widget/statistics',
             element: <WidgetStatistics />
         },
@@ -73,14 +79,14 @@ const MainRoutes = {
             path: '/widget/chart',
             element: <WidgetChart />
         },
-        {
-            path: '/election',
-            element: <Election />
-        },
-        {
-            path: '/localElectionScanPage',
-            element: <LocalElectionScanPage />
-        },
+        // {
+        //     path: '/election',
+        //     element: <Election />
+        // },
+        // {
+        //     path: '/localElectionScanPage',
+        //     element: <LocalElectionScanPage />
+        // },
         {
             path: '/nationalAssemblyElectionScanPage',
             element: <NationalAssemblyElectionScanPage />
@@ -104,14 +110,14 @@ const MainRoutes = {
             element: <LocalElectionResult />
         },
 
-        {
-            path: '/vote-ndi-qr',
-            element: <VoteNDIQRCodePage />
-        },
-        {
-            path: '/ecbQrCode',
-            element: <EcbQRCodePage />
-        },
+        // {
+        //     path: '/vote-ndi-qr',
+        //     element: <VoteNDIQRCodePage />
+        // },
+        // {
+        //     path: '/ecbQrCode',
+        //     element: <EcbQRCodePage />
+        // },
         {
             path: '/dashboard/candidates',
             element: <Candidates />
