@@ -16,7 +16,7 @@ import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
 import MainCard from 'ui-component/cards/MainCard';
 
-const LocalElectionResult = () => {
+const ElectionFinalResultPage = () => {
     const navigate = useNavigate();
     const [candidates, setCandidates] = useState([]);
     const location = useLocation();
@@ -192,4 +192,4 @@ const LocalElectionResult = () => {
     );
 };
 
-export default LocalElectionResult;
+export default ElectionFinalResultPage;

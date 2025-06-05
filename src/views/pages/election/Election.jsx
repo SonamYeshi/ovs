@@ -58,7 +58,7 @@ const Election = () => {
 
     const handleProceed = () => {
         if (selectedElection) {
-            navigate('/vote-ndi-qr', {
+            navigate('/election/vote-qrCode', {
                 state: {
                     electionId: selectedElection.id,
                     electionTypeId: selectedElection.electionTypeId,

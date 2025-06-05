@@ -38,7 +38,7 @@ import Footer from '../landing/Footer';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL+'api/v1/ndi';
 
-const LocalElectionScanPage = () => {
+const ElectionCandidatesPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedCandidateId, setSelectedCandidateId] = useState(null);
@@ -62,7 +62,7 @@ const LocalElectionScanPage = () => {
 
     useEffect(() => {
         if (!electionId || !electionTypeId) {
-            navigate('/vote-ndi-qr');
+            navigate('/election/vote-qrCode');
             return;
         }
 
@@ -158,7 +158,7 @@ const LocalElectionScanPage = () => {
                 return globalLib.successMsg(res.data.message);
             })
             .then(() => {
-                navigate('/vote-ndi-qr', {
+                navigate('/election/vote-qrCode', {
                     state: { electionTypeId: electionTypeId, electionId: electionId }
                 });
                 return;
@@ -169,7 +169,7 @@ const LocalElectionScanPage = () => {
 
                 globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
                     setLoading(false);
-                    navigate('/vote-ndi-qr', {
+                    navigate('/election/vote-qrCode', {
                         state: { electionTypeId: electionTypeId, electionId: electionId }
                     });
                     return;
@@ -213,7 +213,7 @@ const LocalElectionScanPage = () => {
     const handleDialogClose = () => {
         setDialogState((prev) => ({ ...prev, open: false }));
         if (candidates.length === 0) {
-            navigate('/vote-ndi-qr', {
+            navigate('/election/vote-qrCode', {
                 state: { electionTypeId: electionTypeId, electionId: electionId }
             });
             return;
@@ -411,4 +411,4 @@ const LocalElectionScanPage = () => {
     );
 };
 
-export default LocalElectionScanPage;
+export default ElectionCandidatesPage;
