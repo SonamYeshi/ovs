@@ -6,8 +6,9 @@ import { BUTTON_ADD_COLOR, TITLE } from 'common/color';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import electionSetupService from 'services/electionSetup.service';
 import MainCard from 'ui-component/cards/MainCard';
+import publicService from 'services/public.service';
+import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR, TITLE } from 'common/color';
 import AppBar from 'ui-component/extended/AppBar';
 import Footer from '../landing/Footer';
 
@@ -27,7 +28,7 @@ const Election = () => {
     useEffect(() => {
         const fetchElectionTypes = async () => {
             try {
-                const response = await electionSetupService.getAllSubElectionType();
+                const response = await publicService.getAllElections();
                 if (response.status === 200) {
                     setElectionTypes(response.data);
                 }

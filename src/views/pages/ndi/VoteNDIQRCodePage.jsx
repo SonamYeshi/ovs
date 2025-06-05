@@ -77,7 +77,6 @@ const VoteNDIQRCodePage = () => {
 
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
             const data = JSON.parse(event.data);
-            console.log(data);
 
             eventSource.close();
             if (data.status === 'exists') {

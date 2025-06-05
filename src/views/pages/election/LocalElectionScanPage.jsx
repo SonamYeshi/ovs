@@ -17,6 +17,8 @@ import {
     TableRow,
     Typography
 } from '@mui/material';
+import MainCard from 'ui-component/cards/MainCard';
+import AppBar from 'ui-component/extended/AppBar';
 import CrossImg from 'assets/images/corssImg.png';
 import voteFailureSound from 'assets/images/failureAudio.mp3';
 import voteSuccessSound from 'assets/images/successAudio.mp3';
@@ -28,9 +30,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import blockchainService from 'services/blockchain.service';
 import blockchainAuthService from 'services/blockchainAuth.service';
-import candidateService from 'services/candidate.service';
-import MainCard from 'ui-component/cards/MainCard';
-import AppBar from 'ui-component/extended/AppBar';
+import publicService from 'services/public.service';
 import NdiService from '../../../services/ndi.service';
 import { setDIDs } from '../../../utils/ndi-storage';
 import Footer from '../landing/Footer';
@@ -69,7 +69,7 @@ const LocalElectionScanPage = () => {
         setRelationshipDID(window.localStorage.getItem('relationship_did'));
         setHolderDID(window.localStorage.getItem('holder_did'));
 
-        candidateService
+        publicService
             .getCandidates(electionTypeId, electionId, dzongkhag, gewog, village)
             .then((response) => {
                 setCandidates(response.data);
