@@ -1,13 +1,10 @@
 // material-ui
-import { useTheme } from '@mui/material/styles';
+import { List, ListItem, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import { ThemeMode } from 'config';
-import Login from '../authentication/authentication3/HomeLogin';
-import AppBar from 'ui-component/extended/AppBar';
-import Election from '../election/Election';
-import { motion } from 'framer-motion';
+import { useTheme } from '@mui/material/styles';
 import MainCard from 'ui-component/cards/MainCard';
-import { Typography,Grid,ListItem,List } from '@mui/material';
+import AppBar from 'ui-component/extended/AppBar';
+import Footer from './Footer';
 // =============================|| LANDING MAIN ||============================= //
 
 const Landing = () => {
@@ -15,24 +12,9 @@ const Landing = () => {
 
     return (
         <>
-            {/* <Box
-                id="home"
-                sx={{
-                    overflowX: 'hidden',
-                    overflowY: 'clip',
-                    background:
-                        theme.palette.mode === ThemeMode.DARK
-                            ? theme.palette.background.default
-                            : `linear-gradient(360deg, ${theme.palette.grey[100]} 1.09%, ${theme.palette.background.paper} 100%)`
-                }}
-            >
-                <AppBar />
-              
-            </Box> */}
             <AppBar />
-
             <Box sx={{ p: 0 }}>
-                <MainCard sx={{p:10}}>
+                <MainCard sx={{ p: 10 }}>
                     <Box display={'flex'} flexDirection={'column'} gap={3}>
                         <Typography variant="h3" sx={{ color: '#003366', fontWeight: 'bold' }}>
                             About Online Voting System (OVS)
@@ -107,6 +89,7 @@ const Landing = () => {
                     </Box>
                 </MainCard>
             </Box>
+            <Footer />
         </>
     );
 };

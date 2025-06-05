@@ -24,6 +24,7 @@ import electionSetupService from 'services/electionSetup.service';
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
+import Footer from '../landing/Footer';
 
 const ElectionNameSetup = () => {
     const [open, setOpen] = useState(false);
@@ -301,6 +302,7 @@ const ElectionNameSetup = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+              <Footer/>
         </MainCard>
     );
 };

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { Box, useTheme, useMediaQuery, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-
 import VoteIcon from 'assets/images/VoteIcon.png';
-import MainCard from 'ui-component/cards/MainCard';
+import { BUTTON_ADD_COLOR, TITLE } from 'common/color';
 import NormalLoadingPage from 'common/NormalLoadingPage';
-import voteService from 'services/vote.service';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import electionSetupService from 'services/electionSetup.service';
-import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR, TITLE } from 'common/color';
+import MainCard from 'ui-component/cards/MainCard';
 import AppBar from 'ui-component/extended/AppBar';
+import Footer from '../landing/Footer';
 
 const Election = () => {
     const [electionTypes, setElectionTypes] = useState([]);
@@ -83,8 +82,8 @@ const Election = () => {
     return (
         <>
             <AppBar />
-            <Box >
-                <Box sx={{ background: TITLE, color: '#ffffff' }} p={1} >
+            <Box>
+                <Box sx={{ background: TITLE, color: '#ffffff' }} p={1}>
                     {' '}
                     <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff' }}>
                         Election Types
@@ -209,6 +208,7 @@ const Election = () => {
                     </DialogActions>
                 </Dialog>
             </Box>
+            <Footer />
         </>
     );
 };

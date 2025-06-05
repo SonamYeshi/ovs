@@ -1,30 +1,30 @@
-import { useEffect, useState } from 'react';
-import React from 'react';
-import { QRCode } from 'react-qrcode-logo';
-import NDIlogobg from '../../../assets/images/ndi/QRNDIlogo.png';
-import ScanButton from '../../../assets/images/ndi/ScanButton.png';
-import GooglePlay from '../../../assets/images/ndi/google.jpg';
-import AppStore from '../../../assets/images/ndi/apple.jpg';
-import AppConstant from '../ndi/AppConstant';
-import BaseButton from '../ndi/BaseButton';
-import Divider from '@mui/material/Divider';
-import BaseInlineColorText from '../ndi/BaseInlineColorText';
-import { Box, Grid, Typography, Button, IconButton } from '@mui/material';
-import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined';
 import { faPlayCircle } from '@fortawesome/free-solid-svg-icons';
+import CloseIcon from '@mui/icons-material/Close';
+import PlayCircleOutlinedIcon from '@mui/icons-material/PlayCircleOutlined';
+import { Box, Button, Grid, IconButton, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import CrossImg from 'assets/images/corssImg.png';
-import CloseIcon from '@mui/icons-material/Close';
-import MainCard from 'ui-component/cards/MainCard';
+import Divider from '@mui/material/Divider';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import globalLib from 'common/global-lib';
-import AppBar from 'ui-component/extended/AppBar';
-import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR, TITLE } from 'common/color';
-import NdiService from '../../../services/ndi.service';
-import vcIssuanceService from 'services/vc-issuance-service';
+import CrossImg from 'assets/images/corssImg.png';
 import VCIssueLoading from 'common/VCIssueLoading';
+import { TITLE } from 'common/color';
+import globalLib from 'common/global-lib';
+import { useEffect, useState } from 'react';
+import { QRCode } from 'react-qrcode-logo';
+import vcIssuanceService from 'services/vc-issuance-service';
+import MainCard from 'ui-component/cards/MainCard';
+import AppBar from 'ui-component/extended/AppBar';
+import NDIlogobg from '../../../assets/images/ndi/QRNDIlogo.png';
+import ScanButton from '../../../assets/images/ndi/ScanButton.png';
+import AppStore from '../../../assets/images/ndi/apple.jpg';
+import GooglePlay from '../../../assets/images/ndi/google.jpg';
+import NdiService from '../../../services/ndi.service';
+import AppConstant from '../ndi/AppConstant';
+import BaseButton from '../ndi/BaseButton';
+import BaseInlineColorText from '../ndi/BaseInlineColorText';
+import Footer from '../landing/Footer';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'api/v1/vc';
 
@@ -284,6 +284,7 @@ const EcbQRCodePage = () => {
                     </Box>
                 </MainCard>
             </Box>
+            <Footer/>
         </>
     );
 };

@@ -6,14 +6,18 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Slide from '@mui/material/Slide';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR } from 'common/color';
 import globalLib from 'common/global-lib';
 import { useFormik } from 'formik';
@@ -21,11 +25,10 @@ import { MaterialReactTable } from 'material-react-table';
 import React, { useEffect, useState } from 'react';
 import electionRuleService from 'services/electionRule.service';
 import electionSetupService from 'services/electionSetup.service';
-import voteService from 'services/vote.service';
-
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
+import Footer from '../landing/Footer';
 
 // animation
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
@@ -64,11 +67,15 @@ const ElectionRuleSetup = () => {
             electionId: '',
             dzongkhag: '',
             gewog: '',
-            village: ''
+            village: '',
+            qualifyingDate: '',
+            deadLine: ''
         },
         validationSchema: Yup.object({
             electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
-            electionId: Yup.string().required(AppConstant().REQUIRED_FIELD)
+            electionId: Yup.string().required(AppConstant().REQUIRED_FIELD),
+            qualifyingDate: Yup.string().required(AppConstant().REQUIRED_FIELD),
+            deadLine: Yup.string().required(AppConstant().REQUIRED_FIELD)
         }),
         onSubmit: async (values) => {
             const mappedSelections = {
@@ -360,20 +367,49 @@ const ElectionRuleSetup = () => {
 
                                     {/* -- Age Field -- */}
                                     <Grid item sm={12} xs={12} md={12}>
-                                        <InputLabel>Minimum Age</InputLabel>
-                                        <TextField
-                                            fullWidth
-                                            id="minAge"
-                                            name="minAge"
-                                            size="small"
-                                            value={values.minAge}
-                                            onChange={(e) => setFieldValue('minAge', e.target.value)}
-                                            error={touched.minAge && Boolean(errors.minAge)}
-                                            helperText={touched.minAge && errors.minAge}
-                                            disabled
-                                        />
+                                        <InputLabel>Qualifying date</InputLabel>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DatePicker
+                                                value={values.qualifyingDate}
+                                                onChange={(value) =>setFieldValue('qualifyingDate', value)}
+                                                slotProps={{
+                                                    textField: {
+                                                        fullWidth: true,
+                                                        size: 'small',
+                                                        error: Boolean(touched.qualifyingDate && errors.qualifyingDate),
+                                                        helperText:touched.qualifyingDate && errors.qualifyingDate
+                                                    }
+                                                }}
+                                            />
+                                        </LocalizationProvider>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item sm={12} xs={12}>
+                                        <InputLabel>Deadline</InputLabel>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DateTimePicker']}>
+                                                <DateTimePicker
+                                                    value={values.deadLine} // value from Formik
+                                                    onChange={(value) => {
+                                                        setFieldValue('deadLine', value); // store Dayjs object
+                                                    }}
+                                                    viewRenderers={{
+                                                        hours: renderTimeViewClock,
+                                                        minutes: renderTimeViewClock,
+                                                        seconds: renderTimeViewClock
+                                                    }}
+                                                    slotProps={{
+                                                        textField: {
+                                                            size: 'small',
+                                                            fullWidth: true,
+                                                            error: Boolean(touched.deadLine && errors.deadLine),
+                                                            helperText: touched.deadLine && errors.deadLine
+                                                        }
+                                                    }}
+                                                />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Grid>
+                                    <Grid item xs={12} mt={2}>
                                         <fieldset style={{ border: '1px solid rgba(0, 0, 0, 0.23)', borderRadius: '4px', padding: '16px' }}>
                                             <legend style={{ padding: '0 8px' }}>Voter Selection Criteria</legend>
                                             <FormGroup row>
@@ -448,6 +484,7 @@ const ElectionRuleSetup = () => {
                         </DialogActions>
                     </Dialog>
                 </Box>
+                <Footer/>
             </MainCard>
         </>
     );

@@ -1,14 +1,11 @@
-import { useEffect, useState } from 'react';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import Footer from '../landing/Footer';
 // project imports
 import VoteIcon from 'assets/images/VoteIcon.png';
-import NationalAssemblyImg from 'assets/images/National Assembly.png';
-import NationalCouncilImg from 'assets/images/nationa Council.png';
-import LocalGovtImg from 'assets/images/Local Oovernment.png';
 import NormalLoadingPage from 'common/NormalLoadingPage';
 import MainCard from 'ui-component/cards/MainCard';
 
@@ -58,61 +55,69 @@ const ElectionResult = () => {
     }
 
     return (
-        <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
-            {electionTypes.map((election) => (
-                <Grid key={election.id} item xs={12} sm={6} md={3}>
-                    <MainCard
-                        onClick={() => handleCardClick(election)}
-                        sx={{
-                            height: {
-                                xs: 200,
-                                sm: 200,
-                                md: 200,
-                                lg: 200,
-                                xl: 200
-                            },
-                            cursor: 'pointer',
-                            transition: 'box-shadow 0.5s',
-                            '&:hover': { boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)' }
-                        }}
-                    >
-                        <Box sx={{ textDecoration: 'none' }} display={'flex'} flexDirection="column" alignItems="center" gap={2}>
-                            <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
-                            <Typography
-                                variant="body1"
+        <>
+            <MainCard>
+                <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }}>
+                    {electionTypes.map((election) => (
+                        <Grid key={election.id} item xs={12} sm={6} md={3}>
+                            <MainCard
+                                onClick={() => handleCardClick(election)}
                                 sx={{
-                                    fontSize: {
-                                        xs: '13px',
-                                        sm: '10px',
-                                        md: '17px',
-                                        lg: '15px',
-                                        xl: '1rem'
+                                    height: {
+                                        xs: 200,
+                                        sm: 200,
+                                        md: 200,
+                                        lg: 200,
+                                        xl: 200
                                     },
-                                    color: '#000000'
+                                    border: '2px solid #002B69',
+                                    cursor: 'pointer',
+                                    transition: 'box-shadow 0.5s',
+                                    '&:hover': {
+                                        boxShadow: '0px 10px 20px #002B69'
+                                    }
                                 }}
                             >
-                                {election.electionTypeName}
-                            </Typography>
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    fontSize: {
-                                        xs: '13px',
-                                        sm: '10px',
-                                        md: '17px',
-                                        lg: '15px',
-                                        xl: '1rem'
-                                    },
-                                    color: '#000000'
-                                }}
-                            >
-                                {election.electionName}
-                            </Typography>
-                        </Box>
-                    </MainCard>
+                                <Box sx={{ textDecoration: 'none' }} display={'flex'} flexDirection="column" alignItems="center" gap={2}>
+                                    <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
+                                    <Typography
+                                        variant="body1"
+                                        sx={{
+                                            fontSize: {
+                                                xs: '13px',
+                                                sm: '10px',
+                                                md: '17px',
+                                                lg: '15px',
+                                                xl: '1rem'
+                                            },
+                                            color: '#000000'
+                                        }}
+                                    >
+                                        {election.electionTypeName}
+                                    </Typography>
+                                    <Typography
+                                        variant="body1"
+                                        sx={{
+                                            fontSize: {
+                                                xs: '13px',
+                                                sm: '10px',
+                                                md: '17px',
+                                                lg: '15px',
+                                                xl: '1rem'
+                                            },
+                                            color: '#000000'
+                                        }}
+                                    >
+                                        {election.electionName}
+                                    </Typography>
+                                </Box>
+                            </MainCard>
+                        </Grid>
+                    ))}
                 </Grid>
-            ))}
-        </Grid>
+                <Footer />
+            </MainCard>
+        </>
     );
 };
 

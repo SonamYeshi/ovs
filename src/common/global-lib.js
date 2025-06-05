@@ -10,6 +10,8 @@ const Roles = {
     USER: 6
 };
 
+
+export const currentDates = new Date();
 // // regx fro email and password
 export const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 export const passRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z])(?!.*\s).{8,}$/;

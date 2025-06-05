@@ -1,4 +1,5 @@
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import CloseIcon from '@mui/icons-material/Close';
 import {
     Avatar,
     Box,
@@ -6,7 +7,7 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
+    IconButton,
     Paper,
     Table,
     TableBody,
@@ -14,27 +15,26 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Typography,
-    IconButton
+    Typography
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import CrossImg from 'assets/images/corssImg.png';
+import voteFailureSound from 'assets/images/failureAudio.mp3';
+import voteSuccessSound from 'assets/images/successAudio.mp3';
 import { TITLE } from 'common/color';
+import globalLib from 'common/global-lib';
 import LoadingPage from 'common/LoadingPage';
+import Processing from 'common/Processing';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import globalLib from 'common/global-lib';
-
-import candidateService from 'services/candidate.service';
-import NdiService from '../../../services/ndi.service';
-import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
-import { clearDIDs, setDIDs } from '../../../utils/ndi-storage';
+import blockchainAuthService from 'services/blockchainAuth.service';
+import candidateService from 'services/candidate.service';
 import MainCard from 'ui-component/cards/MainCard';
-import voteSuccessSound from 'assets/images/successAudio.mp3';
-import voteFailureSound from 'assets/images/failureAudio.mp3';
-import Processing from 'common/Processing';
 import AppBar from 'ui-component/extended/AppBar';
+import NdiService from '../../../services/ndi.service';
+import { setDIDs } from '../../../utils/ndi-storage';
+import Footer from '../landing/Footer';
+
 
 const BASE_URL = import.meta.env.VITE_BASE_URL+'api/v1/ndi';
 
@@ -406,6 +406,7 @@ const LocalElectionScanPage = () => {
                     </Dialog>
                 </MainCard>
             </Box>
+             <Footer/>
         </>
     );
 };

@@ -25,6 +25,7 @@ import voteService from 'services/vote.service';
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
+import Footer from '../landing/Footer';
 
 // animation
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
@@ -530,6 +531,7 @@ const EligibilitySetup = () => {
                         </DialogActions>
                     </Dialog>
                 </Box>
+                  <Footer/>
             </MainCard>
         </>
     );

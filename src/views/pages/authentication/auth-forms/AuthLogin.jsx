@@ -160,7 +160,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
                     </FormControl>
                     <CustomAlert alert={alert} setAlert={setAlert} />
 
-                    <Grid container alignItems="center" justifyContent="flex-end">
+                    {/* <Grid container alignItems="center" justifyContent="flex-end">
                         <Grid item>
                             <Typography
                                 variant="subtitle1"
@@ -172,7 +172,7 @@ const JWTLogin = ({ loginProp, ...others }) => {
                                 Forgot Password?
                             </Typography>
                         </Grid>
-                    </Grid>
+                    </Grid> */}
 
                     {errors.submit && (
                         <Box sx={{ mt: 3 }}>

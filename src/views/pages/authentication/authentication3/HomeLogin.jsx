@@ -1,28 +1,17 @@
 import Stack from '@mui/material/Stack';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
-// project imports
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoginLogo from 'ui-component/LoginLogo';
-import AuthCardWrapper from '../AuthCardWrapper';
-import AuthWrapper1 from '../AuthWrapper1';
 import AuthLogin from '../auth-forms/AuthLogin';
-// material-ui
+import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { Typography, Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { TITLE } from 'common/color';
 import AppBar from 'ui-component/extended/AppBar';
-
-// third party
-
-// project imports
 import useAuth from 'hooks/useAuth';
+import Footer from 'views/pages/landing/Footer';
 
-// assets
-
-// assets
 
 // ================================|| AUTH3 - LOGIN ||================================ //
 
@@ -116,6 +105,7 @@ const Login = () => {
                 </Box>
                 {/* </AuthWrapper1> */}
             </Box>
+             <Footer/>
         </>
     );
 };

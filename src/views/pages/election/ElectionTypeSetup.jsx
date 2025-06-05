@@ -19,8 +19,8 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import globalLib from 'common/global-lib';
 import electionSetupService from 'services/electionSetup.service';
-
 import AppConstant from 'utils/AppConstant';
+import Footer from '../landing/Footer';
 
 // animation
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
@@ -180,6 +180,7 @@ const ElectionTypeSetup = () => {
                         </Box>
                     )}
                 />
+                <Footer />
             </MainCard>
 
             <Dialog

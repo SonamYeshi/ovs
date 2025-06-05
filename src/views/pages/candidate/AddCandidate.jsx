@@ -18,18 +18,18 @@ import {
 } from '@mui/material';
 import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR } from 'common/color';
 import globalLib, { cidErrMsg, cidRegex } from 'common/global-lib';
+import Processing from 'common/Processing';
 import { useFormik } from 'formik';
 import { MaterialReactTable } from 'material-react-table';
 import { useEffect, useRef, useState } from 'react';
+import blockchainAuthService from 'services/blockchainAuth.service';
 import candidateService from 'services/candidate.service';
 import commonService from 'services/commonService';
 import electionSetupService from 'services/electionSetup.service';
-import voteService from 'services/vote.service';
 import MainCard from 'ui-component/cards/MainCard';
 import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
-import blockchainAuthService from 'services/blockchainAuth.service';
-import Processing from 'common/Processing';
+import Footer from '../landing/Footer';
 
 const AddCandidate = () => {
     const [open, setOpen] = useState(false);
@@ -115,12 +115,12 @@ const AddCandidate = () => {
         if (!bc_token) {
             return globalLib.warningMsg('Could not load access token for blockchain.');
         }
-        formData.append('bc_authToken', bc_token)
+        formData.append('bc_authToken', bc_token);
 
         candidateService
             .saveCandidate(formData)
             .then((response) => {
-                console.log(response.data)
+                console.log(response.data);
                 globalLib.successMsg(response.data);
                 getAllCandidates();
                 resetForm();
@@ -129,7 +129,7 @@ const AddCandidate = () => {
             })
             .catch((error) => {
                 globalLib.warningMsg(error?.response?.data?.error || 'Failed to register candidate');
-                setLoading(false)
+                setLoading(false);
             });
     };
 
@@ -561,10 +561,11 @@ const AddCandidate = () => {
                 </DialogActions>
             </Dialog>
             {loading && (
-                    <>
-                        <Processing text="Registering..."/>
-                    </>
-                )}
+                <>
+                    <Processing text="Registering..." />
+                </>
+            )}
+            <Footer />
         </MainCard>
     );
 };
