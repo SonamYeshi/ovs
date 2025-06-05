@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainCard from 'ui-component/cards/MainCard';
 import publicService from 'services/public.service';
-import { BUTTON_ADD_COLOR, BUTTON_CANCEL_COLOR, BUTTON_VIEW_COLOR, TITLE } from 'common/color';
 import AppBar from 'ui-component/extended/AppBar';
 import Footer from '../landing/Footer';
 

@@ -34,19 +34,19 @@ const deleteEligibilityCriteria = (id) => {
 
 // sub election type
 
-const saveSubElectionType = (data) => {
-    return axios.post(BASE_URL+'/saveSubElectionType', data, {
-        headers: authHeader()
-    });
-};
+// const saveSubElectionType = (data) => {
+//     return axios.post(BASE_URL+'/saveSubElectionType', data, {
+//         headers: authHeader()
+//     });
+// };
 
-const getAllSubElectionType = () => {
-    return axios.get(BASE_URL+'/getAllSubElectionType');
-};
+// const getAllSubElectionType = () => {
+//     return axios.get(BASE_URL+'/getAllSubElectionType');
+// };
 
-const deleteSubElection = (id) => {
-    return axios.delete(BASE_URL+'/deleteSubElection/' + id);
-};
+// const deleteSubElection = (id) => {
+//     return axios.delete(BASE_URL+'/deleteSubElection/' + id);
+// };
 
 export default {
     // getCandidates,
@@ -57,7 +57,7 @@ export default {
     // deleteElection,
     getAllEligibilityCriteria,
     deleteEligibilityCriteria,
-    saveSubElectionType,
-    getAllSubElectionType,
-    deleteSubElection
+    // saveSubElectionType,
+    // getAllSubElectionType,
+    // deleteSubElection
 };
