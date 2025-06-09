@@ -134,11 +134,11 @@ const ElectionFinalResultPage = () => {
                                     {candidates.map((item, index) => (
                                         <TableRow key={item.candidateId}>
                                             <TableCell align="center">{index + 1}</TableCell>
-                                            <TableCell>{item.candidateId}</TableCell>
+                                            <TableCell>{item.candidateName}</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     src={item.proPicUrl}
-                                                    alt={item.candidateId}
+                                                    alt={item.candidateName}
                                                     sx={{ width: 70, height: 70 }}
                                                     variant="circular"
                                                 />

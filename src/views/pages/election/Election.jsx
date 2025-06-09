@@ -1,11 +1,13 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, useMediaQuery, useTheme } from '@mui/material';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
+import {
+    Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+    useMediaQuery, useTheme, Typography, Grid
+} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import VoteIcon from 'assets/images/VoteIcon.png';
 import { BUTTON_ADD_COLOR, TITLE } from 'common/color';
 import NormalLoadingPage from 'common/NormalLoadingPage';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import MainCard from 'ui-component/cards/MainCard';
 import publicService from 'services/public.service';
 import AppBar from 'ui-component/extended/AppBar';
@@ -16,10 +18,10 @@ const Election = () => {
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedElection, setSelectedElection] = useState(null);
+    const [countdowns, setCountdowns] = useState({});
 
     const navigate = useNavigate();
     const theme = useTheme();
-
     const isXs = useMediaQuery(theme.breakpoints.down('sm'));
     const isSm = useMediaQuery(theme.breakpoints.only('sm'));
     const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -27,17 +29,43 @@ const Election = () => {
     useEffect(() => {
         const fetchElectionTypes = async () => {
             try {
-                const response = await publicService.getAllElections();
+                const response = await publicService.getAllActiveElections();
                 if (response.status === 200) {
                     setElectionTypes(response.data);
                 }
             } catch (error) {
-                console.error('Failed to fetch election types:', error);
+                console.error('Failed to fetch elections:', error);
             }
         };
-
         fetchElectionTypes();
     }, []);
+
+    // Countdown logic
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const updatedCountdowns = {};
+
+            electionTypes.forEach((election) => {
+                const deadline = new Date(election.electionDeadline).getTime();
+                const distance = deadline - now;
+
+                if (distance > 0) {
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    updatedCountdowns[election.electionId] = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                } else {
+                    updatedCountdowns[election.electionId] = 'Expired';
+                }
+            });
+
+            setCountdowns(updatedCountdowns);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [electionTypes]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -60,7 +88,7 @@ const Election = () => {
         if (selectedElection) {
             navigate('/election/vote-qrCode', {
                 state: {
-                    electionId: selectedElection.id,
+                    electionId: selectedElection.electionId,
                     electionTypeId: selectedElection.electionTypeId,
                     electionTypeName: selectedElection.electionTypeName,
                     electionName: selectedElection.electionName
@@ -69,138 +97,117 @@ const Election = () => {
         }
     };
 
-    const getResponsiveFontSize = () => {
-        if (isXs) return '0.8rem';
-        if (isSm) return '1rem';
-        return '1.2rem';
-    };
-
-    if (loading) {
-        return <NormalLoadingPage />;
-    }
+    if (loading) return <NormalLoadingPage />;
 
     return (
         <>
             <AppBar />
             <Box>
                 <Box sx={{ background: TITLE, color: '#ffffff' }} p={1}>
-                    {' '}
-                    <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff' }}>
-                        Election Types
-                    </Typography>
+                    <Typography textAlign="center" variant="h2">Elections</Typography>
                 </Box>
 
-                <Grid container spacing={2} justifyContent="space-between" alignItems="center" style={{ marginTop: '10px' }} p={5}>
-                    {electionTypes.map((election) => (
-                        <Grid item xs={12} sm={6} md={3} key={election.id}>
-                            <MainCard
-                                onClick={() => handleCardClick(election)}
-                                sx={{
-                                    height: {
-                                        xs: 200,
-                                        sm: 200,
-                                        md: 200,
-                                        lg: 200,
-                                        xl: 200
-                                    },
-                                    border: '2px solid #002B69',
-                                    cursor: 'pointer',
-                                    transition: 'box-shadow 0.5s',
-                                    '&:hover': {
-                                        boxShadow: '0px 10px 20px #002B69'
-                                    }
-                                }}
-                            >
-                                <Box sx={{ textDecoration: 'none' }} display={'flex'} flexDirection="column" alignItems="center" gap={2}>
-                                    <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
-                                    <Typography
-                                        variant="subtitle2"
-                                        sx={{
-                                            fontSize: {
-                                                xs: '13px',
-                                                sm: '10px',
-                                                md: '17px',
-                                                lg: '15px',
-                                                xl: '1rem'
-                                            },
-                                            color: '#000000'
-                                        }}
-                                    >
-                                        {election.electionTypeName}
-                                    </Typography>
-                                    <Typography
-                                        variant="caption"
-                                        sx={{
-                                            fontSize: {
-                                                xs: '13px',
-                                                sm: '10px',
-                                                md: '17px',
-                                                lg: '15px',
-                                                xl: '1rem'
-                                            },
-                                            color: '#000000'
-                                        }}
-                                    >
-                                        {election.electionName}
-                                    </Typography>
+                <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 2, px: 5 }}>
+                    {electionTypes
+                        .filter(election => new Date(election.electionDeadline) > new Date())
+                        .map((election) => (
+                            <Grid item xs={12} sm={6} md={3} key={election.id}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                                    {countdowns[election.electionId] && countdowns[election.electionId] !== 'Expired' ? (
+                                        (() => {
+                                            const parts = countdowns[election.electionId].split(' ');
+                                            return (
+                                                <Typography variant="subtitle1" sx={{ textAlign: 'center', fontWeight: 900 }}>
+                                                    {parts.map((part, index) => {
+                                                        const value = part.slice(0, -1);
+                                                        const label = part.slice(-1);
+                                                        return (
+                                                            <Box key={index} component="span" sx={{ mr: 1 }}>
+                                                                <Box component="span" sx={{ color: '#d32f2f', fontWeight: 900, fontSize: '1.25rem' }}>
+                                                                    {value}
+                                                                </Box>
+                                                                <Box component="span" sx={{ color: '#000', fontWeight: 900, fontSize: '1.25rem' }}>
+                                                                    {label}
+                                                                </Box>
+                                                            </Box>
+                                                        );
+                                                    })}
+                                                </Typography>
+                                            );
+                                        })()
+                                    ) : countdowns[election.electionId] === 'Expired' ? (
+                                        <Typography variant="subtitle1" color="error" sx={{ fontWeight: 900, fontSize: '1.25rem' }}>
+                                            Expired
+                                        </Typography>
+                                    ) : (
+                                        <CircularProgress size={20} color="inherit" />
+                                    )}
                                 </Box>
-                            </MainCard>
-                        </Grid>
-                    ))}
+
+
+                                <MainCard
+                                    onClick={() => handleCardClick(election)}
+                                    sx={{
+                                        height: 220,
+                                        border: '2px solid #002B69',
+                                        cursor: 'pointer',
+                                        transition: 'box-shadow 0.5s',
+                                        '&:hover': { boxShadow: '0px 10px 20px #002B69' }
+                                    }}
+                                >
+                                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                                        <img src={VoteIcon} alt={election.electionName} height="20%" width="20%" />
+                                        <Typography
+                                            variant="subtitle2"
+                                            sx={{ fontSize: '1rem', fontWeight: 'bold', color: '#000000' }}
+                                        >
+                                            {election.electionTypeName}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontSize: '0.9rem', color: '#000000' }}>
+                                            {election.electionName}
+                                        </Typography>
+                                        {/* {countdowns[election.electionId] ? (
+                                            <Typography variant="caption" color="error" sx={{ mt: 1 }}>
+                                                {countdowns[election.electionId]}
+                                            </Typography>
+                                        ) : (
+                                            <Box sx={{ mt: 1 }}>
+                                                <CircularProgress size={14} color="inherit" />
+                                            </Box>
+                                        )} */}
+
+                                    </Box>
+                                </MainCard>
+                            </Grid>
+                        ))}
                 </Grid>
 
                 {/* Confirmation Dialog */}
                 <Dialog
                     open={dialogOpen}
                     onClose={(event, reason) => {
-                        if (reason !== 'backdropClick') {
-                            handleDialogClose();
-                        }
+                        if (reason !== 'backdropClick') handleDialogClose();
                     }}
-                    maxWidth="sm" // Reduces the width
-                    fullWidth // Ensures it adapts to smaller screens
-                    sx={{
-                        '& .MuiDialog-paper': {
-                            borderRadius: 3,
-                            paddingX: 2,
-                            paddingY: 2
-                        }
-                    }}
+                    maxWidth="sm"
+                    fullWidth
+                    sx={{ '& .MuiDialog-paper': { borderRadius: 3, px: 2, py: 2 } }}
                 >
                     <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Notice</DialogTitle>
                     <DialogContent>
-                        <Typography
-                            variant="body1"
-                            fontWeight="bold"
-                            fontSize={'15px'}
-                            textAlign="center"
-                            gutterBottom
-                            sx={{ marginBottom: 2 }}
-                        >
+                        <Typography variant="body1" fontWeight="bold" fontSize="15px" textAlign="center" gutterBottom>
                             You need to have your Voter VC available in your{' '}
-                            <span style={{ color: '#5AC994' }}>
-                                <strong>Bhutan NDI</strong>
-                            </span>{' '}
-                            Wallet to cast your vote.
+                            <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to cast your vote.
                         </Typography>
-                        <Typography variant="caption" fontWeight="bold" fontSize={'13px'} textAlign="center">
+                        <Typography variant="caption" fontWeight="bold" fontSize="13px" textAlign="center">
                             If you don’t have it yet, visit the ‘Generate Voter VC’ page, scan the QR code, and share your details using the{' '}
-                            <span style={{ color: '#5AC994' }}>
-                                <strong>Bhutan NDI</strong>
-                            </span>{' '}
-                            Wallet to get it.
+                            <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to get it.
                         </Typography>
                     </DialogContent>
                     <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button onClick={handleDialogClose} color="error" variant="contained">
-                            Cancel
-                        </Button>
+                        <Button onClick={handleDialogClose} color="error" variant="contained">Cancel</Button>
                         <Button
                             onClick={handleProceed}
-                            sx={{
-                                background: BUTTON_ADD_COLOR,
-                                '&:hover': { backgroundColor: BUTTON_ADD_COLOR }
-                            }}
+                            sx={{ background: BUTTON_ADD_COLOR, '&:hover': { backgroundColor: BUTTON_ADD_COLOR } }}
                             variant="contained"
                         >
                             Proceed

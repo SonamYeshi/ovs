@@ -43,6 +43,15 @@ const VoteNDIQRCodePage = () => {
     const location = useLocation();
     const { electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
 
+    const setDIDCredentials = async (relationship_did, holder_did) => {
+        if (relationship_did && holder_did) {
+            await setDIDs(relationship_did, holder_did);
+        } else {
+            await clearDIDs();
+        }
+    };
+
+
     useEffect(() => {
         if (!electionId || !electionTypeId) {
             navigate('/election', { replace: true });
@@ -76,13 +85,14 @@ const VoteNDIQRCodePage = () => {
         const eventSource = new EventSource(endPoint);
 
         eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
+
             const data = JSON.parse(event.data);
 
             eventSource.close();
             if (data.status === 'exists') {
-                setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
                 setLoading(true); // Show loading spinner
-
+                await setDIDCredentials(data.userDTO.relationship_did, data.userDTO.holder_did);
+                
                 // Directly navigate without checking if already voted
                 navigate('/election/candidates', {
                     state: {
@@ -275,7 +285,7 @@ const VoteNDIQRCodePage = () => {
                     </Box>
                 </MainCard>
             </Box>
-             <Footer/>
+            <Footer />
         </>
     );
 };

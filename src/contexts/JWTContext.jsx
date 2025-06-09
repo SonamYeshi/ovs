@@ -11,7 +11,7 @@ import accountReducer from 'store/accountReducer';
 
 // project imports
 import Loader from 'ui-component/Loader';
-import axios from 'utils/axios';    
+import axios from 'utils/axios';
 
 import { clearAuthTokens, setAuthTokens } from '../utils/auth-storage';
 import { clearBlockchainToken } from '../utils/bc-token-stogare';
@@ -49,7 +49,7 @@ const setSession = async (serviceToken, refreshToken, user) => {
     } else {
         await clearAuthTokens();
         await clearBlockchainToken();
-        await clearDIDs();
+        // await clearDIDs();
         delete axios.defaults.headers.common.Authorization;
     }
 };
@@ -100,7 +100,7 @@ export const JWTProvider = ({ children }) => {
                     message: response?.error.response?.data?.message || 'Login failed.'
                 };
             }
-    
+
             const { serviceToken, refreshToken, user } = response.response.data;
             await setSession(serviceToken, refreshToken, user);
             dispatch({
@@ -110,7 +110,7 @@ export const JWTProvider = ({ children }) => {
                     user
                 }
             });
-    
+
             return { success: true };
         } catch (error) {
             console.error('Login error:', error);

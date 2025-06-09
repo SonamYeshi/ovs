@@ -34,11 +34,20 @@ import publicService from 'services/public.service';
 import NdiService from '../../../services/ndi.service';
 import { setDIDs } from '../../../utils/ndi-storage';
 import Footer from '../landing/Footer';
+import { h } from '@fullcalendar/core/preact';
 
 
-const BASE_URL = import.meta.env.VITE_BASE_URL+'api/v1/ndi';
+const BASE_URL = import.meta.env.VITE_BASE_URL + 'api/v1/ndi';
 
 const ElectionCandidatesPage = () => {
+    const [loading, setLoading] = useState(false);
+    const [validatingLoad, setValidatingLoad] = useState(false);
+    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+    const [dialogMessage, setDialogMessage] = useState('');
+    const [relationshipDID, setRelationshipDID] = useState(null);
+    const [holderDID, setHolderDID] = useState(null);
+    const [walletCheckDialogOpen, setWalletCheckDialogOpen] = useState(false);
+
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedCandidateId, setSelectedCandidateId] = useState(null);
@@ -50,13 +59,6 @@ const ElectionCandidatesPage = () => {
         message: '',
         confirmAction: null
     });
-    const [loading, setLoading] = useState(false);
-    const [validatingLoad, setValidatingLoad] = useState(false);
-    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
-    const [dialogMessage, setDialogMessage] = useState('');
-    const [relationshipDID, setRelationshipDID] = useState(null);
-    const [holderDID, setHolderDID] = useState(null);
-    const [walletCheckDialogOpen, setWalletCheckDialogOpen] = useState(false);
 
     const { voterVid, dzongkhag, gewog, village, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
 
@@ -66,30 +68,31 @@ const ElectionCandidatesPage = () => {
             return;
         }
 
-        setRelationshipDID(window.localStorage.getItem('relationship_did'));
-        setHolderDID(window.localStorage.getItem('holder_did'));
+        setRelationshipDID(localStorage.getItem('relationship_did'));
+        setHolderDID(localStorage.getItem('holder_did'));
 
-        publicService
-            .getCandidates(electionTypeId, electionId, dzongkhag, gewog, village)
-            .then((response) => {
-                setCandidates(response.data);
-            })
-            .catch((error) => {
-                setDialogState({
-                    open: true,
-                    type: 'result',
-                    title: 'Error',
-                    message: 'No Candidates found for this election.',
-                    confirmAction: null
+        if (electionId && electionTypeId) {
+            publicService
+                .getCandidates(electionTypeId, electionId, dzongkhag, gewog, village)
+                .then((response) => {
+                    setCandidates(response.data);
+                })
+                .catch((error) => {
+                    setDialogState({
+                        open: true,
+                        type: 'result',
+                        title: 'Error',
+                        message: 'No Candidates found for this election.',
+                        confirmAction: null
+                    });
                 });
-            });
+        }
     }, [electionId, electionTypeId]);
 
     const getCandidateById = (id) => candidates.find((c) => c.id === id);
 
-    const handleNDINotificationRequest = async () => {
+    const handleNDINotificationRequest = () => {
         setWalletCheckDialogOpen(true);
-
         NdiService.proofNdiRequest(true, relationshipDID)
             .then((res) => {
                 const threadId = res.data.threadId;
@@ -106,100 +109,78 @@ const ElectionCandidatesPage = () => {
         const endPoint = `${BASE_URL}/nats-subscribe?threadId=${threadId}&isBiometric=true&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
 
-        eventSource.addEventListener('NDI_SSI_EVENT', (event) => {
-            const data = JSON.parse(event.data);
-            setWalletCheckDialogOpen(false);
-            const candidate = getCandidateById(selectedCandidateId);
+        eventSource.addEventListener('NDI_SSI_EVENT', async (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                setWalletCheckDialogOpen(false);
 
-            if (data.status === 'exists') {
-                setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
-                const voterVID = data.userDTO.vid;
-                
-                submitVote(candidate, voterVID);
-            } else {
+                if (data.status === 'exists') {
+                    const candidate = getCandidateById(selectedCandidateId);
+                    setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
+                    const voterVID = data.userDTO.vid;
+
+                    submitVote(candidate, voterVID);
+                } else {
+                    setErrorDialogOpen(true);
+                    setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
+                }
+                // eventSource.close();
+            } catch (error) {
+                console.error('Error in NDI_SSI_EVENT handler:', error);
                 setErrorDialogOpen(true);
-                setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
+                setDialogMessage('An error occurred while processing the vote.');
+                setWalletCheckDialogOpen(false);
+
             }
         });
     };
 
     const submitVote = async (candidate, voterVID) => {
-        setValidatingLoad(true);
-
-        const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
-        if (!bc_token) {
-            return globalLib.warningMsg('Could not load access token for blockchain.');
-        }
-
-        const payload = {
-            voterID: voterVID,
-            candidateCid: candidate.candidateCid,
-            candidateId: candidate.id,
-            electionTypeId: electionTypeId,
-            electionId: electionId,
-            bcAccessToken: bc_token,
-            ndiRelationshipDID: relationshipDID,
-            ndiHolderDID: holderDID
-        };
-        setValidatingLoad(false);
 
         setLoading(true);
-        blockchainService
-            .saveVote(payload)
+        await blockchainAuthService.fetchBlockchainAccessToken()
+            .then((bc_token) => {
+                if (!bc_token) {
+                    throw new Error('Could not load access token for blockchain.');
+                }
+
+                const payload = {
+                    voterID: voterVID,
+                    candidateCid: candidate.candidateCid,
+                    candidateId: candidate.id,
+                    electionTypeId,
+                    electionId,
+                    bcAccessToken: bc_token,
+                    ndiRelationshipDID: relationshipDID,
+                    ndiHolderDID: holderDID
+                };
+
+                return blockchainService.saveVote(payload);
+            })
             .then((res) => {
                 if (!res.data || !res.data.message) {
                     throw new Error('Response is missing data.message');
                 }
 
-                // ✅ Play sound here
                 const audio = new Audio(voteSuccessSound);
-                audio.play().catch((err) => console.error('Error playing sound:', err));
+                audio.play().catch((err) => console.error('Error playing success sound:', err));
 
                 return globalLib.successMsg(res.data.message);
             })
-            .then(() => {
-                navigate('/election/vote-qrCode', {
-                    state: { electionTypeId: electionTypeId, electionId: electionId }
-                });
-                return;
-            })
             .catch((err) => {
-                const audio = new Audio(voteFailureSound);
-                audio.play().catch((err) => console.error('Error playing sound:', err));
+                console.error('Error submitting vote:', err?.response?.data?.error || err.message || err);
 
-                globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong').then(() => {
-                    setLoading(false);
-                    navigate('/election/vote-qrCode', {
-                        state: { electionTypeId: electionTypeId, electionId: electionId }
-                    });
-                    return;
+                const audio = new Audio(voteFailureSound);
+                audio.play().catch((err) => console.error('Error playing failure sound:', err));
+
+                return globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong');
+            })
+            .finally(() => {
+                setLoading(false);
+                navigate('/election/vote-qrCode', {
+                    state: { electionTypeId, electionId }
                 });
             });
-    };
-
-    const handleVoteClick = (candidateId) => {
-        const candidate = getCandidateById(candidateId);
-        setSelectedCandidateId(candidateId);
-
-        setDialogState({
-            open: true,
-            type: 'confirm',
-            title: 'Confirmation',
-            message: (
-                <>
-                    <Box display={'flex'} justifyContent={'center'} mb={2}>
-                        <Avatar src={candidate.proPicUrl} alt={candidate.candidateName} sx={{ width: 90, height: 90 }} variant="circular" />
-                    </Box>
-                    <Typography variant="h5" textAlign={'center'}>
-                        Confirmation
-                    </Typography>{' '}
-                    <br />
-                    Are you sure you want to confirm your vote for <strong>{candidate.candidateName}</strong>? This process cannot be
-                    undone.
-                </>
-            ),
-            confirmAction: null
-        });
     };
 
     const getArrowIconColor = (candidateId) => {
@@ -221,14 +202,42 @@ const ElectionCandidatesPage = () => {
         setSelectedCandidateId(null);
         setLoading(false);
     };
-    
+
+    const handleVoteClick = (candidateId) => {
+        const candidate = getCandidateById(candidateId);
+        setSelectedCandidateId(candidateId);
+
+        setDialogState({
+            open: true,
+            type: 'confirm',
+            title: 'Confirmation',
+            message: (
+                <>
+                    <Box sx={{ zIndex: 1 }}>
+                        <Box display={'flex'} justifyContent={'center'} mb={2} >
+                            <Avatar src={candidate.proPicUrl} alt={candidate.candidateName} sx={{ width: 90, height: 90 }} variant="circular" />
+                        </Box>
+                        <Typography variant="h5" textAlign={'center'}>
+                            Confirmation
+                        </Typography>{' '}
+                        <br />
+                        Are you sure you want to confirm your vote for <strong>{candidate.candidateName}</strong>? This process cannot be
+                        undone.
+
+                    </Box>
+                </>
+            ),
+            confirmAction: null
+        });
+    };
+
     return (
         <>
             <AppBar />
             <Box>
                 <Box sx={{ background: TITLE, color: '#ffffff' }} p={1}>
                     {' '}
-                    <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff', mb:1 }}>
+                    <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff', mb: 1 }}>
                         <div>{electionTypeName}</div>
                     </Typography>
                     <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: '#ffffff', mb: 1 }}>
@@ -302,6 +311,13 @@ const ElectionCandidatesPage = () => {
                             </TableContainer>
                         </Paper>
                     </Box>
+
+                    {loading && (
+                        <>
+                            <LoadingPage />
+                        </>
+                    )}
+
                     {/* Dialog */}
                     <Dialog
                         open={dialogState.open}
@@ -329,6 +345,7 @@ const ElectionCandidatesPage = () => {
                                     color="success"
                                     variant="outlined"
                                     onClick={() => {
+                                        setDialogState((prev) => ({ ...prev, open: false }));
                                         handleNDINotificationRequest();
                                     }}
                                 >
@@ -338,22 +355,13 @@ const ElectionCandidatesPage = () => {
                         </DialogActions>
                     </Dialog>
 
-                    {/* lodaing page */}
-                    {validatingLoad && (
-                        <>
-                            <Processing text="Validating..." />
-                        </>
-                    )}
-                    {loading && (
-                        <>
-                            <LoadingPage />
-                        </>
-                    )}
-
                     <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
                         <IconButton
                             aria-label="close"
-                            onClick={() => setErrorDialogOpen(false)}
+                            onClick={() => {
+                                setErrorDialogOpen(false);
+                                handleDialogClose();
+                            }}
                             sx={{
                                 position: 'absolute',
                                 right: 8,
@@ -379,7 +387,7 @@ const ElectionCandidatesPage = () => {
 
                     <Dialog
                         open={walletCheckDialogOpen}
-                        onClose={() => {}}
+                        onClose={() => { }}
                         PaperProps={{
                             sx: {
                                 borderRadius: 3,
@@ -406,7 +414,7 @@ const ElectionCandidatesPage = () => {
                     </Dialog>
                 </MainCard>
             </Box>
-             <Footer/>
+            <Footer />
         </>
     );
 };
