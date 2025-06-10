@@ -4,9 +4,13 @@
 
 import axios from 'axios';
 import { clearAuthTokens, setAuthTokens } from './auth-storage';
+import { accessToken } from 'mapbox-gl';
+
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+const REFRESH_TOKEN_URL = BASE_URL + 'api/v1/auth';
 
 const axiosServices = axios.create({
-    baseURL: import.meta.env.VITE_BASE_URL,
+    baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json'
     }
@@ -16,6 +20,7 @@ const axiosServices = axios.create({
 axiosServices.interceptors.request.use(
     async (config) => {
         const accessToken = localStorage.getItem('serviceToken');
+        
         if (accessToken) {
             config.headers['Authorization'] = `Bearer ${accessToken}`;
         }
@@ -33,8 +38,8 @@ axiosServices.interceptors.response.use(
         const refreshTokenStored = localStorage.getItem('refreshToken');
 
         // Avoid retrying the refresh token request
-        const isRefreshCall = originalRequest.url.includes('/api/v1/auth/refreshtoken');
-
+        const isRefreshCall = originalRequest.url.includes(REFRESH_TOKEN_URL +'/refreshtoken');
+        
         if (error.response?.status === 401 && !originalRequest._retry && !isRefreshCall) {
             originalRequest._retry = true;
 
@@ -46,7 +51,7 @@ axiosServices.interceptors.response.use(
             }
 
             try {
-                const response = await axios.post('http://localhost:8080/api/v1/auth/refreshtoken', {
+                const response = await axios.post(REFRESH_TOKEN_URL + '/refreshtoken', {
                     refreshToken: refreshTokenStored
                 });
                 const { accessToken, refreshToken, user } = response.data;

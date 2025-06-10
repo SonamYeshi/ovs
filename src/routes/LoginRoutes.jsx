@@ -13,9 +13,9 @@ const AuthForgotPassword = Loadable(lazy(() => import('views/pages/authenticatio
 const AuthResetPassword = Loadable(lazy(() => import('views/pages/authentication/authentication3/ResetPassword3')));
 const AuthCheckMail = Loadable(lazy(() => import('views/pages/authentication/authentication3/CheckMail3')));
 const Election = Loadable(lazy(() => import('views/pages/election/Election')));
-const LocalElectionScanPage = Loadable(lazy(() => import('views/pages/election/LocalElectionScanPage')));
+const ElectionCandidatesPage = Loadable(lazy(() => import('views/pages/election/ElectionCandidatesPage')));
 const VoteNDIQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoteNDIQRCodePage')));
-const EcbQRCodePage = Loadable(lazy(() => import('views/pages/ndi/EcbQRCodePage')));
+const VoterVcQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoterVcQRCodePage')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -54,16 +54,16 @@ const LoginRoutes = {
             element: <Election />
         },
         {
-            path: '/vote-ndi-qr',
+            path: '/election/vote-qrCode',
             element: <VoteNDIQRCodePage />
         },
         {
-            path: '/localElectionScanPage',
-            element: <LocalElectionScanPage />
+            path: '/election/candidates',
+            element: <ElectionCandidatesPage />
         },
         {
-            path: '/ecbQrCode',
-            element: <EcbQRCodePage />
+            path: '/vc-qrCode',
+            element: <VoterVcQRCodePage />
         }
     ]
 };

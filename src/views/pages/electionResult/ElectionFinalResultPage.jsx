@@ -16,7 +16,7 @@ import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
 import MainCard from 'ui-component/cards/MainCard';
 
-const LocalElectionResult = () => {
+const ElectionFinalResultPage = () => {
     const navigate = useNavigate();
     const [candidates, setCandidates] = useState([]);
     const location = useLocation();
@@ -134,11 +134,11 @@ const LocalElectionResult = () => {
                                     {candidates.map((item, index) => (
                                         <TableRow key={item.candidateId}>
                                             <TableCell align="center">{index + 1}</TableCell>
-                                            <TableCell>{item.candidateId}</TableCell>
+                                            <TableCell>{item.candidateName}</TableCell>
                                             <TableCell align="center">
                                                 <Avatar
                                                     src={item.proPicUrl}
-                                                    alt={item.candidateId}
+                                                    alt={item.candidateName}
                                                     sx={{ width: 70, height: 70 }}
                                                     variant="circular"
                                                 />
@@ -192,4 +192,4 @@ const LocalElectionResult = () => {
     );
 };
 
-export default LocalElectionResult;
+export default ElectionFinalResultPage;

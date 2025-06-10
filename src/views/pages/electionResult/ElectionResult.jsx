@@ -40,7 +40,7 @@ const ElectionResult = () => {
     }, []);
 
     const handleCardClick = (election) => {
-        navigate('/localElectionResult', {
+        navigate('/electionResult/result', {
             state: {
                 electionTypeId: election.electionTypeId,
                 electionId: election.id,

@@ -28,7 +28,7 @@ import Footer from '../landing/Footer';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'api/v1/vc';
 
-const EcbQRCodePage = () => {
+const VoterVcQRCodePage = () => {
     const isMobile = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const [url, setUrl] = useState('');
     const [deepLinkUrl, setDeepLinkUrl] = useState('');
@@ -289,4 +289,4 @@ const EcbQRCodePage = () => {
     );
 };
 
-export default EcbQRCodePage;
+export default VoterVcQRCodePage;

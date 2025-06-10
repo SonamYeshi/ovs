@@ -30,6 +30,8 @@ import AppConstant from 'utils/AppConstant';
 import * as Yup from 'yup';
 import Footer from '../landing/Footer';
 
+import dayjs from 'dayjs';
+
 // animation
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
@@ -69,13 +71,13 @@ const ElectionRuleSetup = () => {
             gewog: '',
             village: '',
             qualifyingDate: '',
-            deadLine: ''
+            electionDeadline: ''
         },
         validationSchema: Yup.object({
             electionTypeId: Yup.string().required(AppConstant().REQUIRED_FIELD),
             electionId: Yup.string().required(AppConstant().REQUIRED_FIELD),
             qualifyingDate: Yup.string().required(AppConstant().REQUIRED_FIELD),
-            deadLine: Yup.string().required(AppConstant().REQUIRED_FIELD)
+            electionDeadline: Yup.string().required(AppConstant().REQUIRED_FIELD)
         }),
         onSubmit: async (values) => {
             const mappedSelections = {
@@ -84,11 +86,19 @@ const ElectionRuleSetup = () => {
                 village: selectedElections['Village'] || false
             };
 
+            const electionDateTime = {
+                qualifyingDate: dayjs(values.qualifyingDate).format('YYYY-MM-DD'),
+                electionDeadline: dayjs(values.electionDeadline).format('YYYY-MM-DDTHH:mm:ss')
+            };
+
+
             try {
                 const payload = {
                     ...values,
+                    ...electionDateTime,
                     ...mappedSelections
                 };
+                console.log(payload)
                 const response = await electionRuleService.saveElectionRule(payload);
                 if (response.status === 200) {
                     globalLib.successMsg(response.data);
@@ -128,6 +138,8 @@ const ElectionRuleSetup = () => {
         setFieldValue('dzongkhag', row.dzongkhag);
         setFieldValue('gewog', row.gewog);
         setFieldValue('village', row.village);
+        setFieldValue('qualifyingDate', dayjs(row.qualifyingDate));
+        setFieldValue('electionDeadline', dayjs(row.electionDeadline));
 
         // 3. Set checkboxes
         const updatedSelections = {
@@ -367,10 +379,10 @@ const ElectionRuleSetup = () => {
 
                                     {/* -- Age Field -- */}
                                     <Grid item sm={12} xs={12} md={12}>
-                                        <InputLabel>Qualifying date</InputLabel>
+                                        <InputLabel>Qualifying Date</InputLabel>
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                                             <DatePicker
-                                                value={values.qualifyingDate}
+                                                value={values.qualifyingDate ? dayjs(values.qualifyingDate) : null}
                                                 onChange={(value) =>setFieldValue('qualifyingDate', value)}
                                                 slotProps={{
                                                     textField: {
@@ -384,13 +396,13 @@ const ElectionRuleSetup = () => {
                                         </LocalizationProvider>
                                     </Grid>
                                     <Grid item sm={12} xs={12}>
-                                        <InputLabel>Deadline</InputLabel>
+                                        <InputLabel>Election Deadline</InputLabel>
                                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                                             <DemoContainer components={['DateTimePicker']}>
                                                 <DateTimePicker
-                                                    value={values.deadLine} // value from Formik
+                                                    value={values.electionDeadline ? dayjs(values.electionDeadline) : null} // value from Formik
                                                     onChange={(value) => {
-                                                        setFieldValue('deadLine', value); // store Dayjs object
+                                                        setFieldValue('electionDeadline', value); // store Dayjs object
                                                     }}
                                                     viewRenderers={{
                                                         hours: renderTimeViewClock,
@@ -401,8 +413,8 @@ const ElectionRuleSetup = () => {
                                                         textField: {
                                                             size: 'small',
                                                             fullWidth: true,
-                                                            error: Boolean(touched.deadLine && errors.deadLine),
-                                                            helperText: touched.deadLine && errors.deadLine
+                                                            error: Boolean(touched.electionDeadline && errors.electionDeadline),
+                                                            helperText: touched.electionDeadline && errors.electionDeadline
                                                         }
                                                     }}
                                                 />

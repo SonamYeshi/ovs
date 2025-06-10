@@ -89,7 +89,7 @@ const AppBar = ({ ...others }) => {
 
                             <Button
                                 component={Link}
-                                href="/ecbQrCode"
+                                href="/vc-qrCode"
                                 sx={{
                                     color: '#002B69'
                                     // background: BUTTON_ADD_COLOR,

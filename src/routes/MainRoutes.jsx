@@ -19,24 +19,19 @@ const WidgetChart = Loadable(lazy(() => import('views/widget/Chart')));
 
 // election
 const Election = Loadable(lazy(() => import('views/pages/election/Election')));
-const LocalElectionScanPage = Loadable(lazy(() => import('views/pages/election/LocalElectionScanPage')));
-const NationalAssemblyElectionScanPage = Loadable(lazy(() => import('views/pages/election/NationalAssemblyElectionScanPage')));
-const NationalCouncilElectionScanPage = Loadable(lazy(() => import('views/pages/election/NationalCouncilElectionScanPage')));
-const ByeElectionScanPage = Loadable(lazy(() => import('views/pages/election/ByeElectionScanPage')));
+const ElectionCandidatesPage = Loadable(lazy(() => import('views/pages/election/ElectionCandidatesPage')));
 
 // election result
 const ElectionResult = Loadable(lazy(() => import('views/pages/electionResult/ElectionResult')));
-const LocalElectionResult = Loadable(lazy(() => import('views/pages/electionResult/LocalElectionResult')));
+const ElectionFinalResultPage = Loadable(lazy(() => import('views/pages/electionResult/ElectionFinalResultPage')));
 const VoteNDIQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoteNDIQRCodePage')));
-const NotEligible = Loadable(lazy(() => import('views/pages/ndi/NotEligible')));
-const Candidates = Loadable(lazy(() => import('views/pages/ndi/CandidateDisplayPage')));
 const Dasbboard = Loadable(lazy(() => import('views/dashboard/Dashoard')));
 const ElectionEligibilitySetup = Loadable(lazy(() => import('views/pages/election/EligibilitySetup')));
 const ElectionType = Loadable(lazy(() => import('views/pages/election/ElectionTypeSetup')));
 const SubElectionType = Loadable(lazy(() => import('views/pages/election/ElectionNameSetup')));
 const ElectionRule = Loadable(lazy(() => import('views/pages/election/ElectionRuleSetup')));
 const ElectionParameter = Loadable(lazy(() => import('views/pages/election/ElectionParameterSetup')));
-const EcbQRCodePage = Loadable(lazy(() => import('views/pages/ndi/EcbQRCodePage')));
+const VoterVcQRCodePage = Loadable(lazy(() => import('views/pages/ndi/VoterVcQRCodePage')));
 const HomePage = Loadable(lazy(() => import('views/pages/landing/HomePage')));
 
 
@@ -84,21 +79,9 @@ const MainRoutes = {
         //     element: <Election />
         // },
         // {
-        //     path: '/localElectionScanPage',
-        //     element: <LocalElectionScanPage />
+        //     path: '/election/candidates',
+        //     element: <ElectionCandidatesPage />
         // },
-        {
-            path: '/nationalAssemblyElectionScanPage',
-            element: <NationalAssemblyElectionScanPage />
-        },
-        {
-            path: '/nationalCouncilElectionScanPage',
-            element: <NationalCouncilElectionScanPage />
-        },
-        {
-            path: '/byeElectionScanPage',
-            element: <ByeElectionScanPage />
-        },
 
         // election result
         {
@@ -106,26 +89,18 @@ const MainRoutes = {
             element: <ElectionResult />
         },
         {
-            path: '/localElectionResult',
-            element: <LocalElectionResult />
+            path: '/electionResult/result',
+            element: <ElectionFinalResultPage />
         },
 
         // {
-        //     path: '/vote-ndi-qr',
+        //     path: '/election/vote-qrCode',
         //     element: <VoteNDIQRCodePage />
         // },
         // {
-        //     path: '/ecbQrCode',
-        //     element: <EcbQRCodePage />
+        //     path: '/vc-qrCode',
+        //     element: <VoterVcQRCodePage />
         // },
-        {
-            path: '/dashboard/candidates',
-            element: <Candidates />
-        },
-        {
-            path: '/dashboard/not-eligible',
-            element: <NotEligible />
-        },
         {
             path: 'electionEligibilitySetup',
             element: <ElectionEligibilitySetup />
