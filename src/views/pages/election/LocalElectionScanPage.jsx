@@ -180,7 +180,6 @@ const LocalElectionScanPage = () => {
     const handleVoteClick = (candidateId) => {
         const candidate = getCandidateById(candidateId);
         setSelectedCandidateId(candidateId);
-
         setDialogState({
             open: true,
             type: 'confirm',
@@ -188,7 +187,7 @@ const LocalElectionScanPage = () => {
             message: (
                 <>
                     <Box display={'flex'} justifyContent={'center'} mb={2}>
-                        <Avatar src={candidate.proPicUrl} alt={candidate.candidateName} sx={{ width: 90, height: 90 }} variant="circular" />
+                        <Avatar src={candidate.proPicUrl} alt={candidate.candidateName} sx={{ width: 200, height: 200 }} variant="circular" />
                     </Box>
                     <Typography variant="h5" textAlign={'center'}>
                         Confirmation
@@ -264,7 +263,7 @@ const LocalElectionScanPage = () => {
                                                     <Avatar
                                                         src={candidate.proPicUrl}
                                                         alt={candidate.candidateName}
-                                                        sx={{ width: 70, height: 70 }}
+                                                        sx={{ width: 100, height: 100 }}
                                                         variant="circular"
                                                     />
                                                 </TableCell>
