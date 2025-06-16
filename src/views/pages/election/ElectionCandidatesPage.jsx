@@ -36,7 +36,6 @@ import { setDIDs } from '../../../utils/ndi-storage';
 import Footer from '../landing/Footer';
 import { h } from '@fullcalendar/core/preact';
 
-
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'api/v1/ndi';
 
 const ElectionCandidatesPage = () => {
@@ -131,7 +130,6 @@ const ElectionCandidatesPage = () => {
                 setErrorDialogOpen(true);
                 setDialogMessage('An error occurred while processing the vote.');
                 setWalletCheckDialogOpen(false);
-
             }
         });
     };
@@ -158,9 +156,9 @@ const ElectionCandidatesPage = () => {
     };
 
     const submitVote = async (candidate, voterVID) => {
-
         setLoading(true);
-        await blockchainAuthService.fetchBlockchainAccessToken()
+        await blockchainAuthService
+            .fetchBlockchainAccessToken()
             .then((bc_token) => {
                 if (!bc_token) {
                     throw new Error('Could not load access token for blockchain.');
