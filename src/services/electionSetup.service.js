@@ -42,6 +42,10 @@ const getElectionByElectionType = (id) => {
     return axios.get(BASE_URL + '/getElectionByElectionType/' + id);
 };
 
+const getElectionsForResult = () => {
+    return axios.get(BASE_URL + '/getElectionsForResult');
+};
+
 export default {
     saveElectionType,
     getElectionType,
@@ -50,5 +54,6 @@ export default {
     getAllSubElectionType,
     deleteSubElection,
     getAllElectionParameter,
-    getElectionByElectionType
+    getElectionByElectionType,
+    getElectionsForResult,
 };

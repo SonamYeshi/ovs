@@ -98,7 +98,7 @@ const ElectionRuleSetup = () => {
                     ...electionDateTime,
                     ...mappedSelections
                 };
-                console.log(payload)
+                
                 const response = await electionRuleService.saveElectionRule(payload);
                 if (response.status === 200) {
                     globalLib.successMsg(response.data);

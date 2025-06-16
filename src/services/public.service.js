@@ -20,12 +20,23 @@ const getCandidates = (electionTypeId, electionId, dzongkhag, gewog, village) =>
     // return axios.get(`${BASE_URL}/getCandidates/${electionTypeId}/${electionId}/${dzongkhag}/${gewog}/${village}`);
 };
 
-// const getAllElections = () => {
-//     return axios.get(BASE_URL + '/getAllElection');
-// };
+const checkVoterEligibility = async (userDTO, electionId, electionTypeId) => {
+
+    const payload = {
+        dateOfBirth: userDTO.dob,
+        dzongkhag: userDTO.dzongkhag,
+        gewog: userDTO.gewog,
+        village: userDTO.village,
+        electionTypeId,
+        electionId
+    };
+
+    const response = await axios.post(`${BASE_URL}/voterEligibilityCheck`, payload);
+    return response.data;
+};
 
 export default {
     getAllActiveElections,
     getCandidates,
-    // getAllElections,
+    checkVoterEligibility,
 };

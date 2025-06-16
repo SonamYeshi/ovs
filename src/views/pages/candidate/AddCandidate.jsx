@@ -113,6 +113,7 @@ const AddCandidate = () => {
         setLoading(true);
         const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
         if (!bc_token) {
+            setLoading(false);
             return globalLib.warningMsg('Could not load access token for blockchain.');
         }
         formData.append('bc_authToken', bc_token);

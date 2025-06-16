@@ -12,6 +12,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import publicService from 'services/public.service';
 import AppBar from 'ui-component/extended/AppBar';
 import Footer from '../landing/Footer';
+import Layout from 'ui-component/Layout';
 
 const Election = () => {
     const [electionTypes, setElectionTypes] = useState([]);
@@ -100,16 +101,29 @@ const Election = () => {
     if (loading) return <NormalLoadingPage />;
 
     return (
-        <>
-            <AppBar />
-            <Box>
-                <Box sx={{ background: TITLE, color: '#ffffff' }} p={1}>
-                    <Typography textAlign="center" variant="h2">Elections</Typography>
-                </Box>
+        <Layout>
+            <Box sx={{ background: TITLE, color: '#ffffff' }} p={1}>
+                <Typography textAlign="center" variant="h2" sx={{ color: '#ffffff' }}>Elections</Typography>
+            </Box>
 
-                <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 2, px: 5 }}>
-                    {electionTypes
-                        .filter(election => new Date(election.electionDeadline) > new Date())
+            <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 2, px: 5 }}>
+                {electionTypes.filter(election => new Date(election.electionDeadline) > new Date()).length === 0 ? (
+                    <Box
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="center"
+                        minHeight="200px"
+                    >
+                        <Typography
+                            variant="h3"
+                            color="text.secondary"
+                            sx={{ textAlign: 'center', width: '100%', mt: 4 }}
+                        >
+                        There are currently no active elections.
+                        </Typography>
+                    </Box>
+                ) :
+                    (electionTypes.filter(election => new Date(election.electionDeadline) > new Date())
                         .map((election) => (
                             <Grid item xs={12} sm={6} md={3} key={election.id}>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
@@ -135,10 +149,6 @@ const Election = () => {
                                                 </Typography>
                                             );
                                         })()
-                                    ) : countdowns[election.electionId] === 'Expired' ? (
-                                        <Typography variant="subtitle1" color="error" sx={{ fontWeight: 900, fontSize: '1.25rem' }}>
-                                            Expired
-                                        </Typography>
                                     ) : (
                                         <CircularProgress size={20} color="inherit" />
                                     )}
@@ -166,57 +176,48 @@ const Election = () => {
                                         <Typography variant="caption" sx={{ fontSize: '0.9rem', color: '#000000' }}>
                                             {election.electionName}
                                         </Typography>
-                                        {/* {countdowns[election.electionId] ? (
-                                            <Typography variant="caption" color="error" sx={{ mt: 1 }}>
-                                                {countdowns[election.electionId]}
-                                            </Typography>
-                                        ) : (
-                                            <Box sx={{ mt: 1 }}>
-                                                <CircularProgress size={14} color="inherit" />
-                                            </Box>
-                                        )} */}
 
                                     </Box>
                                 </MainCard>
                             </Grid>
-                        ))}
-                </Grid>
+                        ))
+                    )
+                }
+            </Grid>
 
-                {/* Confirmation Dialog */}
-                <Dialog
-                    open={dialogOpen}
-                    onClose={(event, reason) => {
-                        if (reason !== 'backdropClick') handleDialogClose();
-                    }}
-                    maxWidth="sm"
-                    fullWidth
-                    sx={{ '& .MuiDialog-paper': { borderRadius: 3, px: 2, py: 2 } }}
-                >
-                    <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Notice</DialogTitle>
-                    <DialogContent>
-                        <Typography variant="body1" fontWeight="bold" fontSize="15px" textAlign="center" gutterBottom>
-                            You need to have your Voter VC available in your{' '}
-                            <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to cast your vote.
-                        </Typography>
-                        <Typography variant="caption" fontWeight="bold" fontSize="13px" textAlign="center">
-                            If you don’t have it yet, visit the ‘Generate Voter VC’ page, scan the QR code, and share your details using the{' '}
-                            <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to get it.
-                        </Typography>
-                    </DialogContent>
-                    <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Button onClick={handleDialogClose} color="error" variant="contained">Cancel</Button>
-                        <Button
-                            onClick={handleProceed}
-                            sx={{ background: BUTTON_ADD_COLOR, '&:hover': { backgroundColor: BUTTON_ADD_COLOR } }}
-                            variant="contained"
-                        >
-                            Proceed
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-            </Box>
-            <Footer />
-        </>
+            {/* Confirmation Dialog */}
+            <Dialog
+                open={dialogOpen}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick') handleDialogClose();
+                }}
+                maxWidth="sm"
+                fullWidth
+                sx={{ '& .MuiDialog-paper': { borderRadius: 3, px: 2, py: 2 } }}
+            >
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'center' }}>Notice</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1" fontWeight="bold" fontSize="15px" textAlign="center" gutterBottom>
+                        You need to have your Voter VC available in your{' '}
+                        <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to cast your vote.
+                    </Typography>
+                    <Typography variant="caption" fontWeight="bold" fontSize="13px" textAlign="center">
+                        If you don’t have it yet, visit the ‘Generate Voter VC’ page, scan the QR code, and share your details using the{' '}
+                        <span style={{ color: '#5AC994' }}><strong>Bhutan NDI</strong></span> Wallet to get it.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button onClick={handleDialogClose} color="error" variant="contained">Cancel</Button>
+                    <Button
+                        onClick={handleProceed}
+                        sx={{ background: BUTTON_ADD_COLOR, '&:hover': { backgroundColor: BUTTON_ADD_COLOR } }}
+                        variant="contained"
+                    >
+                        Proceed
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Layout>
     );
 };
 

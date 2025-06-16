@@ -12,6 +12,7 @@ import { TITLE } from 'common/color';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NormalLoadingPage from 'common/NormalLoadingPage';
+import Processing from 'common/Processing';
 import blockchainAuthService from 'services/blockchainAuth.service';
 import blockchainService from 'services/blockchain.service';
 import MainCard from 'ui-component/cards/MainCard';
@@ -88,67 +89,138 @@ const ElectionFinalResultPage = () => {
     };
 
     if (loading) {
-        return <NormalLoadingPage />;
+        return <Processing text='Loading election results, please wait...' />;
     }
 
     return (
         <>
             <MainCard>
                 <Box mt={4}>
-                    <Typography variant="h3" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
-                        <div> {electionTypeName}</div>
+                    <Typography
+                        variant="h3"
+                        align="center"
+                        fontWeight="bold"
+                        sx={{ color: TITLE, mb: 2 }}
+                    >
+                        Voting result for {electionName}
                     </Typography>
-                    <Typography variant="h4" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 3 }}>
-                        <div>{electionName} </div>
-                    </Typography>
-                    <Typography variant="h5" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 1 }}>
-                        Total Voters : {voteCount}
-                    </Typography>
-                    <Typography variant="h5" align="center" fontWeight="bold" sx={{ color: TITLE, mb: 4 }}>
-                        Vote counts : {voteCount}
-                    </Typography>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: 6,
+                            mb: 4,
+                        }}
+                    >
+                        <Typography variant="h5" sx={{ color: TITLE }}>
+                            Total Voters:{' '}
+                            <Box component="span" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
+                                {voteCount}
+                            </Box>
+                        </Typography>
+
+                        <Typography variant="h5" sx={{ color: TITLE }}>
+                            Vote Counts:{' '}
+                            <Box component="span" sx={{ fontWeight: 'bold', fontSize: '1rem' }}>
+                                {voteCount}
+                            </Box>
+                        </Typography>
+                    </Box>
                 </Box>
+
                 <Box
-                    mt={1}
                     sx={{
-                        display: 'flex',
-                        justifyContent: 'center'
+                        display: "flex",
+                        justifyContent: "center",
+                        mt: 1,
                     }}
                 >
-                    <Paper elevation={3} sx={{ borderRadius: 1, p: 3, width: '90%', maxWidth: 800 }}>
-                        <TableContainer>
+                    <Paper elevation={3} sx={{ borderRadius: 1, p: 3, width: "90%", maxWidth: 800 }}>
+                        <TableContainer
+                            sx={{
+                                border: "2px dotted #003366",
+                                borderRadius: 1,
+                                overflow: "hidden",
+                                borderCollapse: "separate",
+                                borderSpacing: "0 8px",
+                            }}
+                        >
                             <Table>
                                 <TableHead>
-                                    <TableRow>
-                                        <TableCell align="center" sx={{ fontWeight: 'bold', color: '#003366' }}>
-                                            Sl.No
-                                        </TableCell>
-                                        <TableCell sx={{ fontWeight: 'bold', color: '#003366' }}>Candidate</TableCell>
+                                    <TableRow
+                                        sx={{
+                                            borderBottom: "2px dotted #003366",
+                                            "& th": {
+                                                fontWeight: "bold",
+                                                color: "#003366",
+                                                paddingY: 1,
+                                                paddingX: 2,
+                                            },
+                                        }}
+                                    >
+                                        <TableCell align="center">Sl.No</TableCell>
+                                        <TableCell align='center'>Candidate</TableCell>
                                         <TableCell align="center"></TableCell>
-                                        <TableCell align="center" sx={{ fontWeight: 'bold', color: '#003366' }}>
-                                            Vote Count
-                                        </TableCell>
+                                        <TableCell align="center">Vote Count</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {candidates.map((item, index) => (
-                                        <TableRow key={item.candidateId}>
+                                        <TableRow
+                                            key={item.candidateId}
+                                            sx={{
+                                                borderBottom: "2px dotted #003366",
+                                                "&:last-child": {
+                                                    borderBottom: "none",
+                                                },
+                                                "& td": {
+                                                    paddingY: 1,
+                                                    paddingX: 2,
+                                                    verticalAlign: "middle",
+                                                },
+                                            }}
+                                        >
                                             <TableCell align="center">{index + 1}</TableCell>
-                                            <TableCell>{item.candidateName}</TableCell>
+
+                                            <TableCell align='center'>
+                                                <Typography variant="body2" fontWeight="bold" color="text.secondary">
+                                                    འོས་མི།
+                                                </Typography>
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    {item.candidateName}
+                                                </Typography>
+                                            </TableCell>
+
                                             <TableCell align="center">
                                                 <Avatar
                                                     src={item.proPicUrl}
                                                     alt={item.candidateName}
-                                                    sx={{ width: 70, height: 70 }}
+                                                    sx={{ width: 90, height: 90 }}
                                                     variant="circular"
                                                 />
                                             </TableCell>
+
                                             <TableCell align="center">
-                                                <Chip
-                                                    label={item.voteCount}
-                                                    variant="contained"
-                                                    sx={{ fontWeight: 'bold', backgroundColor: '#003366', color: '#ffffff' }}
-                                                />
+                                                <Box
+                                                    sx={{
+                                                        fontFamily: "'Courier New', monospace", // calculator-style font
+                                                        backgroundColor: "#000000",
+                                                        color: "#00FF00",
+                                                        fontWeight: "bold",
+                                                        fontSize: "1.5rem",
+                                                        paddingY: 0.5,
+                                                        paddingX: 2,
+                                                        borderRadius: 1,
+                                                        minWidth: 80,
+                                                        display: "inline-block",
+                                                        textAlign: "center",
+                                                        boxShadow: "inset 0 0 5px #00FF00",
+                                                    }}
+                                                >
+                                                    {item.voteCount}
+                                                </Box>
+
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -157,37 +229,38 @@ const ElectionFinalResultPage = () => {
                         </TableContainer>
                     </Paper>
                 </Box>
-
-                {/* Dialog */}
-                <Dialog
-                    open={dialogState.open}
-                    onClose={(event, reason) => {
-                        if (reason !== 'backdropClick') {
-                            handleDialogClose();
-                        }
-                    }}
-                >
-                    <DialogContent>
-                        <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-                            <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
-                                {dialogState.message}
-                            </Typography>
-                        </Box>
-                    </DialogContent>
-                    <DialogActions style={{ justifyContent: 'center' }}>
-                        <Button
-                            size="small"
-                            color="error"
-                            variant="outlined"
-                            onClick={() => {
-                                handleDialogClose();
-                            }}
-                        >
-                            {dialogState.type}
-                        </Button>
-                    </DialogActions>
-                </Dialog>
             </MainCard>
+
+
+
+            <Dialog
+                open={dialogState.open}
+                onClose={(event, reason) => {
+                    if (reason !== 'backdropClick') {
+                        handleDialogClose();
+                    }
+                }}
+            >
+                <DialogContent>
+                    <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
+                        <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
+                            {dialogState.message}
+                        </Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions style={{ justifyContent: 'center' }}>
+                    <Button
+                        size="small"
+                        color="error"
+                        variant="outlined"
+                        onClick={() => {
+                            handleDialogClose();
+                        }}
+                    >
+                        {dialogState.type}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 };

@@ -97,7 +97,7 @@ const ElectionCandidatesPage = () => {
             .then((res) => {
                 const threadId = res.data.threadId;
 
-                natsListenerForNotification(threadId);
+                // natsListenerForNotification(threadId);
             })
             .catch((err) => {
                 console.log(err);
@@ -105,6 +105,7 @@ const ElectionCandidatesPage = () => {
             });
     };
 
+    //commented for now since we are doing away with bio metric for second stage
     const natsListenerForNotification = (threadId) => {
         const endPoint = `${BASE_URL}/nats-subscribe?threadId=${threadId}&isBiometric=true&electionTypeId=${electionTypeId}&electionId=${electionId}`;
         const eventSource = new EventSource(endPoint);
@@ -119,7 +120,7 @@ const ElectionCandidatesPage = () => {
                     setDIDs(data.userDTO.relationship_did, data.userDTO.holder_did);
                     const voterVID = data.userDTO.vid;
 
-                    submitVote(candidate, voterVID);
+                    // submitVote(candidate, voterVID);
                 } else {
                     setErrorDialogOpen(true);
                     setDialogMessage(data.userDTO.message || 'Biometric scan failed.');
@@ -133,6 +134,27 @@ const ElectionCandidatesPage = () => {
 
             }
         });
+    };
+
+    const storingVote = () => {
+        if (!selectedCandidateId) {
+            globalLib.warningMsg('Please select a candidate before submitting your vote.');
+            return;
+        }
+
+        const candidate = getCandidateById(selectedCandidateId);
+        if (!candidate) {
+            globalLib.warningMsg('Selected candidate not found.');
+            return;
+        }
+
+        if (!voterVid) {
+            globalLib.warningMsg('Voter ID is missing.');
+            return;
+        }
+
+        submitVote(candidate, voterVid);
+
     };
 
     const submitVote = async (candidate, voterVID) => {
@@ -212,23 +234,30 @@ const ElectionCandidatesPage = () => {
             type: 'confirm',
             title: 'Confirmation',
             message: (
-                <>
-                    <Box sx={{ zIndex: 1 }}>
-                        <Box display={'flex'} justifyContent={'center'} mb={2} >
-                            <Avatar src={candidate.proPicUrl} alt={candidate.candidateName} sx={{ width: 90, height: 90 }} variant="circular" />
-                        </Box>
-                        <Typography variant="h5" textAlign={'center'}>
-                            Confirmation
-                        </Typography>{' '}
-                        <br />
-                        Are you sure you want to confirm your vote for <strong>{candidate.candidateName}</strong>? This process cannot be
-                        undone.
-
+                <Box sx={{ zIndex: 1, textAlign: 'center' }}>
+                    <Box display="flex" justifyContent="center" mb={2}>
+                        <Avatar
+                            src={candidate.proPicUrl}
+                            alt={candidate.candidateName}
+                            sx={{
+                                width: 170,
+                                height: 170
+                            }}
+                            variant="circular"
+                        />
                     </Box>
-                </>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        Confirmation
+                    </Typography>
+                    <Typography>
+                        Are you sure you want to confirm your vote for{' '}
+                        <strong>{candidate.candidateName}</strong>? This process cannot be undone.
+                    </Typography>
+                </Box>
             ),
             confirmAction: null
         });
+
     };
 
     return (
@@ -244,45 +273,74 @@ const ElectionCandidatesPage = () => {
                         <div> {electionName} </div>
                     </Typography>
                 </Box>
-                <MainCard sx={{ p: 5 }}>
+
+                <MainCard sx={{ p: 3 }}>
                     <Box
-                        mt={1}
                         sx={{
                             display: 'flex',
                             justifyContent: 'center'
                         }}
                     >
-                        <Paper elevation={3} sx={{ borderRadius: 2, p: 4, width: '80%', maxWidth: 900 }}>
-                            <TableContainer component={Paper}>
-                                <Table>
+                        <Paper elevation={3} sx={{ borderRadius: 1.5, p: 2, width: '100%', maxWidth: 900 }}>
+                            <TableContainer
+                                component={Paper}
+                                sx={{
+                                    border: '2px dotted #000',
+                                    borderRadius: 1,
+                                    overflow: 'hidden',
+                                    p: 0
+                                }}
+                            >
+                                <Table
+                                    sx={{
+                                        '& td, & th': {
+                                            borderBottom: '2px dotted #000',
+                                            borderLeft: 'none',
+                                            borderRight: 'none',
+                                        },
+                                        '& tbody tr:last-child td': {
+                                            borderBottom: 'none'
+                                        },
+                                        '& thead th': {
+                                            fontWeight: 'bold',
+                                            backgroundColor: '#f5f5f5'
+                                        }
+                                    }}
+                                >
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
-                                            <TableCell align="center"></TableCell>
+                                            <TableCell
+                                                align="center"
+                                                colSpan={4}
+                                                sx={{ fontWeight: 'bold', fontSize: '1.2rem', backgroundColor: '#f5f5f5' }}
+                                            >
+                                                Candidates for {electionName}
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {candidates.map((candidate, index) => (
                                             <TableRow key={candidate.id}>
-                                                <TableCell align="center">{index + 1}</TableCell>
-                                                <TableCell>{candidate.candidateName}</TableCell>
+                                                <TableCell align="center">
+                                                    <Typography variant="body1" fontWeight="bold" color="text.secondary">
+                                                        འོས་མི།
+                                                    </Typography>
+                                                    <Typography variant="body1" fontWeight="bold">
+                                                        {candidate.candidateName}
+                                                    </Typography>
+                                                </TableCell>
                                                 <TableCell align="center">
                                                     <Avatar
                                                         src={candidate.proPicUrl}
                                                         alt={candidate.candidateName}
-                                                        sx={{ width: 70, height: 70 }}
+                                                        sx={{ width: 80, height: 80 }}
                                                         variant="circular"
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <ArrowCircleLeftIcon
                                                         fontSize="large"
-                                                        sx={{
-                                                            color: getArrowIconColor(candidate.id)
-                                                        }}
+                                                        sx={{ color: getArrowIconColor(candidate.id) }}
                                                     />
                                                 </TableCell>
                                                 <TableCell align="center">
@@ -292,8 +350,8 @@ const ElectionCandidatesPage = () => {
                                                         sx={{
                                                             backgroundColor: getVoteButtonColor(candidate.id),
                                                             borderRadius: '30px',
-                                                            px: 7,
-                                                            py: 2.5,
+                                                            px: 6,
+                                                            py: 1.5,
                                                             minWidth: '100px',
                                                             textTransform: 'none',
                                                             '&:hover': {
@@ -311,108 +369,109 @@ const ElectionCandidatesPage = () => {
                             </TableContainer>
                         </Paper>
                     </Box>
-
-                    {loading && (
-                        <>
-                            <LoadingPage />
-                        </>
-                    )}
-
-                    {/* Dialog */}
-                    <Dialog
-                        open={dialogState.open}
-                        onClose={(event, reason) => {
-                            if (reason !== 'backdropClick') {
-                                handleDialogClose();
-                            }
-                        }}
-                    >
-                        <DialogContent>
-                            <Box p={2} display={'flex'} justifyContent={'center'} flexDirection={'column'}>
-                                <Typography variant="caption" fontSize={'13px'} textAlign={'center'}>
-                                    {dialogState.message}
-                                </Typography>
-                            </Box>
-                        </DialogContent>
-                        <DialogActions style={{ justifyContent: 'center' }}>
-                            <Button size="small" color="error" variant="outlined" onClick={handleDialogClose}>
-                                {dialogState.type === 'confirm' ? 'No' : 'Close'}
-                            </Button>
-
-                            {dialogState.type === 'confirm' && (
-                                <Button
-                                    size="small"
-                                    color="success"
-                                    variant="outlined"
-                                    onClick={() => {
-                                        setDialogState((prev) => ({ ...prev, open: false }));
-                                        handleNDINotificationRequest();
-                                    }}
-                                >
-                                    Confirm
-                                </Button>
-                            )}
-                        </DialogActions>
-                    </Dialog>
-
-                    <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
-                        <IconButton
-                            aria-label="close"
-                            onClick={() => {
-                                setErrorDialogOpen(false);
-                                handleDialogClose();
-                            }}
-                            sx={{
-                                position: 'absolute',
-                                right: 8,
-                                top: 8
-                            }}
-                        >
-                            <CloseIcon color="error" />
-                        </IconButton>
-                        <Box display={'flex'} justifyContent={'center'}>
-                            <img src={CrossImg} alt="corssImg" width="30%" />
-                        </Box>
-                        <DialogContent>
-                            <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
-                                <Typography variant="h4" textAlign={'center'}>
-                                    Error Message
-                                </Typography>
-                                <Typography variant="h5" color="error" textAlign={'center'}>
-                                    {dialogMessage}
-                                </Typography>
-                            </Box>
-                        </DialogContent>
-                    </Dialog>
-
-                    <Dialog
-                        open={walletCheckDialogOpen}
-                        onClose={() => { }}
-                        PaperProps={{
-                            sx: {
-                                borderRadius: 3,
-                                p: { xs: 2, sm: 4 },
-                                maxWidth: 400,
-                                textAlign: 'center'
-                            }
-                        }}
-                    >
-                        <DialogContent>
-                            <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
-                                <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
-                                    Waiting for Biometric Verification
-                                </Typography>
-
-                                <Typography
-                                    variant="body1"
-                                    sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary', fontWeight: 'bold' }}
-                                >
-                                    Open your <span style={{ color: '#5AC994' }}>Bhutan NDI</span> App for Biometric authentication
-                                </Typography>
-                            </Box>
-                        </DialogContent>
-                    </Dialog>
                 </MainCard>
+
+                {loading && <LoadingPage />}
+
+                <Dialog
+                    open={dialogState.open}
+                    onClose={(event, reason) => {
+                        if (reason !== 'backdropClick') {
+                            handleDialogClose();
+                        }
+                    }}
+                >
+                    <DialogContent>
+                        <Box p={2}>{dialogState.message}</Box> {/* Directly render the layout */}
+                    </DialogContent>
+
+                    <DialogActions sx={{ justifyContent: 'center' }}>
+                        <Button
+                            size="small"
+                            color="error"
+                            variant="outlined"
+                            onClick={handleDialogClose}
+                            disabled={loading}
+                        >
+                            {dialogState.type === 'confirm' ? 'No' : 'Close'}
+                        </Button>
+
+                        {dialogState.type === 'confirm' && (
+                            <Button
+                                size="small"
+                                color="success"
+                                variant="outlined"
+                                onClick={() => {
+                                    storingVote();
+                                    // setDialogState((prev) => ({ ...prev, open: false }));
+                                    // handleNDINotificationRequest(); //poping for bio-metric request notify
+                                }}
+                                disabled={loading}
+                            >
+                                Confirm
+                            </Button>
+                        )}
+                    </DialogActions>
+                </Dialog>
+
+
+                <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
+                    <IconButton
+                        aria-label="close"
+                        onClick={() => {
+                            setErrorDialogOpen(false);
+                            handleDialogClose();
+                        }}
+                        sx={{
+                            position: 'absolute',
+                            right: 8,
+                            top: 8
+                        }}
+                    >
+                        <CloseIcon color="error" />
+                    </IconButton>
+                    <Box display={'flex'} justifyContent={'center'}>
+                        <img src={CrossImg} alt="corssImg" width="30%" />
+                    </Box>
+                    <DialogContent>
+                        <Box sx={{ p: 1, minWidth: 300 }} display={'flex'} flexDirection={'column'} gap={2}>
+                            <Typography variant="h4" textAlign={'center'}>
+                                Error Message
+                            </Typography>
+                            <Typography variant="h5" color="error" textAlign={'center'}>
+                                {dialogMessage}
+                            </Typography>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog
+                    open={walletCheckDialogOpen}
+                    onClose={() => { }}
+                    PaperProps={{
+                        sx: {
+                            borderRadius: 3,
+                            p: { xs: 2, sm: 4 },
+                            maxWidth: 400,
+                            textAlign: 'center'
+                        }
+                    }}
+                >
+                    <DialogContent>
+                        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+                            <Typography variant="h5" fontWeight={600} sx={{ fontSize: { xs: '1.2rem', sm: '1.5rem' } }}>
+                                Waiting for Biometric Verification
+                            </Typography>
+
+                            <Typography
+                                variant="body1"
+                                sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, color: 'text.secondary', fontWeight: 'bold' }}
+                            >
+                                Open your <span style={{ color: '#5AC994' }}>Bhutan NDI</span> App for Biometric authentication
+                            </Typography>
+                        </Box>
+                    </DialogContent>
+                </Dialog>
             </Box>
             <Footer />
         </>
