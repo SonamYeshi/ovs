@@ -92,7 +92,6 @@ const VoteNDIQRCodePage = () => {
     };
 
     const natsListener = (threadId) => {
-        // Close any existing connection
         if (eventSourceRef.current) {
             eventSourceRef.current.close();
         }
@@ -127,20 +126,7 @@ const VoteNDIQRCodePage = () => {
             }
         };
 
-        const handleError = (error) => {
-            if (eventProcessed || eventSourceRef.current?.readyState === EventSource.CLOSED) {
-                return;
-            }
-
-            console.error('EventSource connection error:', error);
-            setLoading(false);
-            setDialogMessage('Connection error occurred');
-            setErrorDialogOpen(true);
-            eventSourceRef.current?.close();
-        };
-
         eventSourceRef.current.addEventListener('NDI_SSI_EVENT', handleEvent);
-        eventSourceRef.current.onerror = handleError;
 
         // Return cleanup function
         return () => {
@@ -174,18 +160,69 @@ const VoteNDIQRCodePage = () => {
     };
 
     const navigateToCandidatesPage = (userDTO) => {
-        navigate('/election/candidates', {
-            state: {
-                voterVid: userDTO.vid,
-                village: userDTO.village,
-                dzongkhag: userDTO.dzongkhag,
-                gewog: userDTO.gewog,
-                electionTypeId,
-                electionId,
-                electionTypeName,
-                electionName,
-            },
-        });
+        // 1. Store data in sessionStorage (as before)
+        const stateData = {
+            voterVid: userDTO.vid,
+            village: userDTO.village,
+            dzongkhag: userDTO.dzongkhag,
+            gewog: userDTO.gewog,
+            electionTypeId,
+            electionId,
+            electionTypeName,
+            electionName,
+        };
+        sessionStorage.setItem('candidatesPageState', JSON.stringify(stateData));
+        // window.open('/election/candidates', '_blank');
+
+        const openOnSecondaryScreen = () => {
+            try {
+                // Get primary screen dimensions
+                const primaryWidth = window.screen.width;
+                const primaryHeight = window.screen.height;
+
+                // Position window on secondary screen (right of primary)
+                const leftPos = primaryWidth;
+                const topPos = 0;
+
+                // Use full secondary screen dimensions
+                const width = primaryWidth;
+                const height = primaryHeight;
+
+                // Window features (important flags)
+                const features = [
+                    `width=${width}`,
+                    `height=${height}`,
+                    `left=${leftPos}`,
+                    `top=${topPos}`,
+                    'fullscreen=yes',
+                    'location=no',
+                    'menubar=no',
+                    'toolbar=no',
+                    'status=no'
+                ].join(',');
+
+                // Open window
+                const candidatesWindow = window.open(
+                    '/election/candidates',
+                    'CandidatesWindow', // Named target for reusing same window
+                    features
+                );
+
+                // Focus and prevent accidental closure
+                if (candidatesWindow) {
+                    candidatesWindow.focus();
+                    // Optional: Prevent user from closing with JS (ethical considerations apply)
+                    candidatesWindow.onbeforeunload = () => "Candidate display is active. Close anyway?";
+                }
+
+            } catch (e) {
+                console.error("Failed to open secondary window:", e);
+                // Fallback: Open in new tab
+                window.open('/election/candidates', '_blank');
+            }
+        };
+        // 3. Delay opening slightly to ensure sessionStorage is ready
+        setTimeout(openOnSecondaryScreen, 100);
     };
 
     const handleIneligibleUser = (message) => {

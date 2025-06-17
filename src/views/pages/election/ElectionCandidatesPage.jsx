@@ -36,6 +36,7 @@ import { setDIDs } from '../../../utils/ndi-storage';
 import Footer from '../landing/Footer';
 import { h } from '@fullcalendar/core/preact';
 import Layout from 'ui-component/Layout';
+import Logo from 'assets/images/ecb-logo.gif';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'api/v1/ndi';
 
@@ -47,6 +48,8 @@ const ElectionCandidatesPage = () => {
     const [relationshipDID, setRelationshipDID] = useState(null);
     const [holderDID, setHolderDID] = useState(null);
     const [walletCheckDialogOpen, setWalletCheckDialogOpen] = useState(false);
+    const [voteCompleted, setVoteCompleted] = useState(false);
+    const [voteFailed, setVotedFailed] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -60,7 +63,22 @@ const ElectionCandidatesPage = () => {
         confirmAction: null
     });
 
-    const { voterVid, dzongkhag, gewog, village, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
+    // const { voterVid, dzongkhag, gewog, village, electionTypeId, electionId, electionName, electionTypeName } = location.state || {};
+    let voterVid, village, dzongkhag, gewog, electionTypeId, electionId, electionTypeName, electionName;
+    const stateData = JSON.parse(sessionStorage.getItem('candidatesPageState'));
+
+    if (stateData) {
+        ({
+            voterVid,
+            village,
+            dzongkhag,
+            gewog,
+            electionTypeId,
+            electionId,
+            electionTypeName,
+            electionName,
+        } = stateData);
+    }
 
     useEffect(() => {
         if (!electionId || !electionTypeId) {
@@ -158,51 +176,139 @@ const ElectionCandidatesPage = () => {
 
     const submitVote = async (candidate, voterVID) => {
         setLoading(true);
-        await blockchainAuthService
-            .fetchBlockchainAccessToken()
-            .then((bc_token) => {
-                if (!bc_token) {
-                    throw new Error('Could not load access token for blockchain.');
+        try {
+            const bc_token = await blockchainAuthService.fetchBlockchainAccessToken();
+            if (!bc_token) {
+                throw new Error('Could not load access token for blockchain.');
+            }
+
+            const payload = {
+                voterID: voterVID,
+                candidateCid: candidate.candidateCid,
+                candidateId: candidate.id,
+                electionTypeId,
+                electionId,
+                bcAccessToken: bc_token,
+                ndiRelationshipDID: relationshipDID,
+                ndiHolderDID: holderDID
+            };
+
+            const res = await blockchainService.saveVote(payload);
+
+            if (!res.data || !res.data.message) {
+                throw new Error('Response is missing data.message');
+            }
+
+            // Play success sound
+            const audio = new Audio(voteSuccessSound);
+            audio.play().catch((err) => console.error('Error playing success sound:', err));
+
+            setVoteCompleted(true);
+            globalLib.successMsg(res.data.message);
+
+            // Reload parent window if exists (for both success and failure cases)
+            const reloadParentWindow = () => {
+                if (window.opener && !window.opener.closed) {
+                    window.opener.location.reload();
                 }
+            };
 
-                const payload = {
-                    voterID: voterVID,
-                    candidateCid: candidate.candidateCid,
-                    candidateId: candidate.id,
-                    electionTypeId,
-                    electionId,
-                    bcAccessToken: bc_token,
-                    ndiRelationshipDID: relationshipDID,
-                    ndiHolderDID: holderDID
-                };
+            // Immediate feedback before cleanup
+            reloadParentWindow();
 
-                return blockchainService.saveVote(payload);
-            })
-            .then((res) => {
-                if (!res.data || !res.data.message) {
-                    throw new Error('Response is missing data.message');
-                }
+            setTimeout(() => {
+                setShowThankYou(false);
+                sessionStorage.removeItem('candidatesPageState');
+                setCandidates([]);
+                setSelectedCandidateId(null);
+                // Ensure parent is reloaded again after delay in case first attempt failed
+                reloadParentWindow();
+            }, 3000);
 
-                const audio = new Audio(voteSuccessSound);
-                audio.play().catch((err) => console.error('Error playing success sound:', err));
+        } catch (err) {
+            console.error('Error submitting vote:', err?.response?.data?.error || err.message || err);
+            setVotedFailed(true);
 
-                return globalLib.successMsg(res.data.message);
-            })
-            .catch((err) => {
-                console.error('Error submitting vote:', err?.response?.data?.error || err.message || err);
+            // Play failure sound
+            const audio = new Audio(voteFailureSound);
+            audio.play().catch((err) => console.error('Error playing failure sound:', err));
 
-                const audio = new Audio(voteFailureSound);
-                audio.play().catch((err) => console.error('Error playing failure sound:', err));
+            // Show error message
+            globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong');
 
-                return globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong');
-            })
-            .finally(() => {
-                setLoading(false);
-                navigate('/election/vote-qrCode', {
-                    state: { electionTypeId, electionId }
-                });
-            });
+            // Reload parent window on failure
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.reload();
+            }
+        } finally {
+            setLoading(false);
+            setDialogState((prev) => ({ ...prev, open: false }));
+        }
     };
+
+    // const submitVote = async (candidate, voterVID) => {
+    //     setLoading(true);
+    //     await blockchainAuthService
+    //         .fetchBlockchainAccessToken()
+    //         .then((bc_token) => {
+    //             if (!bc_token) {
+    //                 throw new Error('Could not load access token for blockchain.');
+    //             }
+
+    //             const payload = {
+    //                 voterID: voterVID,
+    //                 candidateCid: candidate.candidateCid,
+    //                 candidateId: candidate.id,
+    //                 electionTypeId,
+    //                 electionId,
+    //                 bcAccessToken: bc_token,
+    //                 ndiRelationshipDID: relationshipDID,
+    //                 ndiHolderDID: holderDID
+    //             };
+
+    //             return blockchainService.saveVote(payload);
+    //         })
+    //         .then((res) => {
+    //             if (!res.data || !res.data.message) {
+    //                 throw new Error('Response is missing data.message');
+    //             }
+
+    //             const audio = new Audio(voteSuccessSound);
+    //             audio.play().catch((err) => console.error('Error playing success sound:', err));
+
+    //             setVoteCompleted(true);
+    //             globalLib.successMsg(res.data.message);
+
+    //             if (window.opener && !window.opener.closed) {
+    //                 window.opener.location.reload();
+    //             }
+
+    //             setTimeout(() => {
+    //                 setShowThankYou(false);
+    //                 sessionStorage.removeItem('candidatesPageState');
+    //                 setCandidates([]);
+    //                 setSelectedCandidateId(null);
+    //             }, 3000);
+
+    //             // return globalLib.successMsg(res.data.message);
+
+    //         })
+    //         .catch((err) => {
+    //             console.error('Error submitting vote:', err?.response?.data?.error || err.message || err);
+    //             setVotedFailed(true);
+    //             const audio = new Audio(voteFailureSound);
+    //             audio.play().catch((err) => console.error('Error playing failure sound:', err));
+
+    //             return globalLib.warningMsg(err?.response?.data?.error || err.message || 'Something went wrong');
+    //         })
+    //         .finally(() => {
+    //             setLoading(false);
+    //             setDialogState((prev) => ({ ...prev, open: false }));
+    //             // navigate('/election/vote-qrCode', {
+    //             //     state: { electionTypeId, electionId }
+    //             // });
+    //         });
+    // };
 
     const getArrowIconColor = (candidateId) => {
         return selectedCandidateId === candidateId ? '#2bc039' : '#003366';
@@ -260,7 +366,24 @@ const ElectionCandidatesPage = () => {
     };
 
     return (
-        <Layout>
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh'
+        }}>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center', // or 'flex-start' if you want left-aligned
+                alignItems: 'center',
+                p: 2, // padding around logo
+                height: 64 // typical appbar height
+            }}>
+                <img
+                    src={Logo}
+                    alt="Logo"
+                    style={{ height: '40px' }} // adjust as needed
+                />
+            </Box>
             <Box sx={{ background: TITLE, color: '#ffffff' }} p={1}>
                 {' '}
                 <Typography textAlign={'center'} variant="h2" sx={{ color: '#ffffff', mb: 1 }}>
@@ -272,100 +395,133 @@ const ElectionCandidatesPage = () => {
             </Box>
 
             <MainCard sx={{ p: 3 }}>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <Paper elevation={3} sx={{ borderRadius: 1.5, p: 2, width: '100%', maxWidth: 900 }}>
-                        <TableContainer
-                            component={Paper}
-                            sx={{
-                                border: '2px dotted #000',
-                                borderRadius: 1,
-                                overflow: 'hidden',
-                                p: 0
-                            }}
-                        >
-                            <Table
+                {voteCompleted ? (
+                    <Box
+                        sx={{
+                            textAlign: 'center',
+                            py: 10,
+                            px: 3,
+                        }}
+                    >
+                        <Typography variant="h3" color="success" gutterBottom>
+                            Thank You!
+                        </Typography>
+                        <Typography variant="h5" sx={{ mb: 4 }}>
+                            Your vote has been casted successfully.
+                        </Typography>
+                    </Box>
+                ) : voteFailed ? (
+                    <Box
+                        sx={{
+                            textAlign: 'center',
+                            py: 10,
+                            px: 3,
+                        }}
+                    >
+                        <Typography variant="h3" color="error" gutterBottom>
+                            Sorry!
+                        </Typography>
+                        <Typography variant="h5" sx={{ mb: 4 }}>
+                            Your vote could not be processed. Please try again.
+                        </Typography>
+                    </Box>
+                )
+                    
+                    : (<Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <Paper elevation={3} sx={{ borderRadius: 1.5, p: 2, width: '100%', maxWidth: 900 }}>
+                            <TableContainer
+                                component={Paper}
                                 sx={{
-                                    '& td, & th': {
-                                        borderBottom: '2px dotted #000',
-                                        borderLeft: 'none',
-                                        borderRight: 'none',
-                                    },
-                                    '& tbody tr:last-child td': {
-                                        borderBottom: 'none'
-                                    },
-                                    '& thead th': {
-                                        fontWeight: 'bold',
-                                        backgroundColor: '#f5f5f5'
-                                    }
+                                    border: '2px dotted #000',
+                                    borderRadius: 1,
+                                    overflow: 'hidden',
+                                    p: 0
                                 }}
                             >
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell
-                                            align="center"
-                                            colSpan={4}
-                                            sx={{ fontWeight: 'bold', fontSize: '1.2rem', backgroundColor: '#f5f5f5' }}
-                                        >
-                                            Candidates for {electionName}
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {candidates.map((candidate, index) => (
-                                        <TableRow key={candidate.id}>
-                                            <TableCell align="center">
-                                                <Typography variant="body1" fontWeight="bold" color="text.secondary">
-                                                    འོས་མི།
-                                                </Typography>
-                                                <Typography variant="body1" fontWeight="bold">
-                                                    {candidate.candidateName}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <Avatar
-                                                    src={candidate.proPicUrl}
-                                                    alt={candidate.candidateName}
-                                                    sx={{ width: 80, height: 80 }}
-                                                    variant="circular"
-                                                />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <ArrowCircleLeftIcon
-                                                    fontSize="large"
-                                                    sx={{ color: getArrowIconColor(candidate.id) }}
-                                                />
-                                            </TableCell>
-                                            <TableCell align="center">
-                                                <Button
-                                                    variant="contained"
-                                                    onClick={() => handleVoteClick(candidate.id)}
-                                                    sx={{
-                                                        backgroundColor: getVoteButtonColor(candidate.id),
-                                                        borderRadius: '30px',
-                                                        px: 6,
-                                                        py: 1.5,
-                                                        minWidth: '100px',
-                                                        textTransform: 'none',
-                                                        '&:hover': {
-                                                            backgroundColor: '#003366'
-                                                        }
-                                                    }}
-                                                >
-                                                    Vote
-                                                </Button>
+                                <Table
+                                    sx={{
+                                        '& td, & th': {
+                                            borderBottom: '2px dotted #000',
+                                            borderLeft: 'none',
+                                            borderRight: 'none',
+                                        },
+                                        '& tbody tr:last-child td': {
+                                            borderBottom: 'none'
+                                        },
+                                        '& thead th': {
+                                            fontWeight: 'bold',
+                                            backgroundColor: '#f5f5f5'
+                                        }
+                                    }}
+                                >
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell
+                                                align="center"
+                                                colSpan={4}
+                                                sx={{ fontWeight: 'bold', fontSize: '1.2rem', backgroundColor: '#f5f5f5' }}
+                                            >
+                                                Candidates for {electionName}
                                             </TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Paper>
-                </Box>
+                                    </TableHead>
+                                    <TableBody>
+                                        {candidates.map((candidate, index) => (
+                                            <TableRow key={candidate.id}>
+                                                <TableCell align="center">
+                                                    <Typography variant="body1" fontWeight="bold" color="text.secondary">
+                                                        འོས་མི།
+                                                    </Typography>
+                                                    <Typography variant="body1" fontWeight="bold">
+                                                        {candidate.candidateName}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Avatar
+                                                        src={candidate.proPicUrl}
+                                                        alt={candidate.candidateName}
+                                                        sx={{ width: 80, height: 80 }}
+                                                        variant="circular"
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <ArrowCircleLeftIcon
+                                                        fontSize="large"
+                                                        sx={{ color: getArrowIconColor(candidate.id) }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => handleVoteClick(candidate.id)}
+                                                        sx={{
+                                                            backgroundColor: getVoteButtonColor(candidate.id),
+                                                            borderRadius: '30px',
+                                                            px: 6,
+                                                            py: 1.5,
+                                                            minWidth: '100px',
+                                                            textTransform: 'none',
+                                                            '&:hover': {
+                                                                backgroundColor: '#003366'
+                                                            }
+                                                        }}
+                                                    >
+                                                        Vote
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Paper>
+                    </Box>
+                    )}
             </MainCard>
 
             {loading && <LoadingPage />}
@@ -469,7 +625,8 @@ const ElectionCandidatesPage = () => {
                     </Box>
                 </DialogContent>
             </Dialog>
-        </Layout>
+            <Footer />
+        </Box>
     );
 };
 
